@@ -1,0 +1,12 @@
+name = "brouwer_elements"
+version = "0.1.0"
+license = "BSD"
+author = "Jacob Williams"
+description = "Fortran implementation of Brouwer-Lyddane Mean Elements"
+
+[build]
+auto-executables = true
+auto-tests = true
+auto-examples = true
+
+[dependencies]

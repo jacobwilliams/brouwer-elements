@@ -1,0 +1,95 @@
+# Brouwer Elements
+
+Modern Fortran translation of NASA's General Mission Analysis Tool (GMAT) Brouwer-Lyddane mean orbital element conversion routines.
+
+## Overview
+
+The `brouwer_module` provides modern Fortran functions to convert between Cartesian state vectors $[x, y, z, v_x, v_y, v_z]$ and Brouwer-Lyddane mean orbital elements $[a, e, i, \Omega, \omega, M]$ (semi-major axis, eccentricity, inclination, right ascension of ascending node, argument of periapsis, and mean anomaly).
+
+Both short-period perturbation models and full short- plus long-period perturbation models ($J_2, J_3, J_4, J_5$) are supported.
+
+## Features
+
+- **Four Primary Conversion Routines**:
+  - `cartesian_to_brouwer_mean_short`: Cartesian $\rightarrow$ Brouwer Mean Elements (short-period terms only)
+  - `brouwer_mean_short_to_cartesian`: Brouwer Mean Elements (short-period) $\rightarrow$ Cartesian
+  - `cartesian_to_brouwer_mean_long`: Cartesian $\rightarrow$ Brouwer Mean Elements (short and long period terms)
+  - `brouwer_mean_long_to_cartesian`: Brouwer Mean Elements (short and long period) $\rightarrow$ Cartesian
+- **Supporting Routines**:
+  - `brouwer_mean_short_to_osculating` / `brouwer_mean_long_to_osculating`
+  - `cartesian_to_keplerian` / `keplerian_to_cartesian` (supports True Anomaly `"TA"` and Mean Anomaly `"MA"`)
+  - `true_to_mean_anomaly` / `mean_to_true_anomaly`
+  - `true_to_eccentric_anomaly` / `true_to_hyperbolic_anomaly`
+- **Modern Fortran**:
+  - Standard Fortran 2008+ using `iso_fortran_env: real64`.
+  - Pure functions where applicable, with optional `stat` error status arguments.
+  - Compatible with Fortran Package Manager (`fpm`).
+
+## Building and Testing
+
+### Using `fpm` directly
+
+```bash
+fpm build
+fpm test
+```
+
+### Using Pixi
+
+```bash
+pixi run fpm build
+pixi run fpm test
+```
+
+## Usage Example
+
+```fortran
+program example
+    use iso_fortran_env, only: wp => real64
+    use brouwer_module
+
+    implicit none
+
+    real(wp), dimension(6) :: cartesian, blms, blml
+    integer :: stat
+
+    ! Cartesian state [x, y, z, vx, vy, vz] in km and km/s
+    cartesian = [420.040413_wp, 6512.298337_wp, 2338.986311_wp, &
+                 -7.156474_wp,  -0.443318_wp,   2.577366_wp]
+
+    ! Convert to Brouwer Mean Short elements [a (km), e, i (deg), raan (deg), aop (deg), ma (deg)]
+    blms = cartesian_to_brouwer_mean_short(mu_earth, cartesian, stat=stat)
+    if (stat == 0) then
+        print *, "Brouwer Mean Short:", blms
+    end if
+
+    ! Convert to Brouwer Mean Long elements
+    blml = cartesian_to_brouwer_mean_long(mu_earth, cartesian, stat=stat)
+    if (stat == 0) then
+        print *, "Brouwer Mean Long:", blml
+    end if
+
+    ! Convert back to Cartesian
+    cartesian = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+
+end program example
+```
+
+## Adding to Your Project
+
+Add `brouwer-elements` to your `fpm.toml`:
+
+```toml
+[dependencies]
+brouwer_elements = { git = "https://github.com/jacobwilliams/brouwer-elements.git" }
+```
+
+## References
+
+- Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378–397.
+- Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555–558.
+- NASA General Mission Analysis Tool (GMAT), `StateConversionUtil.cpp`.
+
+## License
+
+This project is licensed under the NASA Open Source Agreement (NOSA).
