@@ -24,7 +24,9 @@ program orbit_prop_test
 
     ! Orbit simulation parameters: LEO orbit, ~2 days (approx 30 orbits)
     integer, parameter :: n_steps = 1000
-    real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
+    real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
     real(wp), parameter :: dt = t_final / real(n_steps, wp)
 
     ! Initial orbital elements: [sma (km), ecc, inc (deg), raan (deg), aop (deg), ta (deg)]
@@ -40,15 +42,21 @@ program orbit_prop_test
     type(pyplot) :: plt
     real(wp) :: t, t_out
     integer :: i, stat, idid
+    character(len=100) :: file_suffix
 
     ! colors:
-    real(wp),dimension(3) :: c0 = [0.0_wp, 0.4470_wp, 0.7410_wp]
-    real(wp),dimension(3) :: c1 = [0.8500_wp, 0.3250_wp, 0.0980_wp]
-    real(wp),dimension(3) :: c2 = [0.9290_wp, 0.6940_wp, 0.1250_wp]
+    real(wp),dimension(3),parameter :: c0 = [0.0_wp, 0.4470_wp, 0.7410_wp]
+    real(wp),dimension(3),parameter :: c1 = [0.8500_wp, 0.3250_wp, 0.0980_wp]
+    real(wp),dimension(3),parameter :: c2 = [0.9290_wp, 0.6940_wp, 0.1250_wp]
+
+    integer,dimension(2),parameter :: figsize = [10,5]
 
     print *, "=========================================================="
     print *, " Orbit Propagation & Brouwer Mean Element Plotting Test"
     print *, "=========================================================="
+
+    write(file_suffix, '(i10)') int(t_final / 3600.0_wp) ! hrs
+    file_suffix = '_TF='//trim(adjustl(file_suffix))//'h'
 
     ! 1. Initialize Orbit (e.g. ISS-like LEO orbit)
     kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp]
@@ -71,13 +79,16 @@ program orbit_prop_test
     aop_osc(1) = kep_osc(5);  aop_short(1) = bl_short(5);  aop_long(1) = bl_long(5)
 
     ! 2. Initialize Integrator
-    call solver%initialize(6,maxnum=10000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
+    call solver%initialize(6,maxnum=1000000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
 
     print *, "Propagating orbit with J2, J3, J4, J5 gravity perturbation..."
     do i = 1, n_steps
         t_out = real(i, wp) * dt
         call solver%integrate(t, cart_state, t_out, idid=idid)
-        if (idid < 1) error stop "Integrator error"
+        if (idid < 1) then
+            print*, 'step = ', i, 'idid = ', idid
+            error stop "Integrator error"
+        end if
 
         t_hrs(i + 1) = t / 3600.0_wp
         kep_osc  = cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA")
@@ -98,43 +109,58 @@ program orbit_prop_test
 
     ! Plot 1: Semi-major Axis Comparison
     call plt%initialize(title="Semi-Major Axis: Osculating vs Brouwer Mean", &
+                        figsize=figsize, &
                         xlabel="Time (hours)", &
                         ylabel="Semi-major axis $a$ (km)", &
                         legend = .true.)
-    call plt%add_plot(t_hrs, sma_osc,   label="Osculating", linestyle="-", color=c0)
+    call plt%add_plot(t_hrs, sma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, sma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, sma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%savefig("brouwer_sma_comparison.png")
+    call plt%savefig("brouwer_sma_comparison"//trim(file_suffix)//".png")
 
     ! Plot 2: Eccentricity Comparison
     call plt%initialize(title="Eccentricity: Osculating vs Brouwer Mean", &
-                     xlabel="Time (hours)", &
-                     ylabel="Eccentricity $e$", &
-                     legend = .true.)
-    call plt%add_plot(t_hrs, ecc_osc,   label="Osculating", linestyle="-", color=c0)
+                        figsize=figsize, &
+                        xlabel="Time (hours)", &
+                        ylabel="Eccentricity $e$", &
+                        legend = .true.)
+    call plt%add_plot(t_hrs, ecc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, ecc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, ecc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%savefig("brouwer_ecc_comparison.png" )
+    call plt%savefig("brouwer_ecc_comparison"//trim(file_suffix)//".png" )
 
     ! Plot 3: Inclination Comparison
     call plt%initialize(title="Inclination: Osculating vs Brouwer Mean", &
+                        figsize=figsize, &
                         xlabel="Time (hours)", &
                         ylabel="Inclination $i$ (deg)", &
                         legend = .true.)
-    call plt%add_plot(t_hrs, inc_osc,   label="Osculating", linestyle="-", color=c0)
+    call plt%add_plot(t_hrs, inc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, inc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, inc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%savefig("brouwer_inc_comparison.png")
+    call plt%savefig("brouwer_inc_comparison"//trim(file_suffix)//".png")
 
     ! Plot 4: Argument of Periapsis Comparison
     call plt%initialize(title="Argument of Periapsis: Osculating vs Brouwer Mean", &
+                        figsize=figsize, &
                         xlabel="Time (hours)", &
                         ylabel="Argument of Periapsis $\\omega$ (deg)", &
                         legend = .true.)
-    call plt%add_plot(t_hrs, aop_osc,   label="Osculating", linestyle="-", color=c0)
+    call plt%add_plot(t_hrs, aop_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, aop_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, aop_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%savefig("brouwer_aop_comparison.png")
+    call plt%savefig("brouwer_aop_comparison"//trim(file_suffix)//".png")
+
+    ! Plot 5: RAAN Comparison
+    call plt%initialize(title="RAAN: Osculating vs Brouwer Mean", &
+                        figsize=figsize, &
+                        xlabel="Time (hours)", &
+                        ylabel="RAAN $\\Omega$ (deg)", &
+                        legend = .true.)
+    call plt%add_plot(t_hrs, raan_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
+    call plt%add_plot(t_hrs, raan_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
+    call plt%add_plot(t_hrs, raan_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%savefig("brouwer_raan_comparison"//trim(file_suffix)//".png")
 
     print *, "All plots generated successfully: brouwer_*.png"
     print *, "=========================================================="
