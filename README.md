@@ -1,5 +1,3 @@
-# Brouwer Elements
-
 Modern Fortran version of Brouwer-Lyddane mean orbital element conversion routines.
 
 ## Overview
