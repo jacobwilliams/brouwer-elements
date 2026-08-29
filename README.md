@@ -34,7 +34,7 @@ fpm test
 
 ## Usage Example
 
-```fortran90
+```fortran
 program example
     use iso_fortran_env, only: wp => real64
     use brouwer_module
