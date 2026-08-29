@@ -50,6 +50,14 @@ program example
 
     implicit none
 
+    ! Central body parameters (e.g. Earth)
+    real(wp), parameter :: mu_earth  = 398600.4415_wp           ! km^3/s^2
+    real(wp), parameter :: req_earth = 6378.1363_wp             ! km
+    real(wp), parameter :: j2_earth  = 1.082626925638815e-3_wp
+    real(wp), parameter :: j3_earth  = -0.2532307818191774e-5_wp
+    real(wp), parameter :: j4_earth  = -0.1620429990000000e-5_wp
+    real(wp), parameter :: j5_earth  = -0.2270711043920343e-6_wp
+
     real(wp), dimension(6) :: cartesian, blms, blml
     integer :: stat
 
@@ -58,19 +66,19 @@ program example
                  -7.156474_wp,  -0.443318_wp,   2.577366_wp]
 
     ! Convert to Brouwer Mean Short elements [a (km), e, i (deg), raan (deg), aop (deg), ma (deg)]
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cartesian, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cartesian, stat=stat)
     if (stat == 0) then
         print *, "Brouwer Mean Short:", blms
     end if
 
     ! Convert to Brouwer Mean Long elements
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cartesian, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cartesian, stat=stat)
     if (stat == 0) then
         print *, "Brouwer Mean Long:", blml
     end if
 
     ! Convert back to Cartesian
-    cartesian = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    cartesian = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
 
 end program example
 ```

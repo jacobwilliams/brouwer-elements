@@ -5,6 +5,25 @@ program main_test
 
     implicit none
 
+    real(wp), parameter :: pi = acos(-1.0_wp)
+    real(wp), parameter :: deg2rad = pi / 180.0_wp
+
+    ! Earth parameters
+    real(wp), parameter :: mu_earth  = 398600.4415_wp           ! km^3/s^2
+    real(wp), parameter :: req_earth = 6378.1363_wp             ! km
+    real(wp), parameter :: j2_earth  = 1.082626925638815e-3_wp
+    real(wp), parameter :: j3_earth  = -0.2532307818191774e-5_wp
+    real(wp), parameter :: j4_earth  = -0.1620429990000000e-5_wp
+    real(wp), parameter :: j5_earth  = -0.2270711043920343e-6_wp
+
+    ! Mars parameters
+    real(wp), parameter :: mu_mars  = 42828.375214_wp           ! km^3/s^2
+    real(wp), parameter :: req_mars = 3396.19_wp                ! km
+    real(wp), parameter :: j2_mars  = 1.96045e-3_wp
+    real(wp), parameter :: j3_mars  = 3.15e-5_wp
+    real(wp), parameter :: j4_mars  = -1.54e-5_wp
+    real(wp), parameter :: j5_mars  = 0.0_wp
+
     real(wp), dimension(6) :: cart_orig, blms, cart_roundtrip, blms_roundtrip
     real(wp), dimension(6) :: blml, cart_long, blml_roundtrip
     real(wp), dimension(6) :: kep_orig, cart_test, kep_res
@@ -19,31 +38,31 @@ program main_test
     print *, "=========================================================="
 
     ! -------------------------------------------------------------
-    ! Test 1: Standard LEO Orbit Roundtrips
+    ! Test 1: Standard LEO Orbit Roundtrips (Earth)
     ! -------------------------------------------------------------
     kep_orig = [7000.0_wp, 0.01_wp, 28.5_wp, 45.0_wp, 30.0_wp, 15.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
     call check(stat == 0, "keplerian_to_cartesian LEO")
 
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_orig, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
     call check(stat == 0, "cartesian_to_brouwer_mean_short LEO")
-    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, blms, stat=stat)
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 0, "brouwer_mean_short_to_cartesian LEO")
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Brouwer Short LEO roundtrip")
 
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
     call check(stat == 0, "cartesian_to_brouwer_mean_long LEO")
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "brouwer_mean_long_to_cartesian LEO")
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Brouwer Long LEO roundtrip")
 
-    blms_roundtrip = cartesian_to_brouwer_mean_short(mu_earth, cart_roundtrip, stat=stat)
+    blms_roundtrip = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_roundtrip, stat=stat)
     diff = norm2(blms - blms_roundtrip) / norm2(blms)
     call check(diff < 1.0e-7_wp, "Brouwer Short elements roundtrip")
 
-    blml_roundtrip = cartesian_to_brouwer_mean_long(mu_earth, cart_long, stat=stat)
+    blml_roundtrip = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_long, stat=stat)
     diff = norm2(blml - blml_roundtrip) / norm2(blml)
     call check(diff < 1.0e-7_wp, "Brouwer Long elements roundtrip")
 
@@ -52,13 +71,13 @@ program main_test
     ! -------------------------------------------------------------
     kep_orig = [7200.0_wp, 0.005_wp, 87.0_wp, 120.0_wp, 45.0_wp, 200.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_orig, stat=stat)
-    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, blms, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "High inclination Short roundtrip")
 
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "High inclination Long roundtrip")
 
@@ -67,13 +86,13 @@ program main_test
     ! -------------------------------------------------------------
     kep_orig = [8000.0_wp, 0.05_wp, 105.0_wp, 210.0_wp, 75.0_wp, 315.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_orig, stat=stat)
-    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, blms, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Retrograde Short roundtrip")
 
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Retrograde Long roundtrip")
 
@@ -82,14 +101,14 @@ program main_test
     ! -------------------------------------------------------------
     kep_orig = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "Critical inclination prograde Long conversion")
 
     kep_orig = [7500.0_wp, 0.02_wp, 116.5650512_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "Critical inclination retrograde Long conversion")
 
     ! -------------------------------------------------------------
@@ -97,50 +116,71 @@ program main_test
     ! -------------------------------------------------------------
     kep_orig = [7100.0_wp, 0.01_wp, 177.0_wp, 60.0_wp, 45.0_wp, 100.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_orig, stat=stat)
-    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, blms, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Short roundtrip")
 
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Long roundtrip")
 
     ! -------------------------------------------------------------
-    ! Test 6: Osculating direct calls with special cases
+    ! Test 6: Mars Satellite Orbit Roundtrip
+    ! -------------------------------------------------------------
+    kep_orig = [4000.0_wp, 0.02_wp, 45.0_wp, 70.0_wp, 25.0_wp, 60.0_wp]
+    cart_orig = keplerian_to_cartesian(mu_mars, kep_orig, anomaly_type="TA", stat=stat)
+    call check(stat == 0, "keplerian_to_cartesian Mars")
+
+    blms = cartesian_to_brouwer_mean_short(mu_mars, req_mars, j2_mars, cart_orig, stat=stat)
+    call check(stat == 0, "cartesian_to_brouwer_mean_short Mars")
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_mars, req_mars, j2_mars, blms, stat=stat)
+    call check(stat == 0, "brouwer_mean_short_to_cartesian Mars")
+    diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
+    call check(diff < 1.0e-7_wp, "Mars Short roundtrip")
+
+    blml = cartesian_to_brouwer_mean_long(mu_mars, req_mars, j2_mars, j3_mars, j4_mars, j5_mars, cart_orig, stat=stat)
+    call check(stat == 0, "cartesian_to_brouwer_mean_long Mars")
+    cart_long = brouwer_mean_long_to_cartesian(mu_mars, req_mars, j2_mars, j3_mars, j4_mars, j5_mars, blml, stat=stat)
+    call check(stat == 0, "brouwer_mean_long_to_cartesian Mars")
+    diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
+    call check(diff < 1.0e-7_wp, "Mars Long roundtrip")
+
+    ! -------------------------------------------------------------
+    ! Test 7: Osculating direct calls with special cases
     ! -------------------------------------------------------------
     ! Circular mean elements (ecc <= 1e-11)
     blms = [7000.0_wp, 0.0_wp, 28.5_wp, 45.0_wp, 30.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, blms, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 0, "Short osculating circular inclined")
 
     ! Circular equatorial (ecc <= 1e-11, inc <= 1e-7)
     blms = [7000.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, blms, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 0, "Short osculating circular equatorial")
 
     ! Negative eccentricity input
     blms = [7000.0_wp, -0.01_wp, 28.5_wp, 45.0_wp, 30.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, blms, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 0, "Short osculating negative eccentricity")
 
     ! Long osculating circular inclined & circular equatorial
     blml = [7000.0_wp, 0.0_wp, 28.5_wp, 45.0_wp, 30.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, blml, stat=stat)
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "Long osculating circular inclined")
 
     blml = [7000.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, blml, stat=stat)
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "Long osculating circular equatorial")
 
     ! Long osculating inclined with near-equatorial inc <= 1e-7 and ecc > 0
     blml = [7000.0_wp, 0.01_wp, 0.0_wp, 0.0_wp, 30.0_wp, 50.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, blml, stat=stat)
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
     call check(stat == 0, "Long osculating elliptic equatorial")
 
     ! -------------------------------------------------------------
-    ! Test 7: Cartesian to Keplerian Orbital Regimes
+    ! Test 8: Cartesian to Keplerian Orbital Regimes
     ! -------------------------------------------------------------
     ! Case 1: Non-circular, Inclined with quadrant flips
     kep_orig = [8000.0_wp, 0.1_wp, 45.0_wp, 200.0_wp, 210.0_wp, 220.0_wp]
@@ -205,7 +245,7 @@ program main_test
     call check(diff < 1.0e-7_wp, "Cart2Kep and Kep2Cart with MA anomaly type")
 
     ! -------------------------------------------------------------
-    ! Test 8: Anomaly Conversions (Elliptic, Parabolic, Hyperbolic)
+    ! Test 9: Anomaly Conversions (Elliptic, Parabolic, Hyperbolic)
     ! -------------------------------------------------------------
     ! Elliptic: True <-> Eccentric <-> Mean
     ta = 45.0_wp * deg2rad
@@ -234,66 +274,59 @@ program main_test
     call check(abs(ta - 0.5_wp) < 1.0e-8_wp .and. stat == 0, "Hyperbolic mean_to_true_anomaly roundtrip")
 
     ! -------------------------------------------------------------
-    ! Test 9: Error Handling / Status Flags
+    ! Test 10: Error Handling / Status Flags
     ! -------------------------------------------------------------
-    ! Invalid mu for Brouwer Short
-    blms = cartesian_to_brouwer_mean_short(100.0_wp, cart_orig, stat=stat)
-    call check(stat == 1, "Short error on invalid mu")
+    ! Invalid mu or req <= 0
+    blms = cartesian_to_brouwer_mean_short(-1.0_wp, req_earth, j2_earth, cart_orig, stat=stat)
+    call check(stat == 1, "Short error on negative mu")
 
-    ! Invalid mu for Brouwer Long
-    blml = cartesian_to_brouwer_mean_long(100.0_wp, cart_orig, stat=stat)
-    call check(stat == 1, "Long error on invalid mu")
+    blml = cartesian_to_brouwer_mean_long(mu_earth, -100.0_wp, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
+    call check(stat == 1, "Long error on negative req")
 
     ! Invalid mu for Osculating Short & Long
-    kep_res = brouwer_mean_short_to_osculating(100.0_wp, blms, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(-1.0_wp, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 1, "Short osculating error on invalid mu")
-    cart_test = brouwer_mean_short_to_cartesian(100.0_wp, blms, stat=stat)
+    cart_test = brouwer_mean_short_to_cartesian(-1.0_wp, req_earth, j2_earth, blms, stat=stat)
     call check(stat == 1, "Short cartesian error on invalid mu")
 
-    kep_res = brouwer_mean_long_to_osculating(100.0_wp, blml, stat=stat)
-    call check(stat == 1, "Long osculating error on invalid mu")
-    cart_test = brouwer_mean_long_to_cartesian(100.0_wp, blml, stat=stat)
-    call check(stat == 1, "Long cartesian error on invalid mu")
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, 0.0_wp, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
+    call check(stat == 1, "Long osculating error on zero req")
+    cart_test = brouwer_mean_long_to_cartesian(mu_earth, 0.0_wp, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
+    call check(stat == 1, "Long cartesian error on zero req")
 
     ! Invalid inclination > 180
     cart_test = [10000.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 6.0_wp, 0.0_wp]
     kep_res = [7000.0_wp, 0.01_wp, 185.0_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, kep_res, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, kep_res, stat=stat)
     call check(stat == 2, "Short osculating error on inc > 180")
 
     kep_res = [7000.0_wp, 0.01_wp, 185.0_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, kep_res, stat=stat)
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, kep_res, stat=stat)
     call check(stat == 2, "Long osculating error on inc > 180")
 
     ! Invalid eccentricity >= 0.99
     kep_res = [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, kep_res, stat=stat)
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, kep_res, stat=stat)
     call check(stat == 3, "Short osculating error on ecc >= 0.99")
 
     kep_res = [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, kep_res, stat=stat)
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, kep_res, stat=stat)
     call check(stat == 3, "Long osculating error on ecc >= 0.99")
 
-    ! Invalid periapsis radius < 3000 km
-    kep_res = [3500.0_wp, 0.2_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_short_to_osculating(mu_earth, kep_res, stat=stat)
-    call check(stat == 4, "Short osculating error on radper < 3000 km")
+    ! Invalid periapsis radius <= 0 km
+    kep_res = [-100.0_wp, 0.2_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
+    kep_res = brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, kep_res, stat=stat)
+    call check(stat == 4, "Short osculating error on radper <= 0 km")
 
-    kep_res = [3500.0_wp, 0.2_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
-    kep_res = brouwer_mean_long_to_osculating(mu_earth, kep_res, stat=stat)
-    call check(stat == 4, "Long osculating error on radper < 3000 km")
+    kep_res = [-100.0_wp, 0.2_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
+    kep_res = brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, kep_res, stat=stat)
+    call check(stat == 4, "Long osculating error on radper <= 0 km")
 
-    ! Cartesian to Brouwer errors on radper < 3000 km and ecc >= 0.99
-    cart_test = keplerian_to_cartesian(mu_earth, [3500.0_wp, 0.2_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp])
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_test, stat=stat)
-    call check(stat == 4, "Cart2BrouwerShort error on radper < 3000 km")
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_test, stat=stat)
-    call check(stat == 4, "Cart2BrouwerLong error on radper < 3000 km")
-
+    ! Cartesian to Brouwer errors on ecc >= 0.99
     cart_test = keplerian_to_cartesian(mu_earth, [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp])
-    blms = cartesian_to_brouwer_mean_short(mu_earth, cart_test, stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_test, stat=stat)
     call check(stat == 3, "Cart2BrouwerShort error on ecc >= 0.99")
-    blml = cartesian_to_brouwer_mean_long(mu_earth, cart_test, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_test, stat=stat)
     call check(stat == 3, "Cart2BrouwerLong error on ecc >= 0.99")
 
     ! Zero / invalid Cartesian inputs

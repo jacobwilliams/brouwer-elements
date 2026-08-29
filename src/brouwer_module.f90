@@ -14,23 +14,14 @@ module brouwer_module
     private
 
     ! Mathematical constants
-    real(wp), parameter, public :: pi = acos(-1.0_wp)
-    real(wp), parameter, public :: two_pi = 2.0_wp * pi
-    real(wp), parameter, public :: deg2rad = pi / 180.0_wp
-    real(wp), parameter, public :: rad2deg = 180.0_wp / pi
-
-    ! Physical constants for Earth (matching GMAT defaults)
-    real(wp), parameter, public :: mu_earth = 398600.4415_wp      ! km^3 / s^2
-    real(wp), parameter, public :: req_earth = 6378.1363_wp      ! km (Equatorial radius)
-    real(wp), parameter, public :: j2_earth = 1.082626925638815e-3_wp
-    real(wp), parameter, public :: j3_earth = -0.2532307818191774e-5_wp
-    real(wp), parameter, public :: j4_earth = -0.1620429990000000e-5_wp
-    real(wp), parameter, public :: j5_earth = -0.2270711043920343e-6_wp
+    real(wp), parameter :: pi = acos(-1.0_wp)
+    real(wp), parameter :: two_pi = 2.0_wp * pi
+    real(wp), parameter :: deg2rad = pi / 180.0_wp
+    real(wp), parameter :: rad2deg = 180.0_wp / pi
 
     ! Numerical tolerances
-    real(wp), parameter, private :: kep_ecc_tol = 1.0e-10_wp
-    real(wp), parameter, private :: kep_tol = 1.0e-10_wp
-    real(wp), parameter, private :: singular_tol = 0.001_wp
+    real(wp), parameter :: kep_tol = 1.0e-10_wp !! Tolerance for Keplerian elements
+    real(wp), parameter :: singular_tol = 0.001_wp !! Tolerance for singularities in Brouwer-Lyddane Mean Elements
 
     ! Public API
     public :: cartesian_to_brouwer_mean_short
@@ -54,8 +45,10 @@ contains
     !>
     !  Converts Cartesian state to Brouwer-Lyddane Mean Elements (short-period terms only).
 
-    function cartesian_to_brouwer_mean_short(mu, cartesian, stat) result(blms)
+    function cartesian_to_brouwer_mean_short(mu, req, j2, cartesian, stat) result(blms)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
@@ -71,8 +64,7 @@ contains
         local_stat = 0
         blms = 0.0_wp
 
-        ! Validation: mu must be close to Earth's mu
-        if (abs(mu - mu_earth) > 1.0_wp) then
+        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
             local_stat = 1
             if (present(stat)) stat = local_stat
             return
@@ -98,7 +90,7 @@ contains
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
-        if (radper < 3000.0_wp) then
+        if (radper <= 0.0_wp) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -118,7 +110,7 @@ contains
         end if
 
         blmean = kep
-        kep2 = brouwer_mean_short_to_osculating(mu, kep, stat=local_stat)
+        kep2 = brouwer_mean_short_to_osculating(mu, req, j2, kep, stat=local_stat)
         if (local_stat /= 0) then
             if (present(stat)) stat = local_stat
             return
@@ -171,7 +163,7 @@ contains
 
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
-            kep2 = brouwer_mean_short_to_osculating(mu, blmean2, stat=local_stat)
+            kep2 = brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=local_stat)
             cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=local_stat)
 
             tmp = cart - cart2
@@ -245,8 +237,10 @@ contains
     !  Converts Brouwer-Lyddane Mean Elements (short-period terms only) to
     !  Osculating Keplerian Elements.
 
-    function brouwer_mean_short_to_osculating(mu, blms, stat) result(kepl)
+    function brouwer_mean_short_to_osculating(mu, req, j2, blms, stat) result(kepl)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
@@ -260,13 +254,13 @@ contains
         local_stat = 0
         kepl = 0.0_wp
 
-        if (abs(mu - mu_earth) > 1.0_wp) then
+        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
             local_stat = 1
             if (present(stat)) stat = local_stat
             return
         end if
 
-        smap = blms(1) / req_earth
+        smap = blms(1) / req
         eccp = blms(2)
         incp = blms(3) * deg2rad
         raanp = blms(4) * deg2rad
@@ -280,7 +274,7 @@ contains
         end if
 
         radper = blms(1) * (1.0_wp - blms(2))
-        if (radper < 3000.0_wp) then
+        if (radper <= 0.0_wp) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -312,7 +306,7 @@ contains
         eta = sqrt(max(0.0_wp, 1.0_wp - eccp**2))
         theta = cos(incp)
         p = smap * eta**2
-        k2 = 0.5_wp * j2_earth
+        k2 = 0.5_wp * j2
         gm2 = k2 / (smap**2)
         gm2p = gm2 / (eta**4)
 
@@ -338,7 +332,7 @@ contains
                 - 3.0_wp * sin(2.0_wp * aopp + 2.0_wp * tap) - 3.0_wp * eccp * sin(2.0_wp * aopp + tap) &
                 - eccp * sin(2.0_wp * aopp + 3.0_wp * tap))
 
-        aop1 = aopp + 3.0_wp * j2_earth / (2.0_wp * p**2) * ((2.0_wp - 2.5_wp * sin(incp)**2) * (tap - meanAnom + eccp * sin(tap)) &
+        aop1 = aopp + 3.0_wp * j2 / (2.0_wp * p**2) * ((2.0_wp - 2.5_wp * sin(incp)**2) * (tap - meanAnom + eccp * sin(tap)) &
                + (1.0_wp - 1.5_wp * sin(incp)**2) * ((1.0_wp / eccp) * (1.0_wp - 0.25_wp * eccp**2) * sin(tap) &
                + 0.5_wp * sin(2.0_wp * tap) + (eccp / 12.0_wp) * sin(3.0_wp * tap)) &
                - (1.0_wp / eccp) * (0.25_wp * sin(incp)**2 + (0.5_wp - (15.0_wp / 16.0_wp) * sin(incp)**2) * eccp**2) &
@@ -349,7 +343,7 @@ contains
                + (3.0_wp / 8.0_wp) * sin(incp)**2 * sin(4.0_wp * tap + 2.0_wp * aopp) &
                + (eccp / 16.0_wp) * sin(incp)**2 * sin(5.0_wp * tap + 2.0_wp * aopp))
 
-        ma1 = meanAnom + 3.0_wp * j2_earth * eta / (2.0_wp * eccp * p**2) * (-(1.0_wp - 1.5_wp * sin(incp)**2) &
+        ma1 = meanAnom + 3.0_wp * j2 * eta / (2.0_wp * eccp * p**2) * (-(1.0_wp - 1.5_wp * sin(incp)**2) &
               * ((1.0_wp - 0.25_wp * eccp**2) * sin(tap) + (eccp / 2.0_wp) * sin(2.0_wp * tap) + (eccp**2 / 12.0_wp) * sin(3.0_wp * tap)) &
               + sin(incp)**2 * (0.25_wp * (1.0_wp + 1.25_wp * eccp**2) * sin(tap + 2.0_wp * aopp) &
               - (eccp**2 / 16.0_wp) * sin(tap - 2.0_wp * aopp) - (7.0_wp / 12.0_wp) * (1.0_wp - (eccp**2 / 28.0_wp)) &
@@ -405,7 +399,7 @@ contains
         call wrap_0_2pi(aop1)
         call wrap_0_2pi(raan1)
 
-        kepl(1) = sma1 * req_earth
+        kepl(1) = sma1 * req
         kepl(2) = ecc1
         kepl(3) = inc1 * rad2deg
         kepl(4) = raan1 * rad2deg
@@ -424,8 +418,10 @@ contains
     !>
     !  Converts Brouwer-Lyddane Mean Elements (short-period terms only) to Cartesian.
 
-    function brouwer_mean_short_to_cartesian(mu, blms, stat) result(cart)
+    function brouwer_mean_short_to_cartesian(mu, req, j2, blms, stat) result(cart)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
@@ -433,7 +429,7 @@ contains
         real(wp), dimension(6) :: kepl
         integer :: local_stat
 
-        kepl = brouwer_mean_short_to_osculating(mu, blms, stat=local_stat)
+        kepl = brouwer_mean_short_to_osculating(mu, req, j2, blms, stat=local_stat)
         if (local_stat /= 0) then
             cart = 0.0_wp
             if (present(stat)) stat = local_stat
@@ -448,8 +444,13 @@ contains
     !>
     !  Converts Cartesian state to Brouwer-Lyddane Mean Elements (short and long period terms).
 
-    function cartesian_to_brouwer_mean_long(mu, cartesian, stat) result(blml)
+    function cartesian_to_brouwer_mean_long(mu, req, j2, j3, j4, j5, cartesian, stat) result(blml)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j3 !! Central body J3 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
@@ -465,7 +466,7 @@ contains
         local_stat = 0
         blml = 0.0_wp
 
-        if (abs(mu - mu_earth) > 1.0_wp) then
+        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
             local_stat = 1
             if (present(stat)) stat = local_stat
             return
@@ -485,7 +486,7 @@ contains
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
-        if (radper < 3000.0_wp) then
+        if (radper <= 0.0_wp) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -511,7 +512,7 @@ contains
         end if
 
         blmean = kep
-        kep2 = brouwer_mean_long_to_osculating(mu, kep, stat=local_stat)
+        kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, kep, stat=local_stat)
         if (local_stat /= 0) then
             if (present(stat)) stat = local_stat
             return
@@ -564,7 +565,7 @@ contains
 
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
-            kep2 = brouwer_mean_long_to_osculating(mu, blmean2, stat=local_stat)
+            kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=local_stat)
             cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=local_stat)
 
             tmp = cart - cart2
@@ -634,8 +635,13 @@ contains
     !  Converts Brouwer-Lyddane Mean Elements (short and long period terms) to
     !  Osculating Keplerian Elements.
 
-    function brouwer_mean_long_to_osculating(mu, blml, stat) result(kepl)
+    function brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat) result(kepl)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j3 !! Central body J3 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
@@ -658,14 +664,14 @@ contains
         local_stat = 0
         kepl = 0.0_wp
 
-        if (abs(mu - mu_earth) > 1.0_wp) then
+        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
             local_stat = 1
             if (present(stat)) stat = local_stat
             return
         end if
 
         pseudostate = 0
-        smadp = blml(1) / req_earth
+        smadp = blml(1) / req
         eccdp = blml(2)
         incdp = blml(3) * deg2rad
         raandp = blml(4) * deg2rad
@@ -685,7 +691,7 @@ contains
         end if
 
         radper = blml(1) * (1.0_wp - blml(2))
-        if (radper < 3000.0_wp) then
+        if (radper <= 0.0_wp) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -701,10 +707,10 @@ contains
         call wrap_0_2pi(aopdp)
         call wrap_0_2pi(meanAnom)
 
-        bk2 = 0.5_wp * j2_earth
-        bk3 = -j3_earth
-        bk4 = -(3.0_wp / 8.0_wp) * j4_earth
-        bk5 = -j5_earth
+        bk2 = 0.5_wp * j2
+        bk3 = -j3
+        bk4 = -(3.0_wp / 8.0_wp) * j4
+        bk5 = -j5
 
         eccdp2 = eccdp * eccdp
         cn2 = 1.0_wp - eccdp2
@@ -889,7 +895,7 @@ contains
         call wrap_0_2pi(raan)
         call wrap_0_2pi(aop)
 
-        kepl(1) = sma * req_earth
+        kepl(1) = sma * req
         kepl(2) = ecc
         kepl(3) = inc * rad2deg
         kepl(4) = raan * rad2deg
@@ -908,8 +914,13 @@ contains
     !>
     !  Converts Brouwer-Lyddane Mean Elements (short and long period terms) to Cartesian.
 
-    function brouwer_mean_long_to_cartesian(mu, blml, stat) result(cart)
+    function brouwer_mean_long_to_cartesian(mu, req, j2, j3, j4, j5, blml, stat) result(cart)
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j3 !! Central body J3 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
         integer, intent(out), optional :: stat !! Optional status flag (0 = success)
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
@@ -917,7 +928,7 @@ contains
         real(wp), dimension(6) :: kepl
         integer :: local_stat
 
-        kepl = brouwer_mean_long_to_osculating(mu, blml, stat=local_stat)
+        kepl = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat=local_stat)
         if (local_stat /= 0) then
             cart = 0.0_wp
             if (present(stat)) stat = local_stat
@@ -995,7 +1006,7 @@ contains
 
         ! Specific energy zeta
         zeta = 0.5_wp * velMag**2 - mu / posMag
-        if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= kep_ecc_tol) then
+        if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= kep_tol) then
             local_stat = 6
             if (present(stat)) stat = local_stat
             return
