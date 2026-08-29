@@ -1,9 +1,12 @@
 !------------------------------------------------------------------------------
 !>
-!  Modern Fortran translation of NASA GMAT Brouwer-Lyddane Mean Elements
-!  conversion routines from StateConversionUtil.
+!  Modern Fortran implementation of Brouwer-Lyddane Mean Elements
 !
-!  Along with supporting Keplerian <-> Cartesian and Anomaly conversion routines.
+! ## References
+!
+!  * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
+!  * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
+!  * NASA General Mission Analysis Tool (GMAT), `StateConversionUtil.cpp`.
 
 module brouwer_module
 
