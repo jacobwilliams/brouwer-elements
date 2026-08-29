@@ -1,15 +1,9 @@
 !------------------------------------------------------------------------------
 !>
-! Modern Fortran translation of NASA GMAT Brouwer-Lyddane Mean Elements
-! conversion routines from StateConversionUtil.
+!  Modern Fortran translation of NASA GMAT Brouwer-Lyddane Mean Elements
+!  conversion routines from StateConversionUtil.
 !
-! Routines translated:
-!   - CartesianToBrouwerMeanShort
-!   - BrouwerMeanShortToCartesian
-!   - CartesianToBrouwerMeanLong
-!   - BrouwerMeanLongToCartesian
-!
-! Along with supporting Keplerian <-> Cartesian and Anomaly conversion routines.
+!  Along with supporting Keplerian <-> Cartesian and Anomaly conversion routines.
 
 module brouwer_module
 
@@ -20,7 +14,7 @@ module brouwer_module
     private
 
     ! Mathematical constants
-    real(wp), parameter, public :: pi = 3.141592653589793238462643383279502884197_wp
+    real(wp), parameter, public :: pi = acos(-1.0_wp)
     real(wp), parameter, public :: two_pi = 2.0_wp * pi
     real(wp), parameter, public :: deg2rad = pi / 180.0_wp
     real(wp), parameter, public :: rad2deg = 180.0_wp / pi
@@ -238,13 +232,9 @@ contains
             blmean(4) = -blmean(4)
         end if
 
-        blmean(4) = modulo(blmean(4), 360.0_wp)
-        blmean(5) = modulo(blmean(5), 360.0_wp)
-        blmean(6) = modulo(blmean(6), 360.0_wp)
-
-        if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
-        if (blmean(5) < 0.0_wp) blmean(5) = blmean(5) + 360.0_wp
-        if (blmean(6) < 0.0_wp) blmean(6) = blmean(6) + 360.0_wp
+        call wrap_0_360(blmean(4))
+        call wrap_0_360(blmean(5))
+        call wrap_0_360(blmean(6))
 
         blms = blmean
         if (present(stat)) stat = local_stat
@@ -315,13 +305,9 @@ contains
             pseudostate = 1
         end if
 
-        raanp = modulo(raanp, two_pi)
-        aopp = modulo(aopp, two_pi)
-        meanAnom = modulo(meanAnom, two_pi)
-
-        if (raanp < 0.0_wp) raanp = raanp + two_pi
-        if (aopp < 0.0_wp) aopp = aopp + two_pi
-        if (meanAnom < 0.0_wp) meanAnom = meanAnom + two_pi
+        call wrap_0_2pi(raanp)
+        call wrap_0_2pi(aopp)
+        call wrap_0_2pi(meanAnom)
 
         eta = sqrt(max(0.0_wp, 1.0_wp - eccp**2))
         theta = cos(incp)
@@ -416,9 +402,8 @@ contains
             aop1 = lgh - ma1 - raan1
         end if
 
-        aop1 = modulo(aop1, two_pi)
-        if (aop1 < 0.0_wp) aop1 = aop1 + two_pi
-        if (raan1 < 0.0_wp) raan1 = raan1 + two_pi
+        call wrap_0_2pi(aop1)
+        call wrap_0_2pi(raan1)
 
         kepl(1) = sma1 * req_earth
         kepl(2) = ecc1
@@ -636,13 +621,9 @@ contains
             blmean(4) = -blmean(4)
         end if
 
-        blmean(4) = modulo(blmean(4), 360.0_wp)
-        blmean(5) = modulo(blmean(5), 360.0_wp)
-        blmean(6) = modulo(blmean(6), 360.0_wp)
-
-        if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
-        if (blmean(5) < 0.0_wp) blmean(5) = blmean(5) + 360.0_wp
-        if (blmean(6) < 0.0_wp) blmean(6) = blmean(6) + 360.0_wp
+        call wrap_0_360(blmean(4))
+        call wrap_0_360(blmean(5))
+        call wrap_0_360(blmean(6))
 
         blml = blmean
         if (present(stat)) stat = local_stat
@@ -716,13 +697,9 @@ contains
             return
         end if
 
-        raandp = modulo(raandp, two_pi)
-        aopdp = modulo(aopdp, two_pi)
-        meanAnom = modulo(meanAnom, two_pi)
-
-        if (raandp < 0.0_wp) raandp = raandp + two_pi
-        if (aopdp < 0.0_wp) aopdp = aopdp + two_pi
-        if (meanAnom < 0.0_wp) meanAnom = meanAnom + two_pi
+        call wrap_0_2pi(raandp)
+        call wrap_0_2pi(aopdp)
+        call wrap_0_2pi(meanAnom)
 
         bk2 = 0.5_wp * j2_earth
         bk3 = -j3_earth
@@ -844,8 +821,7 @@ contains
             sinDH = 0.0_wp
         else
             blghp = raandp + aopdp + meanAnom + b3 * cs3gd + b1 * sn2gd + b2 * cosGD
-            blghp = modulo(blghp, two_pi)
-            if (blghp < 0.0_wp) blghp = blghp + two_pi
+            call wrap_0_2pi(blghp)
 
             dlt1e = b14 * sinGD + b13 * cs2gd - b15 * sin3gd
             eccdpdl = b4 * sn2gd - b5 * cosGD + b6 * cs3gd - 0.25_wp * cn2 * cn * gmp2 &
@@ -865,8 +841,7 @@ contains
                * (adr2 * cn2 + adr + 1.0_wp))) + gmp2 * 1.5_wp * ((-2.0_wp * theta - 1.0_wp + 5.0_wp * theta2) &
                * (eccdp * sinta + tadp - meanAnom)) + (3.0_wp + 2.0_wp * theta - 5.0_wp * theta2) &
                * (gmp2 * 0.25_wp * (eccdp * sn3fgd + 3.0_wp * (sn2gta + eccdp * snf2gd)))
-        blgh = modulo(blgh, two_pi)
-        if (blgh < 0.0_wp) blgh = blgh + two_pi
+        call wrap_0_2pi(blgh)
 
         dlte = dlt1e + (0.5_wp * cn2 * ((3.0_wp / (cn2**3) * gm2 * (1.0_wp - theta2) * cs2gta &
                * (3.0_wp * eccdp * costa2 + 3.0_wp * costa + eccdp2 * costa * costa2 + eccdp)) &
@@ -881,7 +856,7 @@ contains
         squar = (dltI * cosI2 * 0.5_wp + sinI2)**2
         sqrI = sqrt(sinDH2 + squar)
         inc = 2.0_wp * asin(min(1.0_wp, max(-1.0_wp, sqrI)))
-        inc = modulo(inc, two_pi)
+        call wrap_0_2pi(inc)
 
         if (ecc <= 1.0e-11_wp) then
             aop = 0.0_wp
@@ -898,7 +873,7 @@ contains
             arg1 = eccdpdl * cosMADP + (eccdp + dlte) * sinMADP
             arg2 = (eccdp + dlte) * cosMADP - eccdpdl * sinMADP
             ma = atan2(arg1, arg2)
-            ma = modulo(ma, two_pi)
+            call wrap_0_2pi(ma)
 
             if (inc <= 1.0e-7_wp) then
                 raan = 0.0_wp
@@ -911,11 +886,8 @@ contains
             end if
         end if
 
-        if (ma < 0.0_wp) ma = ma + two_pi
-        raan = modulo(raan, two_pi)
-        if (raan < 0.0_wp) raan = raan + two_pi
-        aop = modulo(aop, two_pi)
-        if (aop < 0.0_wp) aop = aop + two_pi
+        call wrap_0_2pi(raan)
+        call wrap_0_2pi(aop)
 
         kepl(1) = sma * req_earth
         kepl(2) = ecc
@@ -1194,8 +1166,7 @@ contains
         if (ecc < (1.0_wp - kep_tol)) then
             ea = true_to_eccentric_anomaly(ta_radians, ecc)
             ma = ea - ecc * sin(ea)
-            ma = modulo(ma, two_pi)
-            if (ma < 0.0_wp) ma = ma + two_pi
+            call wrap_0_2pi(ma)
         else if (ecc > (1.0_wp + kep_tol)) then
             ha = true_to_hyperbolic_anomaly(ta_radians, ecc)
             ma = ecc * sinh(ha) - ha
@@ -1222,8 +1193,7 @@ contains
             sinEa = (sqrt(max(0.0_wp, 1.0_wp - ecc**2)) * sin(ta_radians)) / (1.0_wp + eccCosTa)
             cosEa = (ecc + cosTa) / (1.0_wp + eccCosTa)
             ea = atan2(sinEa, cosEa)
-            ea = modulo(ea, two_pi)
-            if (ea < 0.0_wp) ea = ea + two_pi
+            call wrap_0_2pi(ea)
         end if
     end function true_to_eccentric_anomaly
 
@@ -1321,8 +1291,7 @@ contains
                 ta = e
             end if
 
-            ta = modulo(ta, two_pi)
-            if (ta < 0.0_wp) ta = ta + two_pi
+            call wrap_0_2pi(ta)
 
         else
             ! Hyperbolic orbit
@@ -1364,11 +1333,22 @@ contains
                 end if
             end if
 
-            ta = modulo(ta, two_pi)
-            if (ta < 0.0_wp) ta = ta + two_pi
+            call wrap_0_2pi(ta)
         end if
 
         if (present(stat)) stat = local_stat
     end function mean_to_true_anomaly
+
+    pure subroutine wrap_0_2pi(angle)
+        real(wp), intent(inout) :: angle
+        angle = modulo(angle, two_pi)
+        if (angle < 0.0_wp) angle = angle + two_pi
+    end subroutine wrap_0_2pi
+
+    pure subroutine wrap_0_360(angle)
+        real(wp), intent(inout) :: angle
+        angle = modulo(angle, 360.0_wp)
+        if (angle < 0.0_wp) angle = angle + 360.0_wp
+    end subroutine wrap_0_360
 
 end module brouwer_module
