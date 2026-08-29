@@ -85,6 +85,6 @@ brouwer_elements = { git = "https://github.com/jacobwilliams/brouwer-elements.gi
 
 ## References
 
- * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
- * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
- * NASA General Mission Analysis Tool (GMAT), `StateConversionUtil.cpp`.
+ * Brouwer, D., "[Solution of the Problem of Artificial Satellite Theory without Drag](https://articles.adsabs.harvard.edu/pdf/1959AJ.....64..378B)," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
+ * Lyddane, R. H., "[Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite](https://articles.adsabs.harvard.edu/pdf/1963AJ.....68..555L)," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
+ * [NASA General Mission Analysis Tool](https://github.com/nasa/GMAT) (GMAT), `StateConversionUtil.cpp`.
