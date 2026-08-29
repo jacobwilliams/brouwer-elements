@@ -1,3 +1,6 @@
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+/coverage
+
+.DS_Store
