@@ -2,5 +2,6 @@
 .pixi/*
 !.pixi/config.toml
 /coverage
+/doc
 
 .DS_Store

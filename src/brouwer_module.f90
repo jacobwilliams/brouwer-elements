@@ -1,6 +1,5 @@
 !------------------------------------------------------------------------------
-!                        brouwer_module
-!------------------------------------------------------------------------------
+!>
 ! Modern Fortran translation of NASA GMAT Brouwer-Lyddane Mean Elements
 ! conversion routines from StateConversionUtil.
 !
@@ -11,7 +10,6 @@
 !   - BrouwerMeanLongToCartesian
 !
 ! Along with supporting Keplerian <-> Cartesian and Anomaly conversion routines.
-!------------------------------------------------------------------------------
 
 module brouwer_module
 
@@ -56,75 +54,17 @@ module brouwer_module
     public :: true_to_eccentric_anomaly
     public :: true_to_hyperbolic_anomaly
 
-    ! Optional aliases matching original C++ naming convention
-    public :: CartesianToBrouwerMeanShort
-    public :: BrouwerMeanShortToCartesian
-    public :: CartesianToBrouwerMeanLong
-    public :: BrouwerMeanLongToCartesian
-    public :: BrouwerMeanShortToOsculatingElements
-    public :: BrouwerMeanLongToOsculatingElements
-    public :: CartesianToKeplerian
-    public :: KeplerianToCartesian
-    public :: TrueToMeanAnomaly
-    public :: MeanToTrueAnomaly
-
-    interface CartesianToBrouwerMeanShort
-        module procedure cartesian_to_brouwer_mean_short
-    end interface
-
-    interface BrouwerMeanShortToCartesian
-        module procedure brouwer_mean_short_to_cartesian
-    end interface
-
-    interface CartesianToBrouwerMeanLong
-        module procedure cartesian_to_brouwer_mean_long
-    end interface
-
-    interface BrouwerMeanLongToCartesian
-        module procedure brouwer_mean_long_to_cartesian
-    end interface
-
-    interface BrouwerMeanShortToOsculatingElements
-        module procedure brouwer_mean_short_to_osculating
-    end interface
-
-    interface BrouwerMeanLongToOsculatingElements
-        module procedure brouwer_mean_long_to_osculating
-    end interface
-
-    interface CartesianToKeplerian
-        module procedure cartesian_to_keplerian
-    end interface
-
-    interface KeplerianToCartesian
-        module procedure keplerian_to_cartesian
-    end interface
-
-    interface TrueToMeanAnomaly
-        module procedure true_to_mean_anomaly
-    end interface
-
-    interface MeanToTrueAnomaly
-        module procedure mean_to_true_anomaly
-    end interface
-
 contains
 
     !--------------------------------------------------------------------------
-    ! cartesian_to_brouwer_mean_short
-    !--------------------------------------------------------------------------
-    !> Converts Cartesian state to Brouwer-Lyddane Mean Elements (short-period terms only).
     !>
-    !> @param[in]  mu         Central body gravitational parameter (km^3/s^2)
-    !> @param[in]  cartesian  Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-    !> @param[out] stat       Optional status flag (0 = success)
-    !> @return     blms       Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !--------------------------------------------------------------------------
+    !  Converts Cartesian state to Brouwer-Lyddane Mean Elements (short-period terms only).
+
     function cartesian_to_brouwer_mean_short(mu, cartesian, stat) result(blms)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: cartesian
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: blms
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
         integer, parameter :: maxiter = 75
@@ -311,21 +251,15 @@ contains
     end function cartesian_to_brouwer_mean_short
 
     !--------------------------------------------------------------------------
-    ! brouwer_mean_short_to_osculating
-    !--------------------------------------------------------------------------
-    !> Converts Brouwer-Lyddane Mean Elements (short-period terms only) to
-    !> Osculating Keplerian Elements.
     !>
-    !> @param[in]  mu     Gravitational parameter of central body (km^3/s^2)
-    !> @param[in]  blms   Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !> @param[out] stat   Optional status flag (0 = success)
-    !> @return     kepl   Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !--------------------------------------------------------------------------
+    !  Converts Brouwer-Lyddane Mean Elements (short-period terms only) to
+    !  Osculating Keplerian Elements.
+
     function brouwer_mean_short_to_osculating(mu, blms, stat) result(kepl)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: blms
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: kepl
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
         real(wp) :: eta, theta, p, k2, gm2, gm2p, tap, rp, adr
@@ -502,20 +436,15 @@ contains
     end function brouwer_mean_short_to_osculating
 
     !--------------------------------------------------------------------------
-    ! brouwer_mean_short_to_cartesian
-    !--------------------------------------------------------------------------
-    !> Converts Brouwer-Lyddane Mean Elements (short-period terms only) to Cartesian.
     !>
-    !> @param[in]  mu     Central body gravitational parameter (km^3/s^2)
-    !> @param[in]  blms   Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !> @param[out] stat   Optional status flag (0 = success)
-    !> @return     cart   Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-    !--------------------------------------------------------------------------
+    !  Converts Brouwer-Lyddane Mean Elements (short-period terms only) to Cartesian.
+
     function brouwer_mean_short_to_cartesian(mu, blms, stat) result(cart)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: blms
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: cart
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
+
         real(wp), dimension(6) :: kepl
         integer :: local_stat
 
@@ -531,20 +460,14 @@ contains
     end function brouwer_mean_short_to_cartesian
 
     !--------------------------------------------------------------------------
-    ! cartesian_to_brouwer_mean_long
-    !--------------------------------------------------------------------------
-    !> Converts Cartesian state to Brouwer-Lyddane Mean Elements (short and long period terms).
     !>
-    !> @param[in]  mu         Central body gravitational parameter (km^3/s^2)
-    !> @param[in]  cartesian  Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-    !> @param[out] stat       Optional status flag (0 = success)
-    !> @return     blml       Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !--------------------------------------------------------------------------
+    !  Converts Cartesian state to Brouwer-Lyddane Mean Elements (short and long period terms).
+
     function cartesian_to_brouwer_mean_long(mu, cartesian, stat) result(blml)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: cartesian
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: blml
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
         integer, parameter :: maxiter = 75
@@ -726,21 +649,15 @@ contains
     end function cartesian_to_brouwer_mean_long
 
     !--------------------------------------------------------------------------
-    ! brouwer_mean_long_to_osculating
-    !--------------------------------------------------------------------------
-    !> Converts Brouwer-Lyddane Mean Elements (short and long period terms) to
-    !> Osculating Keplerian Elements.
     !>
-    !> @param[in]  mu     Gravitational parameter of central body (km^3/s^2)
-    !> @param[in]  blml   Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !> @param[out] stat   Optional status flag (0 = success)
-    !> @return     kepl   Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !--------------------------------------------------------------------------
+    !  Converts Brouwer-Lyddane Mean Elements (short and long period terms) to
+    !  Osculating Keplerian Elements.
+
     function brouwer_mean_long_to_osculating(mu, blml, stat) result(kepl)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: blml
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: kepl
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper
         real(wp) :: bk2, bk3, bk4, bk5, eccdp2, cn2, cn, gm2, gmp2, gm4, gmp4
@@ -1016,20 +933,15 @@ contains
     end function brouwer_mean_long_to_osculating
 
     !--------------------------------------------------------------------------
-    ! brouwer_mean_long_to_cartesian
-    !--------------------------------------------------------------------------
-    !> Converts Brouwer-Lyddane Mean Elements (short and long period terms) to Cartesian.
     !>
-    !> @param[in]  mu     Central body gravitational parameter (km^3/s^2)
-    !> @param[in]  blml   Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-    !> @param[out] stat   Optional status flag (0 = success)
-    !> @return     cart   Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-    !--------------------------------------------------------------------------
+    !  Converts Brouwer-Lyddane Mean Elements (short and long period terms) to Cartesian.
+
     function brouwer_mean_long_to_cartesian(mu, blml, stat) result(cart)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: blml
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: cart
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
+
         real(wp), dimension(6) :: kepl
         integer :: local_stat
 
@@ -1045,22 +957,15 @@ contains
     end function brouwer_mean_long_to_cartesian
 
     !--------------------------------------------------------------------------
-    ! cartesian_to_keplerian
-    !--------------------------------------------------------------------------
-    !> Converts Cartesian state to Keplerian elements.
     !>
-    !> @param[in]  mu            Gravitational parameter (km^3/s^2)
-    !> @param[in]  cartesian     Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
-    !> @param[in]  anomaly_type  "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-    !> @param[out] stat          Optional status flag (0 = success)
-    !> @return     kepl          Keplerian state [sma, ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
-    !--------------------------------------------------------------------------
+    !  Converts Cartesian state to Keplerian elements.
+
     function cartesian_to_keplerian(mu, cartesian, anomaly_type, stat) result(kepl)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: cartesian
-        character(len=*), intent(in), optional :: anomaly_type
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: kepl
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
+        character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: kepl !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
 
         real(wp), dimension(3) :: pos, vel, angMomentum, nodeVec, eccVec
         real(wp) :: h, n, posMag, velMag, e, zeta, sma, inc, raan, argPeriapsis, trueAnom, anom
@@ -1200,22 +1105,15 @@ contains
     end function cartesian_to_keplerian
 
     !--------------------------------------------------------------------------
-    ! keplerian_to_cartesian
-    !--------------------------------------------------------------------------
-    !> Converts Keplerian elements to Cartesian state vector.
     !>
-    !> @param[in]  mu            Central body gravitational parameter (km^3/s^2)
-    !> @param[in]  keplerian     Keplerian state [sma, ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
-    !> @param[in]  anomaly_type  "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-    !> @param[out] stat          Optional status flag (0 = success)
-    !> @return     cart          Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
-    !--------------------------------------------------------------------------
+    !  Converts Keplerian elements to Cartesian state vector.
+
     function keplerian_to_cartesian(mu, keplerian, anomaly_type, stat) result(cart)
-        real(wp), intent(in) :: mu
-        real(wp), dimension(6), intent(in) :: keplerian
-        character(len=*), intent(in), optional :: anomaly_type
-        integer, intent(out), optional :: stat
-        real(wp), dimension(6) :: cart
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), dimension(6), intent(in) :: keplerian !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
+        character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp), dimension(6) :: cart !! Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp) :: sma, ecc, inc, raan, per, anom, p, onePlusECos, rad
         real(wp) :: cosPerAnom, sinPerAnom, cosInc, sinInc, cosRaan, sinRaan
@@ -1283,17 +1181,15 @@ contains
     end function keplerian_to_cartesian
 
     !--------------------------------------------------------------------------
-    ! true_to_mean_anomaly
-    !--------------------------------------------------------------------------
-    !> Computes Mean Anomaly from True Anomaly.
     !>
-    !> @param[in] ta_radians True anomaly in radians
-    !> @param[in] ecc        Eccentricity
-    !> @return    ma         Mean anomaly in radians [0, 2*pi)
-    !--------------------------------------------------------------------------
+    !  Computes Mean Anomaly from True Anomaly.
+
     pure function true_to_mean_anomaly(ta_radians, ecc) result(ma)
-        real(wp), intent(in) :: ta_radians, ecc
-        real(wp) :: ma, ea, ha
+        real(wp), intent(in) :: ta_radians !! True anomaly in radians
+        real(wp), intent(in) :: ecc !! Eccentricity
+        real(wp) :: ma !! Mean anomaly in radians [0, 2*pi)
+
+        real(wp) :: ea, ha
 
         if (ecc < (1.0_wp - kep_tol)) then
             ea = true_to_eccentric_anomaly(ta_radians, ecc)
@@ -1309,17 +1205,15 @@ contains
     end function true_to_mean_anomaly
 
     !--------------------------------------------------------------------------
-    ! true_to_eccentric_anomaly
-    !--------------------------------------------------------------------------
-    !> Computes Eccentric Anomaly from True Anomaly.
     !>
-    !> @param[in] ta_radians True anomaly in radians
-    !> @param[in] ecc        Eccentricity
-    !> @return    ea         Eccentric anomaly in radians [0, 2*pi)
-    !--------------------------------------------------------------------------
+    !  Computes Eccentric Anomaly from True Anomaly.
+
     pure function true_to_eccentric_anomaly(ta_radians, ecc) result(ea)
-        real(wp), intent(in) :: ta_radians, ecc
-        real(wp) :: ea, cosTa, eccCosTa, sinEa, cosEa
+        real(wp), intent(in) :: ta_radians !! True anomaly in radians
+        real(wp), intent(in) :: ecc !! Eccentricity
+        real(wp) :: ea !! Eccentric anomaly in radians [0, 2*pi)
+
+        real(wp) :: cosTa, eccCosTa, sinEa, cosEa
 
         ea = 0.0_wp
         if (ecc <= (1.0_wp - 1.0e-11_wp)) then
@@ -1334,17 +1228,15 @@ contains
     end function true_to_eccentric_anomaly
 
     !--------------------------------------------------------------------------
-    ! true_to_hyperbolic_anomaly
-    !--------------------------------------------------------------------------
-    !> Computes Hyperbolic Anomaly from True Anomaly.
     !>
-    !> @param[in] ta_radians True anomaly in radians
-    !> @param[in] ecc        Eccentricity (> 1)
-    !> @return    ha         Hyperbolic anomaly in radians
-    !--------------------------------------------------------------------------
+    !  Computes Hyperbolic Anomaly from True Anomaly.
+
     pure function true_to_hyperbolic_anomaly(ta_radians, ecc) result(ha)
-        real(wp), intent(in) :: ta_radians, ecc
-        real(wp) :: ha, tanhHa2
+        real(wp), intent(in) :: ta_radians !! True anomaly in radians
+        real(wp), intent(in) :: ecc !! Eccentricity (> 1)
+        real(wp) :: ha !! Hyperbolic anomaly in radians
+
+        real(wp) :: tanhHa2
 
         ha = 0.0_wp
         if (ecc >= (1.0_wp + kep_tol)) then
@@ -1354,21 +1246,15 @@ contains
     end function true_to_hyperbolic_anomaly
 
     !--------------------------------------------------------------------------
-    ! mean_to_true_anomaly
-    !--------------------------------------------------------------------------
-    !> Computes True Anomaly from Mean Anomaly via Newton-Raphson iteration.
     !>
-    !> @param[in]  ma_radians Mean anomaly in radians
-    !> @param[in]  ecc        Eccentricity
-    !> @param[in]  tol        Optional convergence tolerance (default = 1.0e-8)
-    !> @param[out] stat       Optional status flag (0 = success)
-    !> @return     ta         True anomaly in radians [0, 2*pi)
-    !--------------------------------------------------------------------------
+    !  Computes True Anomaly from Mean Anomaly via Newton-Raphson iteration.
+
     function mean_to_true_anomaly(ma_radians, ecc, tol, stat) result(ta)
-        real(wp), intent(in) :: ma_radians, ecc
-        real(wp), intent(in), optional :: tol
-        integer, intent(out), optional :: stat
-        real(wp) :: ta
+        real(wp), intent(in) :: ma_radians !! Mean anomaly in radians
+        real(wp), intent(in) :: ecc !! Eccentricity
+        real(wp), intent(in), optional :: tol !! Optional convergence tolerance (default = 1.0e-8)
+        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        real(wp) :: ta !! True anomaly in radians [0, 2*pi)
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
         real(wp), parameter :: ztol = 1.0e-30_wp
