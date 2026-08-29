@@ -3,5 +3,6 @@
 !.pixi/config.toml
 /coverage
 /doc
+/*.png
 
 .DS_Store

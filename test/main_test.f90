@@ -343,11 +343,8 @@ program main_test
     call check(stat == 6, "Kep2Cart error on singular p")
 
     print *, "=========================================================="
-    if (all_passed) then
-        print *, " ALL TESTS PASSED SUCCESSFULLY!"
-    else
-        stop 1
-    end if
+    if (.not. all_passed) error stop 'TEST FAILURE: One or more tests failed.'
+    print *, " ALL TESTS PASSED SUCCESSFULLY!"
     print *, "=========================================================="
 
 contains

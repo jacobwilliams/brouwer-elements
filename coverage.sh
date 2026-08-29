@@ -25,12 +25,14 @@ echo "================================================"
 # Create coverage directory and move build artifacts
 mkdir -p "$COV_DIR"
 cp -r build/gfortran_*/*/* "$COV_DIR/" 2>/dev/null || true
+# we want to skip the files that start with 'build_dependencies' because they are not part of the source code
+find "$COV_DIR" -name "build_dependencies*" -exec rm -rf {} +
 
 # Capture initial coverage (baseline)
-lcov --gcov-tool "$GCOV" --capture --initial --base-directory . --directory "$COV_DIR" --output-file "$COV_DIR/coverage.base" --quiet
+lcov --ignore-errors inconsistent --gcov-tool "$GCOV" --capture --initial --base-directory . --directory "$COV_DIR" --output-file "$COV_DIR/coverage.base" --quiet
 
 # Capture test execution coverage
-lcov --gcov-tool "$GCOV" --capture --base-directory . --directory "$COV_DIR" --output-file "$COV_DIR/coverage.capture" --quiet
+lcov --ignore-errors inconsistent --gcov-tool "$GCOV" --capture --base-directory . --directory "$COV_DIR" --output-file "$COV_DIR/coverage.capture" --quiet
 
 # Combine baseline and test coverage
 lcov --add-tracefile "$COV_DIR/coverage.base" --add-tracefile "$COV_DIR/coverage.capture" --output-file "$COV_DIR/coverage.info" --quiet
