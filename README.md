@@ -36,14 +36,12 @@ fpm test
 
 ```fortran
 program example
-  use brouwer_module, only: brouwer_module_wp, &
+  use brouwer_module, only: wp => brouwer_module_wp, &
                 cartesian_to_brouwer_mean_short, &
                 cartesian_to_brouwer_mean_long, &
                 brouwer_mean_long_to_cartesian
 
     implicit none
-
-  integer, parameter :: wp = brouwer_module_wp
 
     ! Central body parameters (e.g. Earth)
     real(wp), parameter :: mu_earth  = 398600.4415_wp           ! km^3/s^2
