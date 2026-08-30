@@ -44,7 +44,6 @@ program main_test
     call check(stat == 0, "keplerian_to_cartesian LEO")
 
     call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat, blms=blms)
-    print*, 'stat = ', stat
     call check(stat == 0, "cartesian_to_brouwer_mean_short LEO")
     call brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat, cart=cart_roundtrip)
     call check(stat == 0, "brouwer_mean_short_to_cartesian LEO")
@@ -351,6 +350,7 @@ program main_test
 contains
 
     subroutine check(condition, test_name)
+        !! Check a condition and print the result of a test.
         logical, intent(in) :: condition
         character(len=*), intent(in) :: test_name
         if (condition) then
