@@ -2,7 +2,7 @@ Modern Fortran version of Brouwer-Lyddane mean orbital element conversion routin
 
 ## Overview
 
-The `brouwer_module` provides modern Fortran functions to convert between Cartesian state vectors $[x, y, z, v_x, v_y, v_z]$ and Brouwer-Lyddane mean orbital elements $[a, e, i, \Omega, \omega, M]$ (semi-major axis, eccentricity, inclination, right ascension of ascending node, argument of periapsis, and mean anomaly).
+The `brouwer_module` provides modern Fortran subroutines to convert between Cartesian state vectors $[x, y, z, v_x, v_y, v_z]$ and Brouwer-Lyddane mean orbital elements $[a, e, i, \Omega, \omega, M]$ (semi-major axis, eccentricity, inclination, right ascension of ascending node, argument of periapsis, and mean anomaly).
 
 Both short-period perturbation models and full short- plus long-period perturbation models ($J_2, J_3, J_4, J_5$) are supported.
 
@@ -19,8 +19,8 @@ Both short-period perturbation models and full short- plus long-period perturbat
   - `true_to_mean_anomaly` / `mean_to_true_anomaly`
   - `true_to_eccentric_anomaly` / `true_to_hyperbolic_anomaly`
 - **Modern Fortran**:
-  - Standard Fortran 2008+ using `iso_fortran_env: real64`.
-  - Pure functions where applicable, with optional `stat` error status arguments.
+  - Standard Fortran 2008+ with selectable `real32`, `real64`, or `real128` working precision.
+  - Pure conversion subroutines with required `stat` error status and result output arguments.
   - Compatible with Fortran Package Manager (`fpm`).
 
 ## Building and Testing
@@ -36,10 +36,14 @@ fpm test
 
 ```fortran
 program example
-    use iso_fortran_env, only: wp => real64
-    use brouwer_module
+  use brouwer_module, only: brouwer_module_wp, &
+                cartesian_to_brouwer_mean_short, &
+                cartesian_to_brouwer_mean_long, &
+                brouwer_mean_long_to_cartesian
 
     implicit none
+
+  integer, parameter :: wp = brouwer_module_wp
 
     ! Central body parameters (e.g. Earth)
     real(wp), parameter :: mu_earth  = 398600.4415_wp           ! km^3/s^2
@@ -49,7 +53,7 @@ program example
     real(wp), parameter :: j4_earth  = -0.1620429990000000e-5_wp
     real(wp), parameter :: j5_earth  = -0.2270711043920343e-6_wp
 
-    real(wp), dimension(6) :: cartesian, blms, blml
+    real(wp), dimension(6) :: cartesian, cartesian_out, blms, blml
     integer :: stat
 
     ! Cartesian state [x, y, z, vx, vy, vz] in km and km/s
@@ -57,19 +61,21 @@ program example
                  -7.156474_wp,  -0.443318_wp,   2.577366_wp]
 
     ! Convert to Brouwer Mean Short elements [a (km), e, i (deg), raan (deg), aop (deg), ma (deg)]
-    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cartesian, stat=stat)
+    call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cartesian, stat=stat, blms=blms)
     if (stat == 0) then
         print *, "Brouwer Mean Short:", blms
     end if
 
     ! Convert to Brouwer Mean Long elements
-    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cartesian, stat=stat)
+    call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                      cartesian, stat=stat, blml=blml)
     if (stat == 0) then
         print *, "Brouwer Mean Long:", blml
     end if
 
     ! Convert back to Cartesian
-    cartesian = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
+    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                      blml, stat=stat, cart=cartesian_out)
 
 end program example
 ```

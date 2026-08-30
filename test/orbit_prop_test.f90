@@ -62,7 +62,7 @@ program orbit_prop_test
     ! 1. Initialize Orbit (e.g. ISS-like LEO orbit)
     kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp]
     ! kep_0 = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp]  ! critical inc
-    cart_0 = keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat)
+    call keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat, cart=cart_0)
     if (stat /= 0) error stop "Error converting initial Keplerian to Cartesian state."
 
     cart_state = cart_0
@@ -70,9 +70,9 @@ program orbit_prop_test
 
     ! Record initial step (t = 0)
     t_hrs(1) = 0.0_wp
-    kep_osc = cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA")
-    bl_short = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state)
-    bl_long  = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state)
+    call cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA", kepl=kep_osc, stat=stat)
+    call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state, stat=stat, blms=bl_short)
+    call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state, stat=stat, blml=bl_long)
 
     sma_osc(1) = kep_osc(1);  sma_short(1) = bl_short(1);  sma_long(1) = bl_long(1)
     ecc_osc(1) = kep_osc(2);  ecc_short(1) = bl_short(2);  ecc_long(1) = bl_long(2)
@@ -93,9 +93,9 @@ program orbit_prop_test
         end if
 
         t_hrs(i + 1) = t / 3600.0_wp
-        kep_osc  = cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA")
-        bl_short = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state)
-        bl_long  = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state)
+        call cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA", kepl=kep_osc, stat=stat)
+        call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state, stat=stat, blms=bl_short)
+        call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state, stat=stat, blml=bl_long)
 
         sma_osc(i + 1) = kep_osc(1);  sma_short(i + 1) = bl_short(1);  sma_long(i + 1) = bl_long(1)
         ecc_osc(i + 1) = kep_osc(2);  ecc_short(i + 1) = bl_short(2);  ecc_long(i + 1) = bl_long(2)
