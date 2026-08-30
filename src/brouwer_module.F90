@@ -71,8 +71,8 @@ contains
         real(wp), parameter :: tol = 1.0e-8_wp
         integer, parameter :: maxiter = 75
 
-        real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
-        real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
+        real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
+                                  aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
         real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
         integer :: pseudostate, ii
 
@@ -315,6 +315,7 @@ contains
         gm2p = gm2 / (eta**4)
 
         call mean_to_true_anomaly(meanAnom, eccp, 1.0e-8_wp, stat=stat, ta=tap)
+        if (stat /= 0) return
         if (tap < 0.0_wp) tap = tap + two_pi
 
         rp = p / (1.0_wp + eccp * cos(tap))
@@ -740,6 +741,7 @@ contains
         cosraandp = cos(raandp)
 
         call mean_to_true_anomaly(meanAnom, eccdp, 1.0e-12_wp, stat=stat, ta=tadp)
+        if (stat /= 0) return
 
         rp = smadp * (1.0_wp - eccdp2) / (1.0_wp + eccdp * cos(tadp))
         adr = smadp / rp
