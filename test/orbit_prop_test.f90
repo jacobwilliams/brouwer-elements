@@ -218,9 +218,14 @@ contains
 
     end subroutine grav_derivs
 
-    subroutine gravity_j2_j3_j4_j5(r,mu,req,j2,j3,j4,j5,acc)
+!*****************************************************************************************
+!>
+!  Gravitational acceleration due to simplified spherical harmonic
+!  expansion (only the J2-J5 terms are used).
+!
+!@note This is an AI-generated routine.
 
-    !! AI-generated routine
+    subroutine gravity_j2_j3_j4_j5(r,mu,req,j2,j3,j4,j5,acc)
 
     real(wp),dimension(3),intent(in)  :: r   !! satellite position vector [km]
     real(wp),intent(in)               :: mu  !! central body gravitational parameter [km^3/s^2]
@@ -235,8 +240,10 @@ contains
     real(wp) :: re_r, re_r2, re_r3, re_r4, re_r5
     real(wp) :: f_r, f_z, mu_r3
 
-    r2 = r(1)**2 + r(2)**2 + r(3)**2
+    r2 = dot_product(r, r)
     rmag = sqrt(r2)
+    if (rmag==0.0_wp) error stop 'Error in gravity_j2_j3_j4_j5: spacecraft at center of body.'
+
     r3 = rmag * r2
     z = r(3)
     z_r = z / rmag
@@ -259,10 +266,10 @@ contains
             - 0.625_wp * j4 * re_r4 * (3.0_wp - 42.0_wp * z2_r2 + 63.0_wp * z4_r4) &
             - 2.625_wp * j5 * re_r5 * (5.0_wp * z_r - 30.0_wp * z3_r3 + 33.0_wp * z4_r4 * z_r)
 
-        f_z = -3.0_wp * j2 * re_r2 * z_r &
-            + 0.5_wp * j3 * re_r3 * (3.0_wp - 15.0_wp * z2_r2) &
-            + 2.5_wp * j4 * re_r4 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
-            - 1.875_wp * j5 * re_r5 * (1.0_wp - 14.0_wp * z2_r2 + 21.0_wp * z4_r4)
+    f_z = -3.0_wp * j2 * re_r2 * z_r &
+        + 0.5_wp * j3 * re_r3 * (3.0_wp - 15.0_wp * z2_r2) &
+        + 2.5_wp * j4 * re_r4 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
+        - 1.875_wp * j5 * re_r5 * (1.0_wp - 14.0_wp * z2_r2 + 21.0_wp * z4_r4)
 
     acc(1) = -mu_r3 * r(1) * f_r
     acc(2) = -mu_r3 * r(2) * f_r
