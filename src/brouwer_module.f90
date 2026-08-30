@@ -108,7 +108,7 @@ contains
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
-            cart = keplerian_to_cartesian(mu, kep, anomaly_type="TA", stat=local_stat)
+            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=local_stat)
             pseudostate = 1
         end if
 
@@ -501,6 +501,14 @@ contains
             return
         end if
 
+        if ((58.80_wp < kep(3) .and. kep(3) < 65.78_wp) .or. &
+            (114.22_wp < kep(3) .and. kep(3) < 121.2_wp)) then
+            ! Warning: possible inaccuracy due to singularity related with critical angle
+            local_stat = 6
+            if (present(stat)) stat = local_stat
+            return
+        end if
+
         ! Convert TA to MA
         kep(6) = kep(6) * deg2rad
         kep(6) = true_to_mean_anomaly(kep(6), kep(2))
@@ -510,7 +518,7 @@ contains
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
-            cart = keplerian_to_cartesian(mu, kep, anomaly_type="TA", stat=local_stat)
+            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=local_stat)
             pseudostate = 1
         end if
 

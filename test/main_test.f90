@@ -99,30 +99,34 @@ program main_test
     ! -------------------------------------------------------------
     ! Test 4: Critical Inclination Orbit (i ~ 63.435 deg and 116.565 deg)
     ! -------------------------------------------------------------
+    ! Brouwer Short-period is non-singular at critical inclination:
     kep_orig = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
+    diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
+    ! Brouwer Long-period has a singularity at critical inclination (1 - 5*cos^2(i) = 0),
+    ! triggering non-convergence flag (stat = 5):
     blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
-    call check(stat == 0, "Critical inclination prograde Long conversion")
+    call check(stat == 6, "Critical inclination prograde Long returns stat=6 (singularity)")
 
     kep_orig = [7500.0_wp, 0.02_wp, 116.5650512_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
     blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
-    call check(stat == 0, "Critical inclination retrograde Long conversion")
+    call check(stat == 6, "Critical inclination retrograde Long returns stat=6 (singularity)")
 
     ! -------------------------------------------------------------
     ! Test 5: Pseudostate Orbit (i > 175 deg)
     ! -------------------------------------------------------------
     kep_orig = [7100.0_wp, 0.01_wp, 177.0_wp, 60.0_wp, 45.0_wp, 100.0_wp]
-    cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat)
-    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat)
-    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat)
+    cart_orig = keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat); if (stat /= 0) error stop "Error converting pseudostate Keplerian to Cartesian state."
+    blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat); if (stat /= 0) error stop "Error converting pseudostate Cartesian to Brouwer Short state."
+    cart_roundtrip = brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat); if (stat /= 0) error stop "Error converting pseudostate Brouwer Short to Cartesian state."
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Short roundtrip")
 
-    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat)
-    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat)
+    blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat); if (stat /= 0) error stop "Error converting pseudostate Cartesian to Brouwer Long state."
+    cart_long = brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat); if (stat /= 0) error stop "Error converting pseudostate Brouwer Long to Cartesian state."
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Long roundtrip")
 
@@ -357,6 +361,7 @@ contains
         else
             print *, "FAIL: ", test_name
             all_passed = .false.
+            error stop
         end if
     end subroutine check
 

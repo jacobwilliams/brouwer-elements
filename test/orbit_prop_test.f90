@@ -60,6 +60,7 @@ program orbit_prop_test
 
     ! 1. Initialize Orbit (e.g. ISS-like LEO orbit)
     kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp]
+    ! kep_0 = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp]  ! critical inc
     cart_0 = keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat)
     if (stat /= 0) error stop "Error converting initial Keplerian to Cartesian state."
 
