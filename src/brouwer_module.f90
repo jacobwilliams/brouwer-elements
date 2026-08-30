@@ -21,6 +21,7 @@ module brouwer_module
     real(wp), parameter :: two_pi = 2.0_wp * pi
     real(wp), parameter :: deg2rad = pi / 180.0_wp
     real(wp), parameter :: rad2deg = 180.0_wp / pi
+    real(wp), parameter :: min_brouwer_radper = 1.0_wp !! Minimum periapsis radius for Brouwer-Lyddane Mean Elements (km)
 
     ! Numerical tolerances
     real(wp), parameter :: kep_tol = 1.0e-10_wp !! Tolerance for Keplerian elements
@@ -53,7 +54,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge
         real(wp), dimension(6) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -93,7 +94,7 @@ contains
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
-        if (radper <= 0.0_wp) then
+        if (radper < min_brouwer_radper) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -191,6 +192,7 @@ contains
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
                 ! Not converging
+                print*, 'Warning: cartesian_to_brouwer_mean_short not converging after ', ii, ' iterations.'
                 local_stat = 5
                 exit
             end if
@@ -245,7 +247,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
@@ -277,7 +279,7 @@ contains
         end if
 
         radper = blms(1) * (1.0_wp - blms(2))
-        if (radper <= 0.0_wp) then
+        if (radper < min_brouwer_radper) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -426,7 +428,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
@@ -455,7 +457,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge; 6 critical inclination
         real(wp), dimension(6) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -489,7 +491,7 @@ contains
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
-        if (radper <= 0.0_wp) then
+        if (radper < min_brouwer_radper) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -601,6 +603,7 @@ contains
                 aeqmean = aeqmean2
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
+                print*, 'Warning: cartesian_to_brouwer_mean_long not converging after ', ii, ' iterations.'
                 local_stat = 5
                 exit
             end if
@@ -654,7 +657,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper
@@ -702,7 +705,7 @@ contains
         end if
 
         radper = blml(1) * (1.0_wp - blml(2))
-        if (radper <= 0.0_wp) then
+        if (radper < min_brouwer_radper) then
             local_stat = 4
             if (present(stat)) stat = local_stat
             return
@@ -933,7 +936,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
@@ -958,7 +961,7 @@ contains
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
         character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 6 invalid, singular, or parabolic Cartesian state
         real(wp), dimension(6) :: kepl !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
 
         real(wp), dimension(3) :: pos, vel, angMomentum, nodeVec, eccVec
@@ -1106,7 +1109,7 @@ contains
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
         real(wp), dimension(6), intent(in) :: keplerian !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
         character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 6 invalid semilatus rectum or mean-to-true anomaly conversion failed
         real(wp), dimension(6) :: cart !! Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp) :: sma, ecc, inc, raan, per, anom, p, onePlusECos, rad
@@ -1245,7 +1248,7 @@ contains
         real(wp), intent(in) :: ma_radians !! Mean anomaly in radians
         real(wp), intent(in) :: ecc !! Eccentricity
         real(wp), intent(in), optional :: tol !! Optional convergence tolerance (default = 1.0e-8)
-        integer, intent(out), optional :: stat !! Optional status flag (0 = success)
+        integer, intent(out), optional :: stat !! Status: 0 success; 6 Newton iteration failed or encountered a singular anomaly conversion
         real(wp) :: ta !! True anomaly in radians [0, 2*pi)
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
