@@ -192,7 +192,6 @@ contains
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
                 ! Not converging
-                print*, 'Warning: cartesian_to_brouwer_mean_short not converging after ', ii, ' iterations.'
                 local_stat = 5
                 exit
             end if
@@ -608,7 +607,6 @@ contains
                 aeqmean = aeqmean2
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
-                print*, 'Warning: cartesian_to_brouwer_mean_long not converging after ', ii, ' iterations.'
                 local_stat = 5
                 exit
             end if
