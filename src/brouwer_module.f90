@@ -337,7 +337,8 @@ contains
                 - 3.0_wp * sin(2.0_wp * aopp + 2.0_wp * tap) - 3.0_wp * eccp * sin(2.0_wp * aopp + tap) &
                 - eccp * sin(2.0_wp * aopp + 3.0_wp * tap))
 
-        aop1 = aopp + 3.0_wp * j2 / (2.0_wp * p**2) * ((2.0_wp - 2.5_wp * sin(incp)**2) * (tap - meanAnom + eccp * sin(tap)) &
+        if (eccp > 1.0e-11_wp) then ! Avoid singularity at zero eccentricity
+            aop1 = aopp + 3.0_wp * j2 / (2.0_wp * p**2) * ((2.0_wp - 2.5_wp * sin(incp)**2) * (tap - meanAnom + eccp * sin(tap)) &
                + (1.0_wp - 1.5_wp * sin(incp)**2) * ((1.0_wp / eccp) * (1.0_wp - 0.25_wp * eccp**2) * sin(tap) &
                + 0.5_wp * sin(2.0_wp * tap) + (eccp / 12.0_wp) * sin(3.0_wp * tap)) &
                - (1.0_wp / eccp) * (0.25_wp * sin(incp)**2 + (0.5_wp - (15.0_wp / 16.0_wp) * sin(incp)**2) * eccp**2) &
@@ -345,15 +346,19 @@ contains
                - 0.5_wp * (1.0_wp - 2.5_wp * sin(incp)**2) * sin(2.0_wp * tap + 2.0_wp * aopp) &
                + (1.0_wp / eccp) * ((7.0_wp / 12.0_wp) * sin(incp)**2 - (1.0_wp / 6.0_wp) &
                * (1.0_wp - (19.0_wp / 8.0_wp) * sin(incp)**2) * eccp**2) * sin(3.0_wp * tap + 2.0_wp * aopp) &
-               + (3.0_wp / 8.0_wp) * sin(incp)**2 * sin(4.0_wp * tap + 2.0_wp * aopp) &
-               + (eccp / 16.0_wp) * sin(incp)**2 * sin(5.0_wp * tap + 2.0_wp * aopp))
+                + (3.0_wp / 8.0_wp) * sin(incp)**2 * sin(4.0_wp * tap + 2.0_wp * aopp) &
+                + (eccp / 16.0_wp) * sin(incp)**2 * sin(5.0_wp * tap + 2.0_wp * aopp))
 
-        ma1 = meanAnom + 3.0_wp * j2 * eta / (2.0_wp * eccp * p**2) * (-(1.0_wp - 1.5_wp * sin(incp)**2) &
+            ma1 = meanAnom + 3.0_wp * j2 * eta / (2.0_wp * eccp * p**2) * (-(1.0_wp - 1.5_wp * sin(incp)**2) &
               * ((1.0_wp - 0.25_wp * eccp**2) * sin(tap) + (eccp / 2.0_wp) * sin(2.0_wp * tap) + (eccp**2 / 12.0_wp) * sin(3.0_wp * tap)) &
               + sin(incp)**2 * (0.25_wp * (1.0_wp + 1.25_wp * eccp**2) * sin(tap + 2.0_wp * aopp) &
               - (eccp**2 / 16.0_wp) * sin(tap - 2.0_wp * aopp) - (7.0_wp / 12.0_wp) * (1.0_wp - (eccp**2 / 28.0_wp)) &
               * sin(3.0_wp * tap + 2.0_wp * aopp) - (3.0_wp * eccp / 8.0_wp) * sin(4.0_wp * tap + 2.0_wp * aopp) &
               - (eccp**2 / 16.0_wp) * sin(5.0_wp * tap + 2.0_wp * aopp)))
+        else
+            aop1 = 0.0_wp
+            ma1 = 0.0_wp
+        end if
 
         lgh = raanp + aopp + meanAnom + (gm2p / 4.0_wp) * (6.0_wp * (-1.0_wp - 2.0_wp * theta + 5.0_wp * theta**2) &
               * (tap - meanAnom + eccp * sin(tap)) + (3.0_wp + 2.0_wp * theta - 5.0_wp * theta**2) &
