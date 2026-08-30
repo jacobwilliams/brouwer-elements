@@ -43,6 +43,7 @@ program orbit_prop_test
     real(wp) :: t, t_out
     integer :: i, stat, idid
     character(len=100) :: file_suffix
+    real(wp), dimension(3) :: acc1, acc2
 
     ! colors:
     real(wp),dimension(3),parameter :: c0 = [0.0_wp, 0.4470_wp, 0.7410_wp]
@@ -166,6 +167,36 @@ program orbit_prop_test
     print *, "All plots generated successfully: brouwer_*.png"
     print *, "=========================================================="
 
+    print*, ''
+    print *, "=========================================================="
+    print *, "Gravity unit test: comparing gravity_j2_j3_j4_j5 vs gravity_j2_j3_j4"
+    print *, "=========================================================="
+
+    ! test of the two grav routines:
+    print*, 'general test of gravity_j2_j3_j4_j5 vs gravity_j2_j3_j4'
+    call gravity_j2_j3_j4_j5(cart_0(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,j5_earth,acc1)
+    call gravity_j2_j3_j4(   cart_0(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,         acc2)
+    print*, 'gravity_j2_j3_j4_j5 acc = ', acc1
+    print*, 'gravity_j2_j3_j4 acc    = ', acc2
+    if (any(abs(acc1 - acc2) > 1.0e-5_wp)) then ! should be close
+        error stop 'Error: gravity_j2_j3_j4_j5 and gravity_j2_j3_j4 not close!'
+    else
+        print*, 'Success: gravity_j2_j3_j4_j5 and gravity_j2_j3_j4 are close.'
+    end if
+
+    ! if j5=0, then these should return the same acceleration vector. Let's test that:
+    print*, 'test when j5=0'
+    call gravity_j2_j3_j4_j5(cart_0(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,0.0_wp,acc1)
+    call gravity_j2_j3_j4(   cart_0(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,       acc2)
+    print*, 'gravity_j2_j3_j4_j5 acc = ', acc1
+    print*, 'gravity_j2_j3_j4 acc    = ', acc2
+    if (any(abs(acc1 - acc2) > 1.0e-12_wp)) then
+        error stop 'Error: gravity_j2_j3_j4_j5 and gravity_j2_j3_j4 do not match when j5=0!'
+    else
+        print*, 'Success: gravity_j2_j3_j4_j5 and gravity_j2_j3_j4 match when j5=0.'
+    end if
+    print *, "=========================================================="
+
 contains
 
     subroutine grav_derivs(me, t, y, dydt)
@@ -181,64 +212,64 @@ contains
         dydt(1:3) = y(4:6)
 
         ! Dynamics: dv/dt = a
-        ! call gravity_j2_j3_j4_j5(y(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,j5_earth,acc)
-        call gravity_j2_j3_j4(y(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,acc)
+        call gravity_j2_j3_j4_j5(y(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,j5_earth,acc)
+        ! call gravity_j2_j3_j4(y(1:3),mu_earth,req_earth,j2_earth,j3_earth,j4_earth,acc)
         dydt(4:6) = acc(1:3)
 
     end subroutine grav_derivs
 
-!     subroutine gravity_j2_j3_j4_j5(r,mu,req,j2,j3,j4,j5,acc)
+    subroutine gravity_j2_j3_j4_j5(r,mu,req,j2,j3,j4,j5,acc)
 
-!     !!@warning This is an AI-generated routine that seems to be wrong?
+    !! AI-generated routine
 
-!     real(wp),dimension(3),intent(in)  :: r   !! satellite position vector [km]
-!     real(wp),intent(in)               :: mu  !! central body gravitational parameter [km^3/s^2]
-!     real(wp),intent(in)               :: req !! body equatorial radius [km]
-!     real(wp),intent(in)               :: j2  !! j2 coefficient
-!     real(wp),intent(in)               :: j3  !! j3 coefficient
-!     real(wp),intent(in)               :: j4  !! j4 coefficient
-!     real(wp),intent(in)               :: j5  !! j5 coefficient
-!     real(wp),dimension(3),intent(out) :: acc !! gravity acceleration vector [km/s^2]
+    real(wp),dimension(3),intent(in)  :: r   !! satellite position vector [km]
+    real(wp),intent(in)               :: mu  !! central body gravitational parameter [km^3/s^2]
+    real(wp),intent(in)               :: req !! body equatorial radius [km]
+    real(wp),intent(in)               :: j2  !! j2 coefficient
+    real(wp),intent(in)               :: j3  !! j3 coefficient
+    real(wp),intent(in)               :: j4  !! j4 coefficient
+    real(wp),intent(in)               :: j5  !! j5 coefficient
+    real(wp),dimension(3),intent(out) :: acc !! gravity acceleration vector [km/s^2]
 
-!     real(wp) :: rmag, r2, r3, r_xy2, z, z_r, z2_r2, z3_r3, z4_r4
-!     real(wp) :: re_r, re_r2, re_r3, re_r4, re_r5
-!     real(wp) :: f_r, f_z, mu_r3
+    real(wp) :: rmag, r2, r3, z, z_r, z2_r2, z3_r3, z4_r4
+    real(wp) :: re_r, re_r2, re_r3, re_r4, re_r5
+    real(wp) :: f_r, f_z, mu_r3
 
-!     r2 = r(1)**2 + r(2)**2 + r(3)**2
-!     rmag = sqrt(r2)
-!     r3 = rmag * r2
-!     z = r(3)
-!     z_r = z / rmag
-!     z2_r2 = z_r * z_r
-!     z3_r3 = z2_r2 * z_r
-!     z4_r4 = z2_r2 * z2_r2
+    r2 = r(1)**2 + r(2)**2 + r(3)**2
+    rmag = sqrt(r2)
+    r3 = rmag * r2
+    z = r(3)
+    z_r = z / rmag
+    z2_r2 = z_r * z_r
+    z3_r3 = z2_r2 * z_r
+    z4_r4 = z2_r2 * z2_r2
 
-!     re_r = req / rmag
-!     re_r2 = re_r * re_r
-!     re_r3 = re_r2 * re_r
-!     re_r4 = re_r3 * re_r
-!     re_r5 = re_r4 * re_r
+    re_r = req / rmag
+    re_r2 = re_r * re_r
+    re_r3 = re_r2 * re_r
+    re_r4 = re_r3 * re_r
+    re_r5 = re_r4 * re_r
 
-!     mu_r3 = mu / r3
+    mu_r3 = mu / r3
 
-!     ! Potential partial derivatives: a = - (mu/rmag^3)*r_vec + a_pert
-!     ! Common factors for zonal perturbation acceleration components
-!     f_r = 1.0_wp + 1.5_wp * j2 * re_r2 * (1.0_wp - 5.0_wp * z2_r2) &
-!             + 2.5_wp * j3 * re_r3 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
-!             - 0.625_wp * j4 * re_r4 * (3.0_wp - 42.0_wp * z2_r2 + 63.0_wp * z4_r4) &
-!             - 2.625_wp * j5 * re_r5 * (5.0_wp * z_r - 30.0_wp * z3_r3 + 33.0_wp * z4_r4 * z_r)
+    ! Potential partial derivatives: a = - (mu/rmag^3)*r_vec + a_pert
+    ! Common factors for zonal perturbation acceleration components
+    f_r = 1.0_wp + 1.5_wp * j2 * re_r2 * (1.0_wp - 5.0_wp * z2_r2) &
+            + 2.5_wp * j3 * re_r3 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
+            - 0.625_wp * j4 * re_r4 * (3.0_wp - 42.0_wp * z2_r2 + 63.0_wp * z4_r4) &
+            - 2.625_wp * j5 * re_r5 * (5.0_wp * z_r - 30.0_wp * z3_r3 + 33.0_wp * z4_r4 * z_r)
 
-!     f_z = 3.0_wp * j2 * re_r2 * z_r &
-!             - 0.5_wp * j3 * re_r3 * (3.0_wp - 7.0_wp * z2_r2) &
-!             - 2.5_wp * j4 * re_r4 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
-!             + 0.625_wp * j5 * re_r5 * (1.0_wp - 14.0_wp * z2_r2 + 21.0_wp * z4_r4)
+        f_z = -3.0_wp * j2 * re_r2 * z_r &
+            + 0.5_wp * j3 * re_r3 * (3.0_wp - 15.0_wp * z2_r2) &
+            + 2.5_wp * j4 * re_r4 * (3.0_wp * z_r - 7.0_wp * z3_r3) &
+            - 1.875_wp * j5 * re_r5 * (1.0_wp - 14.0_wp * z2_r2 + 21.0_wp * z4_r4)
 
-!     acc(1) = -mu_r3 * r(1) * f_r
-!     acc(2) = -mu_r3 * r(2) * f_r
-!     acc(3) = -mu_r3 * (r(3) * f_r - rmag * f_z)
+    acc(1) = -mu_r3 * r(1) * f_r
+    acc(2) = -mu_r3 * r(2) * f_r
+    acc(3) = -mu_r3 * (r(3) * f_r - rmag * f_z)
 
-!     end subroutine gravity_j2_j3_j4_j5
-! !*****************************************************************************************
+    end subroutine gravity_j2_j3_j4_j5
+!*****************************************************************************************
 
 !*****************************************************************************************
 !>
