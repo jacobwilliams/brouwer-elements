@@ -65,7 +65,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge
+        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge
         real(wp), dimension(6) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -74,40 +74,33 @@ contains
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
         real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
         real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
-        integer :: pseudostate, ii, local_stat
+        integer :: pseudostate, ii
 
-        local_stat = 0
+        stat = 0
         blms = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            local_stat = 1
-            if (present(stat)) stat = local_stat
+            stat = 1
             return
         end if
 
         cart = cartesian
-        kep = cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=local_stat)
-        if (local_stat /= 0) then
-            if (present(stat)) stat = local_stat
-            return
-        end if
+        kep = cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat)
+        if (stat /= 0) return
 
         if (kep(3) > 180.0_wp) then
-            local_stat = 2
-            if (present(stat)) stat = local_stat
+            stat = 2
             return
         end if
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
-            local_stat = 3
-            if (present(stat)) stat = local_stat
+            stat = 3
             return
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
         if (radper < min_brouwer_radper) then
-            local_stat = 4
-            if (present(stat)) stat = local_stat
+            stat = 4
             return
         end if
 
@@ -120,16 +113,13 @@ contains
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
-            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=local_stat)
+            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat)
             pseudostate = 1
         end if
 
         blmean = kep
-        kep2 = brouwer_mean_short_to_osculating(mu, req, j2, kep, stat=local_stat)
-        if (local_stat /= 0) then
-            if (present(stat)) stat = local_stat
-            return
-        end if
+        kep2 = brouwer_mean_short_to_osculating(mu, req, j2, kep, stat=stat)
+        if (stat /= 0) return
 
         ! Convert to alternate equinoctial elements
         aeq(1) = kep(1)
@@ -178,8 +168,8 @@ contains
 
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
-            kep2 = brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=local_stat)
-            cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=local_stat)
+            kep2 = brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=stat)
+            cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat)
 
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
@@ -203,13 +193,13 @@ contains
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
                 ! Not converging
-                local_stat = 5
+                stat = 5
                 exit
             end if
 
             ii = ii + 1
             if (ii > maxiter) then
-                local_stat = 5
+                stat = 5
                 exit
             end if
         end do
@@ -244,7 +234,7 @@ contains
         call wrap_0_360(blmean(6))
 
         blms = blmean
-        if (present(stat)) stat = local_stat
+
     end function cartesian_to_brouwer_mean_short
 
     !--------------------------------------------------------------------------
@@ -257,21 +247,20 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
+        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
         real(wp) :: eta, theta, p, k2, gm2, gm2p, tap, rp, adr
         real(wp) :: sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl
         real(wp) :: ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
-        integer :: pseudostate, local_stat
+        integer :: pseudostate
 
-        local_stat = 0
+        stat = 0
         kepl = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            local_stat = 1
-            if (present(stat)) stat = local_stat
+            stat = 1
             return
         end if
 
@@ -283,15 +272,13 @@ contains
         meanAnom = blms(6) * deg2rad
 
         if (incp < 0.0_wp .or. incp > pi) then
-            local_stat = 2
-            if (present(stat)) stat = local_stat
+            stat = 2
             return
         end if
 
         radper = blms(1) * (1.0_wp - blms(2))
         if (radper < min_brouwer_radper) then
-            local_stat = 4
-            if (present(stat)) stat = local_stat
+            stat = 4
             return
         end if
 
@@ -302,8 +289,7 @@ contains
         end if
 
         if (eccp > 0.99_wp) then
-            local_stat = 3
-            if (present(stat)) stat = local_stat
+            stat = 3
             return
         end if
 
@@ -325,7 +311,7 @@ contains
         gm2 = k2 / (smap**2)
         gm2p = gm2 / (eta**4)
 
-        tap = mean_to_true_anomaly(meanAnom, eccp, 1.0e-8_wp, stat=local_stat)
+        tap = mean_to_true_anomaly(meanAnom, eccp, 1.0e-8_wp, stat=stat)
         if (tap < 0.0_wp) tap = tap + two_pi
 
         rp = p / (1.0_wp + eccp * cos(tap))
@@ -431,7 +417,6 @@ contains
             kepl(4) = 360.0_wp - kepl(4)
         end if
 
-        if (present(stat)) stat = local_stat
     end function brouwer_mean_short_to_osculating
 
     !--------------------------------------------------------------------------
@@ -443,21 +428,19 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
+        integer, intent(out) :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
-        integer :: local_stat
 
-        kepl = brouwer_mean_short_to_osculating(mu, req, j2, blms, stat=local_stat)
-        if (local_stat /= 0) then
+        kepl = brouwer_mean_short_to_osculating(mu, req, j2, blms, stat=stat)
+        if (stat /= 0) then
             cart = 0.0_wp
-            if (present(stat)) stat = local_stat
             return
         end if
 
-        cart = keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=local_stat)
-        if (present(stat)) stat = local_stat
+        cart = keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=stat)
+
     end function brouwer_mean_short_to_cartesian
 
     !--------------------------------------------------------------------------
@@ -472,7 +455,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge; 6 critical inclination
+        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge; 6 critical inclination
         real(wp), dimension(6) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -481,48 +464,42 @@ contains
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
         real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
         real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
-        integer :: pseudostate, ii, local_stat
+        integer :: pseudostate, ii
 
-        local_stat = 0
+        stat = 0
         blml = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            local_stat = 1
-            if (present(stat)) stat = local_stat
+            stat = 1
             return
         end if
 
         cart = cartesian
-        kep = cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=local_stat)
-        if (local_stat /= 0) then
-            if (present(stat)) stat = local_stat
+        kep = cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat)
+        if (stat /= 0) then
             return
         end if
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
-            local_stat = 3
-            if (present(stat)) stat = local_stat
+            stat = 3
             return
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
         if (radper < min_brouwer_radper) then
-            local_stat = 4
-            if (present(stat)) stat = local_stat
+            stat = 4
             return
         end if
 
         if (kep(3) > 180.0_wp) then
-            local_stat = 2
-            if (present(stat)) stat = local_stat
+            stat = 2
             return
         end if
 
         if ((58.80_wp < kep(3) .and. kep(3) < 65.78_wp) .or. &
             (114.22_wp < kep(3) .and. kep(3) < 121.2_wp)) then
             ! Warning: possible inaccuracy due to singularity related with critical angle
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -535,16 +512,13 @@ contains
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
-            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=local_stat)
+            cart = keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat)
             pseudostate = 1
         end if
 
         blmean = kep
-        kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, kep, stat=local_stat)
-        if (local_stat /= 0) then
-            if (present(stat)) stat = local_stat
-            return
-        end if
+        kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, kep, stat=stat)
+        if (stat /= 0) return
 
         ! Alternate equinoctial elements
         aeq(1) = kep(1)
@@ -593,8 +567,8 @@ contains
 
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
-            kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=local_stat)
-            cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=local_stat)
+            kep2 = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=stat)
+            cart2 = keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat)
 
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
@@ -618,13 +592,13 @@ contains
                 aeqmean = aeqmean2
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
-                local_stat = 5
+                stat = 5
                 exit
             end if
 
             ii = ii + 1
             if (ii > maxiter) then
-                local_stat = 5
+                stat = 5
                 exit
             end if
         end do
@@ -655,7 +629,7 @@ contains
         call wrap_0_360(blmean(6))
 
         blml = blmean
-        if (present(stat)) stat = local_stat
+
     end function cartesian_to_brouwer_mean_long
 
     !--------------------------------------------------------------------------
@@ -671,30 +645,29 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
+        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
         real(wp), dimension(6) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper
-        real(wp) :: bk2, bk3, bk4, bk5, eccdp2, cn2, cn, gm2, gmp2, gm4, gmp4
-        real(wp) :: theta, theta2, theta4, gm3, gmp3, gm5, gmp5
-        real(wp) :: g3dg2, g4dg2, g5dg2, sinMADP, cosMADP, sinraandp, cosraandp
-        real(wp) :: tadp, rp, adr, sinta, costa, cs2gta, adr2, adr3, costa2
-        real(wp) :: a1, a2, a3, a4, a5, a6, sinI, a10, a7, a8p, a8
-        real(wp) :: b13, b14, b15, a11, a12, a13, a14, a17, a15, a16, a18, a19, a21, a22
-        real(wp) :: sinI2, cosI2, tanI2, a26, a27
-        real(wp) :: b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
-        real(wp) :: sma, sn2gta, snf2gd, csf2gd, sn2gd, cs2gd, sin3gd, cs3gd, sn3fgd, cs3fgd
-        real(wp) :: sinGD, cosGD, bisubc, blghp, eccdpdl, dltI, sinDH, dlt1e
-        real(wp) :: blgh, dlte, eccdpdl2, eccdpde2, ecc, sinDH2, squar, sqrI, inc
-        real(wp) :: ma, raan, aop, arg1, arg2
-        integer :: pseudostate, local_stat
+        real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper, &
+                    bk2, bk3, bk4, bk5, eccdp2, cn2, cn, gm2, gmp2, gm4, gmp4, &
+                    theta, theta2, theta4, gm3, gmp3, gm5, gmp5, &
+                    g3dg2, g4dg2, g5dg2, sinMADP, cosMADP, sinraandp, cosraandp, &
+                    tadp, rp, adr, sinta, costa, cs2gta, adr2, adr3, costa2, &
+                    a1, a2, a3, a4, a5, a6, sinI, a10, a7, a8p, a8, &
+                    b13, b14, b15, a11, a12, a13, a14, a17, a15, a16, a18, a19, a21, a22, &
+                    sinI2, cosI2, tanI2, a26, a27, &
+                    b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, &
+                    sma, sn2gta, snf2gd, csf2gd, sn2gd, cs2gd, sin3gd, cs3gd, sn3fgd, cs3fgd, &
+                    sinGD, cosGD, bisubc, blghp, eccdpdl, dltI, sinDH, dlt1e, &
+                    blgh, dlte, eccdpdl2, eccdpde2, ecc, sinDH2, squar, sqrI, inc, &
+                    ma, raan, aop, arg1, arg2
+        integer :: pseudostate
 
-        local_stat = 0
+        stat = 0
         kepl = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            local_stat = 1
-            if (present(stat)) stat = local_stat
+            stat = 1
             return
         end if
 
@@ -713,21 +686,18 @@ contains
         end if
 
         if (eccdp > 0.99_wp) then
-            local_stat = 3
-            if (present(stat)) stat = local_stat
+            stat = 3
             return
         end if
 
         radper = blml(1) * (1.0_wp - blml(2))
         if (radper < min_brouwer_radper) then
-            local_stat = 4
-            if (present(stat)) stat = local_stat
+            stat = 4
             return
         end if
 
         if (blml(3) > 180.0_wp) then
-            local_stat = 2
-            if (present(stat)) stat = local_stat
+            stat = 2
             return
         end if
 
@@ -765,7 +735,7 @@ contains
         sinraandp = sin(raandp)
         cosraandp = cos(raandp)
 
-        tadp = mean_to_true_anomaly(meanAnom, eccdp, 1.0e-12_wp, stat=local_stat)
+        tadp = mean_to_true_anomaly(meanAnom, eccdp, 1.0e-12_wp, stat=stat)
 
         rp = smadp * (1.0_wp - eccdp2) / (1.0_wp + eccdp * cos(tadp))
         adr = smadp / rp
@@ -935,7 +905,6 @@ contains
             kepl(4) = 360.0_wp - kepl(4)
         end if
 
-        if (present(stat)) stat = local_stat
     end function brouwer_mean_long_to_osculating
 
     !--------------------------------------------------------------------------
@@ -950,21 +919,19 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out), optional :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
+        integer, intent(out) :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
         real(wp), dimension(6) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
-        integer :: local_stat
 
-        kepl = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat=local_stat)
-        if (local_stat /= 0) then
+        kepl = brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat=stat)
+        if (stat /= 0) then
             cart = 0.0_wp
-            if (present(stat)) stat = local_stat
             return
         end if
 
-        cart = keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=local_stat)
-        if (present(stat)) stat = local_stat
+        cart = keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=stat)
+
     end function brouwer_mean_long_to_cartesian
 
     !--------------------------------------------------------------------------
@@ -980,10 +947,9 @@ contains
 
         real(wp), dimension(3) :: pos, vel, angMomentum, nodeVec, eccVec
         real(wp) :: h, n, posMag, velMag, e, zeta, sma, inc, raan, argPeriapsis, trueAnom, anom
-        integer :: local_stat
         character(len=2) :: anom_type
 
-        local_stat = 0
+        stat = 0
         kepl = 0.0_wp
 
         if (present(anomaly_type)) then
@@ -993,8 +959,7 @@ contains
         end if
 
         if (abs(mu) < 1.0e-30_wp) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -1005,8 +970,7 @@ contains
         velMag = norm2(vel)
 
         if (posMag == 0.0_wp .or. velMag == 0.0_wp) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -1015,8 +979,7 @@ contains
         h = norm2(angMomentum)
 
         if (h == 0.0_wp) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -1033,16 +996,14 @@ contains
         ! Specific energy zeta
         zeta = 0.5_wp * velMag**2 - mu / posMag
         if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= kep_tol) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
         sma = -mu / (2.0_wp * zeta)
 
         if (abs(sma * (1.0_wp - e)) < singular_tol) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -1110,7 +1071,6 @@ contains
         kepl(5) = argPeriapsis * rad2deg
         kepl(6) = anom
 
-        if (present(stat)) stat = local_stat
     end function cartesian_to_keplerian
 
     !--------------------------------------------------------------------------
@@ -1121,16 +1081,15 @@ contains
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
         real(wp), dimension(6), intent(in) :: keplerian !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
         character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-        integer, intent(out), optional :: stat !! Status: 0 success; 6 invalid semilatus rectum or mean-to-true anomaly conversion failed
+        integer, intent(out) :: stat !! Status: 0 success; 6 invalid semilatus rectum or mean-to-true anomaly conversion failed
         real(wp), dimension(6) :: cart !! Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp) :: sma, ecc, inc, raan, per, anom, p, onePlusECos, rad, &
                     cosPerAnom, sinPerAnom, cosInc, sinInc, cosRaan, sinRaan, &
                     sqrtGravP, cosAnomPlusE, sinAnom, cosPer, sinPer
-        integer :: local_stat
         character(len=2) :: anom_type
 
-        local_stat = 0
+        stat = 0
         cart = 0.0_wp
 
         if (present(anomaly_type)) then
@@ -1147,17 +1106,13 @@ contains
         anom = keplerian(6) * deg2rad
 
         if (anom_type == "MA") then
-            anom = mean_to_true_anomaly(anom, ecc, 1.0e-8_wp, stat=local_stat)
-            if (local_stat /= 0) then
-                if (present(stat)) stat = local_stat
-                return
-            end if
+            anom = mean_to_true_anomaly(anom, ecc, 1.0e-8_wp, stat=stat)
+            if (stat /= 0) return
         end if
 
         p = sma * (1.0_wp - ecc**2)
         if (abs(p) < 1.0e-30_wp) then
-            local_stat = 6
-            if (present(stat)) stat = local_stat
+            stat = 6
             return
         end if
 
@@ -1186,7 +1141,6 @@ contains
                   - sqrtGravP * sinAnom * (cosPer * sinRaan + cosInc * cosRaan * sinPer)
         cart(6) = sqrtGravP * (cosAnomPlusE * sinInc * cosPer - sinAnom * sinInc * sinPer)
 
-        if (present(stat)) stat = local_stat
     end function keplerian_to_cartesian
 
     !--------------------------------------------------------------------------
@@ -1260,16 +1214,16 @@ contains
         real(wp), intent(in) :: ma_radians !! Mean anomaly in radians
         real(wp), intent(in) :: ecc !! Eccentricity
         real(wp), intent(in), optional :: tol !! Optional convergence tolerance (default = 1.0e-8)
-        integer, intent(out), optional :: stat !! Status: 0 success; 6 Newton iteration failed or encountered a singular anomaly conversion
+        integer, intent(out) :: stat !! Status: 0 success; 6 Newton iteration failed or encountered a singular anomaly conversion
         real(wp) :: ta !! True anomaly in radians [0, 2*pi)
 
         real(wp), parameter :: ztol = 1.0e-30_wp
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
-        integer :: iter, local_stat
+        integer :: iter
         logical :: done
 
-        local_stat = 0
+        stat = 0
         ta = 0.0_wp
 
         if (present(tol)) then
@@ -1289,13 +1243,13 @@ contains
             do while (.not. done)
                 iter = iter + 1
                 if (iter > 1000) then
-                    local_stat = 6
+                    stat = 6
                     exit
                 end if
 
                 temp = 1.0_wp - ecc * cos(e2)
                 if (abs(temp) < ztol) then
-                    local_stat = 6
+                    stat = 6
                     exit
                 end if
 
@@ -1314,11 +1268,11 @@ contains
             if (c >= 1.0e-8_wp) then
                 temp = 1.0_wp - ecc
                 if (abs(temp) < ztol) then
-                    local_stat = 6
+                    stat = 6
                 else
                     temp2 = (1.0_wp + ecc) / temp
                     if (temp2 < 0.0_wp) then
-                        local_stat = 6
+                        stat = 6
                     else
                         f = sqrt(temp2)
                         g = tan(e * 0.5_wp)
@@ -1339,13 +1293,13 @@ contains
             do while (.not. done)
                 iter = iter + 1
                 if (iter > 1000) then
-                    local_stat = 6
+                    stat = 6
                     exit
                 end if
 
                 temp = ecc * cosh(f2) - 1.0_wp
                 if (abs(temp) < ztol) then
-                    local_stat = 6
+                    stat = 6
                     exit
                 end if
 
@@ -1359,11 +1313,11 @@ contains
             f = f2
             temp = ecc - 1.0_wp
             if (abs(temp) < ztol) then
-                local_stat = 6
+                stat = 6
             else
                 temp2 = (ecc + 1.0_wp) / temp
                 if (temp2 < 0.0_wp) then
-                    local_stat = 6
+                    stat = 6
                 else
                     e = sqrt(temp2)
                     g = tanh(f * 0.5_wp)
@@ -1374,7 +1328,6 @@ contains
             call wrap_0_2pi(ta)
         end if
 
-        if (present(stat)) stat = local_stat
     end function mean_to_true_anomaly
 
 !*****************************************************************************************

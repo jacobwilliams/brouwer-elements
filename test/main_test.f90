@@ -326,7 +326,7 @@ program main_test
     call check(stat == 4, "Long osculating error on radper <= 0 km")
 
     ! Cartesian to Brouwer errors on ecc >= 0.99
-    cart_test = keplerian_to_cartesian(mu_earth, [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp])
+    cart_test = keplerian_to_cartesian(mu_earth, [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp], stat=stat)
     blms = cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_test, stat=stat)
     call check(stat == 3, "Cart2BrouwerShort error on ecc >= 0.99")
     blml = cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_test, stat=stat)
