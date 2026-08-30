@@ -1,7 +1,6 @@
 program main_test
 
-    use iso_fortran_env, only: wp => real64
-    use brouwer_module
+    use brouwer_module, wp => brouwer_module_wp
 
     implicit none
 

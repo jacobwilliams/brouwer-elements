@@ -7,8 +7,8 @@
 
 program orbit_prop_test
 
-    use iso_fortran_env, only: wp => real64, error_unit
-    use brouwer_module
+    use iso_fortran_env, only: error_unit
+    use brouwer_module, wp => brouwer_module_wp
     use ddeabm_module, only: ddeabm_class
     use pyplot_module, only: pyplot
 
@@ -24,9 +24,9 @@ program orbit_prop_test
 
     ! Orbit simulation parameters: LEO orbit, ~2 days (approx 30 orbits)
     integer, parameter :: n_steps = 1000
-    real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
     ! real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
-    ! real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
+    real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
     real(wp), parameter :: dt = t_final / real(n_steps, wp)
 
     ! Initial orbital elements: [sma (km), ecc, inc (deg), raan (deg), aop (deg), ta (deg)]

@@ -1,8 +1,8 @@
 !------------------------------------------------------------------------------
 !>
-!  Modern Fortran implementation of Brouwer-Lyddane Mean Elements
+!  Modern Fortran implementation of Brouwer-Lyddane Mean Elements.
 !
-! ## References
+!## References
 !
 !  * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
 !  * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
@@ -10,11 +10,22 @@
 
 module brouwer_module
 
-    use, intrinsic :: iso_fortran_env, only: wp => real64
+    use, intrinsic :: iso_fortran_env
 
     implicit none
 
     private
+
+#ifdef REAL32
+    integer,parameter,public :: brouwer_module_wp = real32   !! Real working precision [4 bytes]
+#elif REAL64
+    integer,parameter,public :: brouwer_module_wp = real64   !! Real working precision [8 bytes]
+#elif REAL128
+    integer,parameter,public :: brouwer_module_wp = real128  !! Real working precision [16 bytes]
+#else
+    integer,parameter,public :: brouwer_module_wp = real64   !! Real working precision if not specified [8 bytes]
+#endif
+    integer,parameter :: wp = brouwer_module_wp !! real kind to use in this module
 
     ! Mathematical constants
     real(wp), parameter :: pi = acos(-1.0_wp)
@@ -1000,9 +1011,7 @@ contains
         end if
 
         ! Angular momentum vector h = pos x vel
-        angMomentum(1) = pos(2) * vel(3) - pos(3) * vel(2)
-        angMomentum(2) = pos(3) * vel(1) - pos(1) * vel(3)
-        angMomentum(3) = pos(1) * vel(2) - pos(2) * vel(1)
+        angMomentum = cross(pos, vel)
         h = norm2(angMomentum)
 
         if (h == 0.0_wp) then
@@ -1115,9 +1124,9 @@ contains
         integer, intent(out), optional :: stat !! Status: 0 success; 6 invalid semilatus rectum or mean-to-true anomaly conversion failed
         real(wp), dimension(6) :: cart !! Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
 
-        real(wp) :: sma, ecc, inc, raan, per, anom, p, onePlusECos, rad
-        real(wp) :: cosPerAnom, sinPerAnom, cosInc, sinInc, cosRaan, sinRaan
-        real(wp) :: sqrtGravP, cosAnomPlusE, sinAnom, cosPer, sinPer
+        real(wp) :: sma, ecc, inc, raan, per, anom, p, onePlusECos, rad, &
+                    cosPerAnom, sinPerAnom, cosInc, sinInc, cosRaan, sinRaan, &
+                    sqrtGravP, cosAnomPlusE, sinAnom, cosPer, sinPer
         integer :: local_stat
         character(len=2) :: anom_type
 
@@ -1254,8 +1263,9 @@ contains
         integer, intent(out), optional :: stat !! Status: 0 success; 6 Newton iteration failed or encountered a singular anomaly conversion
         real(wp) :: ta !! True anomaly in radians [0, 2*pi)
 
-        real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
         real(wp), parameter :: ztol = 1.0e-30_wp
+
+        real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
         integer :: iter, local_stat
         logical :: done
 
@@ -1367,16 +1377,40 @@ contains
         if (present(stat)) stat = local_stat
     end function mean_to_true_anomaly
 
+!*****************************************************************************************
     pure subroutine wrap_0_2pi(angle)
+        !! Wraps an angle in radians to the range [0, 2*pi).
         real(wp), intent(inout) :: angle
         angle = modulo(angle, two_pi)
         if (angle < 0.0_wp) angle = angle + two_pi
     end subroutine wrap_0_2pi
+!*****************************************************************************************
 
+!*****************************************************************************************
     pure subroutine wrap_0_360(angle)
+        !! Wraps an angle in degrees to the range [0, 360).
         real(wp), intent(inout) :: angle
         angle = modulo(angle, 360.0_wp)
         if (angle < 0.0_wp) angle = angle + 360.0_wp
     end subroutine wrap_0_360
+!*****************************************************************************************
+
+!*****************************************************************************************
+!> author: Jacob Williams
+!
+!  Cross product of two 3x1 vectors
+
+    pure function cross(r,v) result(rxv)
+
+    real(wp),dimension(3),intent(in) :: r
+    real(wp),dimension(3),intent(in) :: v
+    real(wp),dimension(3)            :: rxv
+
+    rxv = [r(2)*v(3) - v(2)*r(3), &
+           r(3)*v(1) - v(3)*r(1), &
+           r(1)*v(2) - v(1)*r(2) ]
+
+    end function cross
+!*****************************************************************************************
 
 end module brouwer_module
