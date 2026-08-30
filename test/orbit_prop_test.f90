@@ -24,9 +24,9 @@ program orbit_prop_test
 
     ! Orbit simulation parameters: LEO orbit, ~2 days (approx 30 orbits)
     integer, parameter :: n_steps = 1000
-    ! real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
+    real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
     ! real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
-    real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
     real(wp), parameter :: dt = t_final / real(n_steps, wp)
 
     ! Initial orbital elements: [sma (km), ecc, inc (deg), raan (deg), aop (deg), ta (deg)]
@@ -37,6 +37,7 @@ program orbit_prop_test
     real(wp), dimension(n_steps + 1) :: inc_osc, inc_short, inc_long
     real(wp), dimension(n_steps + 1) :: aop_osc, aop_short, aop_long
     real(wp), dimension(n_steps + 1) :: raan_osc, raan_short, raan_long
+    real(wp), dimension(n_steps + 1) :: ma_osc, ma_short, ma_long
 
     type(ddeabm_class) :: solver
     type(pyplot) :: plt
@@ -79,6 +80,7 @@ program orbit_prop_test
     inc_osc(1) = kep_osc(3);  inc_short(1) = bl_short(3);  inc_long(1) = bl_long(3)
     raan_osc(1) = kep_osc(4); raan_short(1) = bl_short(4); raan_long(1) = bl_long(4)
     aop_osc(1) = kep_osc(5);  aop_short(1) = bl_short(5);  aop_long(1) = bl_long(5)
+    ma_osc(1) = kep_osc(6);  ma_short(1) = bl_short(6);  ma_long(1) = bl_long(6)
 
     ! 2. Initialize Integrator
     call solver%initialize(6,maxnum=1000000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
@@ -102,6 +104,7 @@ program orbit_prop_test
         inc_osc(i + 1) = kep_osc(3);  inc_short(i + 1) = bl_short(3);  inc_long(i + 1) = bl_long(3)
         raan_osc(i + 1) = kep_osc(4); raan_short(i + 1) = bl_short(4); raan_long(i + 1) = bl_long(4)
         aop_osc(i + 1) = kep_osc(5);  aop_short(i + 1) = bl_short(5);  aop_long(i + 1) = bl_long(5)
+        ma_osc(i + 1) = kep_osc(6);  ma_short(i + 1) = bl_short(6);  ma_long(i + 1) = bl_long(6)
     end do
 
     print *, "Propagation completed successfully."
@@ -163,6 +166,17 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, raan_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, raan_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
     call plt%savefig("brouwer_raan_comparison"//trim(file_suffix)//".png")
+
+    ! Plot 6: Mean Anomaly Comparison
+    call plt%initialize(title="Mean Anomaly: Osculating vs Brouwer Mean", &
+                        figsize=figsize, &
+                        xlabel="Time (hours)", &
+                        ylabel="Mean Anomaly $M$ (deg)", &
+                        legend = .true.)
+    call plt%add_plot(t_hrs, ma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
+    call plt%add_plot(t_hrs, ma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
+    call plt%add_plot(t_hrs, ma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%savefig("brouwer_ma_comparison"//trim(file_suffix)//".png")
 
     print *, "All plots generated successfully: brouwer_*.png"
     print *, "=========================================================="
