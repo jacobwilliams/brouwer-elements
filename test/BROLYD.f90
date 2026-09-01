@@ -7,11 +7,82 @@ module brolyd_module
 
   real(wp),parameter :: pi2 = 2.0_wp * acos(-1.0_wp) !6.283185307179586
 
+   ! input parameters
+   !  common/blcnst/ tto,r,ae,gm,bj2,bj3,bj4,bj5,fltinv,xke,esq
+   !  data tto,r,gm,ae,bj2,bj3,bj4,bj5,fltinv,xke,esq/
+   real(wp),parameter :: tto    = 0.d0 !! INPUT REQUEST TIME IN SECONDS FROM EPOCH
+   real(wp),parameter :: r      = 0.d0 !! OUTPUT MAGNITUDE OF SATELLITE RADIUS VECTOR
+   real(wp),parameter :: gm     = 398600.8d0 !! INPUT GRAVITATIONAL CONSTANT OF THE EARTH (KM3/SEC2)
+   real(wp),parameter :: ae     = 6378.135d0 !! INPUT MEAN EQUATORIAL RADIUS OF THE EARTH (KM)
+   real(wp),parameter :: bj2    = -0.10826158d-02 !! INPUT C2, 0 ZONAL HARMONIC COEFFICIENT
+   real(wp),parameter :: bj3    = 0.25388100d-05 !! INPUT C3, 0 ZONAL HARMONIC COEFFICIENT
+   real(wp),parameter :: bj4    = 0.16559700d-05 !! INPUT C4, 0 ZONAL HARMONIC COEFFICIENT
+   real(wp),parameter :: bj5    = 0.21848266d-06 !! INPUT C5 ,0 ZONAL HARMONIC COEFFICIENT
+   real(wp),parameter :: fltinv = 298.25d0 !! INPUT INVERSE FLATTENING COEFFICIENT (1/F)
+   real(wp),parameter :: xke    = 0.743669161d-01 !! GRAVITATIONAL CONSTANT (EARTH RADII)3/2/MIN)
+   real(wp),parameter :: esq    = 0.6994317778266721d-02 !! THE SQUARE OF THE MAJOR ECCENTRICITY CALCULATED FROM e 2=(2f - f 2)
+
+   real(wp),parameter :: bmu    = 1.0D0
+   real(wp),parameter :: re     = 1.0D0
+   real(wp),parameter :: bksubc = 0.01D0
+
   private
 
   public :: brolyd
 
 contains
+
+
+
+! CALL BROLYD (OSCELE, DPELE, IPERT, IPASS, IDMEAN, ORBEL)
+! ARGUMENTS:
+! OSCELE - OUTPUT OSCULATING ELEMENTS AT TIME TTO
+! OSCELE (1) = SEMI-MAJOR AXIS
+! OSCELE (2) = ECCENTRICITY
+! OSCELE (3) = INCLINATION
+! OSCELE (4) = NODE
+! OSCELE (5) = ARGUMENT OF PERIGEE
+! OSCELE (6) = MEAN ANOMALY
+! DPELE - INPUT IS OSCULATING ELEMENTS AT EPOCH IF IDMEAN = 0
+! INPUT IS BROUWER MEAN AT EPOCH IF IDMEAN /= 0
+! OUTPUT ELEMENTS ARE BROUWER MEAN AT TIME TTO
+! DPELE (1) = SEMI-MAJOR AXIS
+! DPELE (2) = ECCENTRICITY
+! DPELE (3) = INCLINATION
+! DPELE (4) = NODE
+! DPELE (5) = ARGUMENT OF PERIGEE
+! DPELE (6) = MEAN ANOMALY
+! IDMEAN - DETERMINES WHICH ELEMENTS ARE INPUT IN DPELE
+! = 0, OSCULATING
+! /= 0, BROUWER MEAN
+! IPASS =1, COMPUTE CONSTANTS NEEDED IN COMPUTATION OF OSCULATING ELEMENTS
+! =2, UPDATE OSCULATING ELEMENT TO OBSERVATION TIME WITHOUT UPDATING
+! CONSTANTS
+! IPERT =0, NO PERTURBATIONS DUE TO OBLATENESS COMPUTED
+! =1, SECULAR TERMS COMPUTED
+! =2, SECULAR + LONG PERIODIC + SHORT PERIODIC TERMS
+! ORBEL - OUTPUT AUXILIARY ORBITAL ELEMENTS
+! CALLING SEQUENCE FOR SUBROUTINE CELEM:
+! CALL CELEM (ORBEL, GMC, PV, VV)
+! ARGUMENTS:
+! ORBEL - INPUT OSCULATING ELEMENTS
+! ORBEL (1) = SEMI-MAJOR AXIS
+! ORBEL (2) = ECCENTRICITY
+! ORBEL (3) = INCLINATION
+! ORBEL (4) = NODE
+! ORBEL (5) = ARGUMENT OF PERIGEE
+! ORBEL (6) = MEAN ANOMALY
+! GMC - INPUT GRAVITATIONAL CONSTANT
+! F-2 NOAA POD GUIDE - 11/98 Revision
+! PV - OUTPUT CARTESIAN POSITION VECTOR
+! PV (1) = X
+! PV (2) = Y
+! PV (3) = Z
+! VV - OUTPUT CARTESIAN VELOCITY VECTOR
+! VV (1) = XDOT
+! VV (2) = YDOT
+! VV (3) = ZDOT
+
 
 SUBROUTINE brolyd(Oscele,Dpele,Ipert,Ipass,Idmean,Orbel)
 !*******************************************************************************************
@@ -24,26 +95,62 @@ SUBROUTINE brolyd(Oscele,Dpele,Ipert,Ipass,Idmean,Orbel)
 !********************************************************************************************
    IMPLICIT NONE
 
-   REAL*8 a , a0 , a1 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a2 , a21 , a22 , a26 , a27 , a3 , a4
-   REAL*8 a5 , a6 , a7 , a8 , a8p , adp , Ae , anu , arg1 , arg2 , b1 , b10 , b11 , b12 , b13 , b14 , b15 , b2 , b3 , b4
-   REAL*8 b5 , b6 , b7 , b8 , b9 , bi , bi0 , bidp , bisubc , Bj2 , Bj3 , Bj4 , Bj5 , bk2 , bk3 , bk4 , bk5 , bksubc , bl , bl0
-   REAL*8 bldot , bldp , blgh , blghp , bmu , cn , cn2 , cosde , cosfd , cosfd2 , cosgd , coshdp , cosi2 , cosldp , cs2gd ,        &
-        & cs2gfd , cs3fgd , cs3gd , csf2gd , dadr
-   REAL*8 dadr2 , dadr3 , delt , dlt1e , dlte , dlti , Dpele , e , e0 , ea , eadp , edp , edp2 ,        &
-        & edpde2 , edpdl , edpdl2 , ek
-   REAL*8 Esq , f15d16 , f15d32 , f1d16 , f1d2 , f1d3 , f1d4 , f1d8 , f35384 , f35576 , f35d52 , f3d2 , f3d32 , f3d8 , f5d12 ,     &
-        & f5d16 , f5d24 , f5d4 , f5d64 , fdp
-   REAL*8 Fltinv , g , g0 , g3dg2 , g4dg2 , g5dg2 , gdot , gdp , Gm , gm2 , gm3 , gm4 , gm5 , gmp2 , gmp3 , gmp4 , gmp5 , h , h0 , &
-        & hdot
-   REAL*8 hdp , Orbel , Oscele , R , re , sinde , sindh , sindh2 , sinfd , singd , sinhdp , sini , sini2 , sinldp , sn2gd ,        &
-        & sn2gfd , sn3fgd , sn3gd , snf2gd , sqri
-   REAL*8 squar , tan12 , tani2 , theta , theta2 , theta4 , Tto , Xke
-   INTEGER id8 , Idmean , if , iflg , Ipass , Ipert , nn
+   save
 
-   DIMENSION Oscele(6) , Dpele(6) , Orbel(5)
-   COMMON /blcnst/ Tto , R , Ae , Gm , Bj2 , Bj3 , Bj4 , Bj5 , Fltinv , Xke , Esq
+   real(wp),dimension(6),intent(inout) :: Oscele !! OUTPUT OSCULATING ELEMENTS AT TIME TTO
+                                                 !! OSCELE (1) = SEMI-MAJOR AXIS
+                                                 !! OSCELE (2) = ECCENTRICITY
+                                                 !! OSCELE (3) = INCLINATION
+                                                 !! OSCELE (4) = NODE
+                                                 !! OSCELE (5) = ARGUMENT OF PERIGEE
+                                                 !! OSCELE (6) = MEAN ANOMALY
+   real(wp),dimension(6),intent(inout) :: Dpele  !! INPUT IS OSCULATING ELEMENTS AT EPOCH IF IDMEAN = 0
+                                                 !! INPUT IS BROUWER MEAN AT EPOCH IF IDMEAN /= 0
+                                                 !! OUTPUT ELEMENTS ARE BROUWER MEAN AT TIME TTO
+                                                 !! DPELE (1) = SEMI-MAJOR AXIS
+                                                 !! DPELE (2) = ECCENTRICITY
+                                                 !! DPELE (3) = INCLINATION
+                                                 !! DPELE (4) = NODE
+                                                 !! DPELE (5) = ARGUMENT OF PERIGEE
+                                                 !! DPELE (6) = MEAN ANOMALY
+   integer,intent(in) :: Idmean !! DETERMINES WHICH ELEMENTS ARE INPUT IN DPELE
+                                !! = 0, OSCULATING
+                                !! /= 0, BROUWER MEAN
+   real(wp),dimension(5),intent(out) :: Orbel !! OUTPUT AUXILIARY ORBITAL ELEMENTS
+                                              !! CALLING SEQUENCE FOR SUBROUTINE CELEM:
+                                              !! CALL CELEM (ORBEL, GMC, PV, VV)
+                                              !! ARGUMENTS:
+                                              !! ORBEL - INPUT OSCULATING ELEMENTS
+                                              !! ORBEL (1) = SEMI-MAJOR AXIS
+                                              !! ORBEL (2) = ECCENTRICITY
+                                              !! ORBEL (3) = INCLINATION
+                                              !! ORBEL (4) = NODE
+                                              !! ORBEL (5) = ARGUMENT OF PERIGEE
+                                              !! ORBEL (6) = MEAN ANOMALY
+
+
+   REAL*8 a , a0 , a1 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19 , a2 , a21 , a22 , a26 , a27 , a3 , a4
+   REAL*8 a5 , a6 , a7 , a8 , a8p , adp , anu , arg1 , arg2 , b1 , b10 , b11 , b12 , b13 , b14 , b15 , b2 , b3 , b4
+   REAL*8 b5 , b6 , b7 , b8 , b9 , bi , bi0 , bidp , bisubc , bk2 , bk3 , bk4 , bk5 , bl , bl0
+   REAL*8 bldot , bldp , blgh , blghp , cn , cn2 , cosde , cosfd , cosfd2 , cosgd , coshdp , cosi2 , cosldp , cs2gd , &
+        & cs2gfd , cs3fgd , cs3gd , csf2gd , dadr
+   REAL*8 dadr2 , dadr3 , delt , dlt1e , dlte , dlti , e , e0 , ea , eadp , edp , edp2 , &
+        & edpde2 , edpdl , edpdl2 , ek
+   REAL*8 f15d16 , f15d32 , f1d16 , f1d2 , f1d3 , f1d4 , f1d8 , f35384 , f35576 , f35d52 , f3d2 , f3d32 , f3d8 , f5d12 , &
+        & f5d16 , f5d24 , f5d4 , f5d64 , fdp
+   REAL*8 g , g0 , g3dg2 , g4dg2 , g5dg2 , gdot , gdp , gm2 , gm3 , gm4 , gm5 , gmp2 , gmp3 , gmp4 , gmp5 , h , h0 , &
+        & hdot
+   REAL*8 hdp , sinde , sindh , sindh2 , sinfd , singd , sinhdp , sini , sini2 , sinldp , sn2gd , &
+        & sn2gfd , sn3fgd , sn3gd , snf2gd , sqri
+   REAL*8 squar , tan12 , tani2 , theta , theta2 , theta4
+   INTEGER id8 , if , iflg , Ipass , Ipert , nn
+
+      !  common/blcnst/ tto,r,ae,gm,bj2,bj3,bj4,bj5,fltinv,xke,esq
+
+   ! DIMENSION Oscele(6) , Dpele(6) , Orbel(5)
+   ! COMMON /blcnst/ Tto , R , Ae , Gm , Bj2 , Bj3 , Bj4 , Bj5 , Fltinv , Xke , Esq
    INTEGER :: todo
-   DATA bmu , re/1.0D0 , 1.0D0/ , bksubc/0.01D0/
+   ! DATA bmu , re/1.0D0 , 1.0D0/ , bksubc/0.01D0/
 
    todo = 1
    main: DO
@@ -236,7 +343,7 @@ SUBROUTINE brolyd(Oscele,Dpele,Ipert,Ipass,Idmean,Orbel)
             b9 = a8*f35384*cn2
             b10 = sini*(a22*a26*g4dg2*f5d12-a27*gmp2)
             b11 = a21*(a5*f5d64+a6+a3*a26*f15d32*sini*sini)
-            b12 = -((80.0*a17+32.0*a16+5.0)*(a22*edp*sini*sini*f35576*g5dg2)+(a*a21*f35d52))
+            b12 = -((80.0*a17+32.0*a16+5.0)*(a22*edp*sini*sini*f35576*g5dg2)+(a8*a21*f35d52))
          ENDIF
          todo = 3
       CASE (3)
@@ -420,7 +527,7 @@ SUBROUTINE brolyd(Oscele,Dpele,Ipert,Ipass,Idmean,Orbel)
          Orbel(3) = gdp
          Orbel(4) = ek*(anu+bldot)
          Orbel(5) = fdp
-         R = a*Ae*(1.0D0-e*dcos(ea))
+         !R = a*Ae*(1.0D0-e*dcos(ea))
          EXIT main
       END SELECT
    ENDDO main
