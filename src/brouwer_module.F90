@@ -9,8 +9,11 @@
 !
 !## References
 !
-!  * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
-!  * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
+!  * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag,"
+!    *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
+!  * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer
+!    Theory of the Artificial Satellite," *Astronomical Journal*,
+!    Vol. 68, Oct. 1963, pp. 555-558.
 !  * NASA General Mission Analysis Tool (GMAT), `StateConversionUtil.cpp`.
 !  * Phipps Jr., W., "Parallelization of the Navy Space Surveillance Center
 !    (NAVSPASUR) Satellite Model," Naval Postgraduate School, 1992.
@@ -1173,13 +1176,13 @@ contains
         if (ecc < (1.0_wp - kep_tol)) then
             ea = true_to_eccentric_anomaly(ta_radians, ecc)
             ma = ea - ecc * sin(ea)
-            call wrap_0_2pi(ma)
         else if (ecc > (1.0_wp + kep_tol)) then
             ha = true_to_hyperbolic_anomaly(ta_radians, ecc)
             ma = ecc * sinh(ha) - ha
         else
             ma = 0.0_wp
         end if
+        call wrap_0_2pi(ma)
     end function true_to_mean_anomaly
 
     !--------------------------------------------------------------------------
@@ -1230,10 +1233,14 @@ contains
         real(wp), intent(in) :: ma_radians !! Mean anomaly in radians
         real(wp), intent(in) :: ecc !! Eccentricity
         real(wp), intent(in), optional :: tol !! Optional convergence tolerance (default = 1.0e-8)
-        integer, intent(out) :: stat !! Status: 0 success; 6 Newton iteration failed or encountered a singular anomaly conversion
+        integer, intent(out) :: stat !! Status:
+                                     !!
+                                     !! * 0 : success
+                                     !! * 1 : infinite loop
+                                     !! * 2 : Newton iteration failed or a singular anomaly conversion
         real(wp), intent(out) :: ta !! True anomaly in radians [0, 2*pi)
 
-        real(wp), parameter :: ztol = 1.0e-30_wp
+        real(wp), parameter :: ztol = 1.0e-30_wp !! zero tolerance to avoid division by zero
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
         integer :: iter
@@ -1259,14 +1266,14 @@ contains
             do while (.not. done)
                 iter = iter + 1
                 if (iter > 1000) then
-                    stat = 6
-                    exit
+                    stat = 1
+                    return
                 end if
 
                 temp = 1.0_wp - ecc * cos(e2)
                 if (abs(temp) < ztol) then
-                    stat = 6
-                    exit
+                    stat = 2
+                    return
                 end if
 
                 e1 = e2 - (e2 - ecc * sin(e2) - rm) / temp
@@ -1284,11 +1291,13 @@ contains
             if (c >= 1.0e-8_wp) then
                 temp = 1.0_wp - ecc
                 if (abs(temp) < ztol) then
-                    stat = 6
+                    stat = 2
+                    return
                 else
                     temp2 = (1.0_wp + ecc) / temp
                     if (temp2 < 0.0_wp) then
-                        stat = 6
+                        stat = 2
+                        return
                     else
                         f = sqrt(temp2)
                         g = tan(e * 0.5_wp)
@@ -1309,14 +1318,14 @@ contains
             do while (.not. done)
                 iter = iter + 1
                 if (iter > 1000) then
-                    stat = 6
-                    exit
+                    stat = 1
+                    return
                 end if
 
                 temp = ecc * cosh(f2) - 1.0_wp
                 if (abs(temp) < ztol) then
-                    stat = 6
-                    exit
+                    stat = 2
+                    return
                 end if
 
                 f1 = f2 - (ecc * sinh(f2) - f2 - rm) / temp
@@ -1329,11 +1338,13 @@ contains
             f = f2
             temp = ecc - 1.0_wp
             if (abs(temp) < ztol) then
-                stat = 6
+                stat = 2
+                return
             else
                 temp2 = (ecc + 1.0_wp) / temp
                 if (temp2 < 0.0_wp) then
-                    stat = 6
+                    stat = 2
+                    return
                 else
                     e = sqrt(temp2)
                     g = tanh(f * 0.5_wp)
