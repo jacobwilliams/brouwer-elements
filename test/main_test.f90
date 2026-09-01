@@ -104,15 +104,19 @@ program main_test
     call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat, blms=blms)
     call brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat, cart=cart_roundtrip)
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
-    ! Brouwer Long-period has a singularity at critical inclination (1 - 5*cos^2(i) = 0),
-    ! triggering non-convergence flag (stat = 5):
     call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat, blml=blml)
-    call check(stat == 6, "Critical inclination prograde Long returns stat=6 (singularity)")
+    call check(stat == 0, "Critical inclination prograde Long conversion")
+    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, cart=cart_long)
+    diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
+    call check(diff < 1.0e-7_wp, "Critical inclination prograde Long roundtrip")
 
     kep_orig = [7500.0_wp, 0.02_wp, 116.5650512_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     call keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat, cart=cart_orig)
     call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat, blml=blml)
-    call check(stat == 6, "Critical inclination retrograde Long returns stat=6 (singularity)")
+    call check(stat == 0, "Critical inclination retrograde Long conversion")
+    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, cart=cart_long)
+    diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
+    call check(diff < 1.0e-7_wp, "Critical inclination retrograde Long roundtrip")
 
     ! -------------------------------------------------------------
     ! Test 5: Pseudostate Orbit (i > 175 deg)

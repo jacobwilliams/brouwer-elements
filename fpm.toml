@@ -9,6 +9,9 @@ auto-executables = true
 auto-tests = true
 auto-examples = true
 
+[fortran]
+source-form = "default"
+
 [dependencies]
 
 [dev-dependencies]

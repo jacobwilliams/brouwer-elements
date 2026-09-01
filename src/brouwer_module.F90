@@ -2,11 +2,18 @@
 !>
 !  Modern Fortran implementation of Brouwer-Lyddane Mean Elements.
 !
+!  Based on the GMAT code `StateConversionUtil.cpp`.
+!
+!  Long-period terms use Phipps' T2 regularization to avoid the critical-
+!  inclination singularity at approximately 63.4 degrees.
+!
 !## References
 !
 !  * Brouwer, D., "Solution of the Problem of Artificial Satellite Theory without Drag," *Astronomical Journal*, Vol. 64, Nov. 1959, pp. 378-397.
 !  * Lyddane, R. H., "Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite," *Astronomical Journal*, Vol. 68, Oct. 1963, pp. 555-558.
 !  * NASA General Mission Analysis Tool (GMAT), `StateConversionUtil.cpp`.
+!  * Phipps Jr., W., "Parallelization of the Navy Space Surveillance Center
+!    (NAVSPASUR) Satellite Model," Naval Postgraduate School, 1992.
 
 module brouwer_module
 
@@ -498,13 +505,6 @@ contains
             return
         end if
 
-        if ((58.80_wp < kep(3) .and. kep(3) < 65.78_wp) .or. &
-            (114.22_wp < kep(3) .and. kep(3) < 121.2_wp)) then
-            ! Warning: possible inaccuracy due to singularity related with critical angle
-            stat = 6
-            return
-        end if
-
         ! Convert TA to MA
         kep(6) = kep(6) * deg2rad
         kep(6) = true_to_mean_anomaly(kep(6), kep(2))
@@ -653,7 +653,7 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
         real(wp), dimension(6), intent(out) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper, &
+        real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper, t2, &
                     bk2, bk3, bk4, bk5, eccdp2, cn2, cn, gm2, gmp2, gm4, gmp4, &
                     theta, theta2, theta4, gm3, gmp3, gm5, gmp5, &
                     g3dg2, g4dg2, g5dg2, sinMADP, cosMADP, sinraandp, cosraandp, &
@@ -725,6 +725,7 @@ contains
         theta = cos(incdp)
         theta2 = theta * theta
         theta4 = theta2 * theta2
+        t2 = critical_inclination_t2(theta)
 
         gm3 = bk3 / (smadp**3)
         gmp3 = gm3 / (cn2**3)
@@ -752,16 +753,16 @@ contains
         adr3 = adr2 * adr
         costa2 = costa * costa
 
-        a1 = ((1.0_wp / 8.0_wp) * gmp2 * cn2) * (1.0_wp - 11.0_wp * theta2 - ((40.0_wp * theta4) / (1.0_wp - 5.0_wp * theta2)))
-        a2 = ((5.0_wp / 12.0_wp) * g4dg2 * cn2) * (1.0_wp - ((8.0_wp * theta4) / (1.0_wp - 5.0_wp * theta2)) - 3.0_wp * theta2)
+        a1 = ((1.0_wp / 8.0_wp) * gmp2 * cn2) * (1.0_wp - theta2 * (11.0_wp + 40.0_wp * theta2 * t2))
+        a2 = ((5.0_wp / 12.0_wp) * g4dg2 * cn2) * (1.0_wp - theta2 * (3.0_wp + 8.0_wp * theta2 * t2))
         a3 = g5dg2 * (3.0_wp * eccdp2 + 4.0_wp)
-        a4 = g5dg2 * (1.0_wp - (24.0_wp * theta4) / (1.0_wp - 5.0_wp * theta2) - 9.0_wp * theta2)
-        a5 = (g5dg2 * (3.0_wp * eccdp2 + 4.0_wp)) * (1.0_wp - (24.0_wp * theta4) / (1.0_wp - 5.0_wp * theta2) - 9.0_wp * theta2)
+        a4 = g5dg2 * (1.0_wp - theta2 * (9.0_wp + 24.0_wp * theta2 * t2))
+        a5 = (g5dg2 * (3.0_wp * eccdp2 + 4.0_wp)) * (1.0_wp - theta2 * (9.0_wp + 24.0_wp * theta2 * t2))
         a6 = g3dg2 * 0.25_wp
         sinI = sin(incdp)
         a10 = cn2 * sinI
         a7 = a6 * a10
-        a8p = g5dg2 * eccdp * (1.0_wp - (16.0_wp * theta4) / (1.0_wp - 5.0_wp * theta2) - 5.0_wp * theta2)
+        a8p = g5dg2 * eccdp * (1.0_wp - theta2 * (5.0_wp + 16.0_wp * theta2 * t2))
         a8 = a8p * eccdp
 
         b13 = eccdp * (a1 - a2)
@@ -771,10 +772,10 @@ contains
         a11 = 2.0_wp + eccdp2
         a12 = 3.0_wp * eccdp2 + 2.0_wp
         a13 = theta2 * a12
-        a14 = (5.0_wp * eccdp2 + 2.0_wp) * (theta4 / (1.0_wp - 5.0_wp * theta2))
-        a17 = theta4 / ((1.0_wp - 5.0_wp * theta2)**2)
-        a15 = (eccdp2 * theta4 * theta2) / ((1.0_wp - 5.0_wp * theta2)**2)
-        a16 = theta2 / (1.0_wp - 5.0_wp * theta2)
+        a14 = (5.0_wp * eccdp2 + 2.0_wp) * theta4 * t2
+        a17 = theta4 * t2**2
+        a15 = eccdp2 * theta4 * theta2 * t2**2
+        a16 = theta2 * t2
         a18 = eccdp * sinI
         a19 = a18 / (1.0_wp + cn)
         a21 = eccdp * theta
@@ -796,9 +797,9 @@ contains
         b4 = cn * eccdp * (a1 - a2)
         b5 = ((9.0_wp * eccdp2 + 4.0_wp) * a10 * a4 * (5.0_wp / 64.0_wp) + a7) * cn
         b6 = (35.0_wp / 384.0_wp) * a8 * cn2 * cn * sinI
-        b7 = ((cn2 * a18) / (1.0_wp - 5.0_wp * theta2)) * ((1.0_wp / 8.0_wp) * gmp2 * (1.0_wp - 15.0_wp * theta2) &
+        b7 = cn2 * a18 * t2 * ((1.0_wp / 8.0_wp) * gmp2 * (1.0_wp - 15.0_wp * theta2) &
              + (1.0_wp - 7.0_wp * theta2) * g4dg2 * (-(5.0_wp / 12.0_wp)))
-        b8 = (5.0_wp / 64.0_wp) * (a3 * cn2 * (1.0_wp - 9.0_wp * theta2 - (24.0_wp * theta4 / (1.0_wp - 5.0_wp * theta2)))) + a6 * cn2
+        b8 = (5.0_wp / 64.0_wp) * a3 * cn2 * (1.0_wp - theta2 * (9.0_wp + 24.0_wp * theta2 * t2)) + a6 * cn2
         b9 = a8 * (35.0_wp / 384.0_wp) * cn2
         b10 = sinI * (a22 * a26 * g4dg2 * (5.0_wp / 12.0_wp) - a27 * gmp2)
         b11 = a21 * (a5 * (5.0_wp / 64.0_wp) + a6 + a3 * a26 * (15.0_wp / 32.0_wp) * sinI * sinI)
@@ -821,7 +822,7 @@ contains
         sinGD = sin(aopdp)
         cosGD = cos(aopdp)
 
-        bisubc = ((1.0_wp - 5.0_wp * theta2)**(-2.0_wp)) * ((25.0_wp * theta4 * theta) * (gmp2 * eccdp2))
+        bisubc = t2**2 * ((25.0_wp * theta4 * theta) * (gmp2 * eccdp2))
 
         if (bisubc >= 0.001_wp) then
             dlt1e = 0.0_wp
@@ -939,6 +940,50 @@ contains
         call keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=stat, cart=cart)
 
     end subroutine brouwer_mean_long_to_cartesian
+
+    !--------------------------------------------------------------------------
+    !> Phipps' bounded approximation to $(1 - 5 cos^2(i))^{-1}$.
+    !
+    ! This method is used to avoid singularity at the critical inclination (i = 63.4deg).
+    !
+    ! This method, based on Warren Phipps's 1992 thesis (Eq. 2.47 and 2.48),
+    ! approximates the factor that causes the singularity by a function,
+    ! named T2 in the thesis.
+    !
+    !### See also
+    !  * The Orekit code `BrouwerLyddanePropagator.java`.
+
+    pure function critical_inclination_t2(cos_inc) result(t2)
+        real(wp), intent(in) :: cos_inc !! cosine of the mean inclination
+        real(wp) :: t2 !! approximation to $(1 - 5 cos^2(i))^{-1}$
+
+        real(wp) :: x, x2, series, product, beta_power, factorial
+        integer :: ii
+
+        real(wp), parameter :: beta = 100.0_wp / 2.0_wp**11 !! Phipps T2 regularization parameter
+
+        x = 1.0_wp - 5.0_wp * cos_inc**2
+        x2 = x**2
+        series = 0.0_wp
+        beta_power = 1.0_wp
+        factorial = 1.0_wp
+        do ii = 0, 12
+            factorial = factorial * real(ii + 1, wp)
+            if (mod(ii, 2) == 0) then
+                series = series + beta_power * x2**ii / factorial
+            else
+                series = series - beta_power * x2**ii / factorial
+            end if
+            beta_power = beta_power * beta
+        end do
+
+        product = 1.0_wp
+        do ii = 0, 10
+            product = product * (1.0_wp + exp(-beta * x2 * 2.0_wp**ii))
+        end do
+        t2 = beta * x * series * product
+
+    end function critical_inclination_t2
 
     !--------------------------------------------------------------------------
     !>

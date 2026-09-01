@@ -24,8 +24,8 @@ program orbit_prop_test
 
     ! Orbit simulation parameters: LEO orbit, ~2 days (approx 30 orbits)
     integer, parameter :: n_steps = 1000
-    real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
-    ! real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
+    real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
     ! real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
     real(wp), parameter :: dt = t_final / real(n_steps, wp)
 
@@ -60,9 +60,11 @@ program orbit_prop_test
     write(file_suffix, '(i10)') int(t_final / 3600.0_wp) ! hrs
     file_suffix = '_TF='//trim(adjustl(file_suffix))//'h'
 
-    ! 1. Initialize Orbit (e.g. ISS-like LEO orbit)
-    kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp]
-    ! kep_0 = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp]  ! critical inc
+    ! 1. Initialize Orbit
+    kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp] ! ISS-like LEO orbit
+    kep_0 = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp] ! critical inclination
+    kep_0 = [6800.0_wp, 0.02_wp, 33.3_wp, 30.0_wp, 40.0_wp, 0.0_wp] ! lower inc case
+ ! critical inc
     call keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat, cart=cart_0)
     if (stat /= 0) error stop "Error converting initial Keplerian to Cartesian state."
 
@@ -83,7 +85,7 @@ program orbit_prop_test
     ma_osc(1) = kep_osc(6);  ma_short(1) = bl_short(6);  ma_long(1) = bl_long(6)
 
     ! 2. Initialize Integrator
-    call solver%initialize(6,maxnum=1000000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
+    call solver%initialize(6,maxnum=10000000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
 
     print *, "Propagating orbit with J2, J3, J4, J5 gravity perturbation..."
     do i = 1, n_steps
