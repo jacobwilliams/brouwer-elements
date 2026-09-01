@@ -1,6 +1,7 @@
 program main_test
 
     use brouwer_module, wp => brouwer_module_wp
+    use ieee_arithmetic, only: ieee_is_finite
 
     implicit none
 
@@ -119,6 +120,15 @@ program main_test
     call check(diff < 1.0e-7_wp, "Critical inclination retrograde Long roundtrip")
 
     ! -------------------------------------------------------------
+    ! Test 4b: Long-Period Critical-Inclination Fallback
+    ! -------------------------------------------------------------
+    ! This high-eccentricity, near-critical orbit enters the `bisubc >= 0.001`
+    ! fallback branch in brouwer_mean_long_to_osculating.
+    blml = [7000.0_wp, 0.5_wp, 60.0_wp, 50.0_wp, 40.0_wp, 80.0_wp]
+    call brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, kepl=kep_res)
+    call check(stat == 0 .and. all(ieee_is_finite(kep_res)), "Long critical-inclination fallback")
+
+    ! -------------------------------------------------------------
     ! Test 5: Pseudostate Orbit (i > 175 deg)
     ! -------------------------------------------------------------
     kep_orig = [7100.0_wp, 0.01_wp, 177.0_wp, 60.0_wp, 45.0_wp, 100.0_wp]
@@ -167,6 +177,13 @@ program main_test
     call brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blms, stat=stat, kepl=kep_res)
     call check(stat == 0, "Short osculating circular equatorial")
 
+    ! Negligible J2 preserves zero eccentricity and exercises the `ma1 = 0`
+    ! branch in brouwer_mean_short_to_osculating.
+    blms = [7000.0_wp, 0.0_wp, 30.0_wp, 45.0_wp, 0.0_wp, 50.0_wp]
+    call brouwer_mean_short_to_osculating(mu_earth, req_earth, 1.0e-30_wp, blms, stat=stat, kepl=kep_res)
+    call check(stat == 0 .and. abs(kep_res(2)) <= 1.0e-11_wp .and. abs(kep_res(6)) <= 1.0e-11_wp, &
+               "Short osculating circular mean-anomaly branch")
+
     ! Negative eccentricity input
     blms = [7000.0_wp, -0.01_wp, 28.5_wp, 45.0_wp, 30.0_wp, 50.0_wp]
     call brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blms, stat=stat, kepl=kep_res)
@@ -176,6 +193,20 @@ program main_test
     blml = [7000.0_wp, 0.0_wp, 28.5_wp, 45.0_wp, 30.0_wp, 50.0_wp]
     call brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, kepl=kep_res)
     call check(stat == 0, "Long osculating circular inclined")
+
+    ! Negligible perturbations preserve zero eccentricity and exercise the
+    ! circular, inclined long-period output branch.
+    blml = [7000.0_wp, 0.0_wp, 30.0_wp, 45.0_wp, 0.0_wp, 50.0_wp]
+    call brouwer_mean_long_to_osculating(mu_earth, req_earth, 1.0e-30_wp, 0.0_wp, 0.0_wp, 0.0_wp, &
+                                         blml, stat=stat, kepl=kep_res)
+    call check(stat == 0 .and. abs(kep_res(2)) <= 1.0e-11_wp .and. kep_res(3) > 1.0e-7_wp, &
+               "Long osculating circular inclined branch")
+
+    blml = [7000.0_wp, 0.0_wp, 0.0_wp, 45.0_wp, 0.0_wp, 50.0_wp]
+    call brouwer_mean_long_to_osculating(mu_earth, req_earth, 1.0e-30_wp, 0.0_wp, 0.0_wp, 0.0_wp, &
+                                         blml, stat=stat, kepl=kep_res)
+    call check(stat == 0 .and. abs(kep_res(2)) <= 1.0e-11_wp .and. kep_res(3) <= 1.0e-7_wp .and. &
+               abs(kep_res(4)) <= 1.0e-11_wp, "Long osculating circular equatorial branch")
 
     blml = [7000.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 50.0_wp]
     call brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, kepl=kep_res)

@@ -162,11 +162,7 @@ contains
             blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
 
             inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
-            if (inc_arg <= 1.0_wp) then
-                blmean2(3) = acos(1.0_wp - 2.0_wp * inc_arg) * rad2deg
-            else
-                blmean2(3) = acos(1.0_wp - 2.0_wp * 1.0_wp) * rad2deg
-            end if
+            blmean2(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
 
             blmean2(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
             if (blmean2(4) < 0.0_wp) blmean2(4) = blmean2(4) + 360.0_wp
@@ -184,11 +180,7 @@ contains
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
             sum_sq_cart = sum(cart**2)
-            if (sum_sq_cart > 0.0_wp) then
-                emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
-            else
-                emag = sqrt(sum_sq_diff)
-            end if
+            emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
 
             aeq2(1) = kep2(1)
             aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
@@ -218,21 +210,11 @@ contains
         blmean(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
 
         inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
-        if (inc_arg <= 1.0_wp) then
-            blmean(3) = acos(1.0_wp - 2.0_wp * inc_arg) * rad2deg
-        else
-            blmean(3) = acos(1.0_wp - 2.0_wp * 1.0_wp) * rad2deg
-        end if
+        blmean(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
 
         blmean(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
         blmean(5) = atan2(aeqmean2(2), aeqmean2(3)) * rad2deg - blmean(4)
         blmean(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
-
-        if (blmean(2) < 0.0_wp) then
-            blmean(2) = -blmean(2)
-            blmean(5) = blmean(5) + 180.0_wp
-            blmean(6) = blmean(6) - 180.0_wp
-        end if
 
         if (pseudostate /= 0) then
             blmean(3) = 180.0_wp - blmean(3)
@@ -396,13 +378,7 @@ contains
                        - 0.5_wp * (sin(incp) / cos(incp * 0.5_wp)) * draan * sin(raanp)
 
         sqr_inc = sqrt(sinhalfisinh**2 + sinhalficosh**2)
-        if (sqr_inc > 1.0_wp) then
-            inc1 = 2.0_wp * asin(1.0_wp)
-        else if (sqr_inc < -1.0_wp) then
-            inc1 = 2.0_wp * asin(-1.0_wp)
-        else
-            inc1 = 2.0_wp * asin(sqr_inc)
-        end if
+        inc1 = 2.0_wp * asin(min(1.0_wp, sqr_inc))
 
         if (inc1 == 0.0_wp .or. abs(inc1 - pi) < 1.0e-14_wp) then
             raan1 = 0.0_wp
@@ -556,11 +532,7 @@ contains
             blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
 
             inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
-            if (inc_arg <= 1.0_wp) then
-                blmean2(3) = acos(1.0_wp - 2.0_wp * inc_arg) * rad2deg
-            else
-                blmean2(3) = acos(1.0_wp - 2.0_wp * 1.0_wp) * rad2deg
-            end if
+            blmean2(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
 
             blmean2(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
             if (blmean2(4) < 0.0_wp) blmean2(4) = blmean2(4) + 360.0_wp
@@ -578,11 +550,7 @@ contains
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
             sum_sq_cart = sum(cart**2)
-            if (sum_sq_cart > 0.0_wp) then
-                emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
-            else
-                emag = sqrt(sum_sq_diff)
-            end if
+            emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
 
             if (emag_old > emag) then
                 emag_old = emag
@@ -612,11 +580,7 @@ contains
         blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
 
         inc_arg = aeqmean(4)**2 + aeqmean(5)**2
-        if (inc_arg <= 1.0_wp) then
-            blmean(3) = acos(1.0_wp - 2.0_wp * inc_arg) * rad2deg
-        else
-            blmean(3) = acos(1.0_wp - 2.0_wp * 1.0_wp) * rad2deg
-        end if
+        blmean(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
 
         blmean(4) = atan2(aeqmean(4), aeqmean(5)) * rad2deg
         if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
