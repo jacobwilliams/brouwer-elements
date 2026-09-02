@@ -4,8 +4,8 @@
 !
 !  Based on the GMAT code `StateConversionUtil.cpp`.
 !
-!  Long-period terms use Phipps' T2 regularization to avoid the critical-
-!  inclination singularity at approximately 63.4 degrees.
+!  Long-period terms use Phipps' T2 regularization to avoid the
+!  critical-inclination singularity at approximately 63.4 degrees.
 !
 !## References
 !
@@ -428,7 +428,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out) :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
+        integer, intent(out) :: stat !! Status propagated from [[brouwer_mean_short_to_osculating]] or [[keplerian_to_cartesian]] conversion
         real(wp), dimension(6), intent(out) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
@@ -903,7 +903,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out) :: stat !! Status propagated from Brouwer-to-osculating or Keplerian-to-Cartesian conversion
+        integer, intent(out) :: stat !! Status propagated from [[brouwer_mean_long_to_osculating]] or [[keplerian_to_cartesian]] conversion
         real(wp), dimension(6), intent(out) :: cart !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp), dimension(6) :: kepl
@@ -919,7 +919,8 @@ contains
     end subroutine brouwer_mean_long_to_cartesian
 
     !--------------------------------------------------------------------------
-    !> Phipps' bounded approximation to $(1 - 5 cos^2(i))^{-1}$.
+    !>
+    !  Phipps' bounded approximation to \( (1 - 5 cos^2(i))^{-1} \).
     !
     ! This method is used to avoid singularity at the critical inclination (i = 63.4deg).
     !
@@ -932,7 +933,7 @@ contains
 
     pure function critical_inclination_t2(cos_inc) result(t2)
         real(wp), intent(in) :: cos_inc !! cosine of the mean inclination
-        real(wp) :: t2 !! approximation to $(1 - 5 cos^2(i))^{-1}$
+        real(wp) :: t2 !! approximation to \( (1 - 5 cos^2(i))^{-1} \)
 
         real(wp) :: x, x2, series, product, beta_power, factorial
         integer :: ii
