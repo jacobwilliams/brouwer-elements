@@ -14,26 +14,19 @@ Both short-period perturbation models and full short- plus long-period perturbat
 
 ## Features
 
-- **Four Primary Conversion Routines**:
-  - `cartesian_to_brouwer_mean_short`: Cartesian $\rightarrow$ Brouwer Mean Elements (short-period terms only)
-  - `brouwer_mean_short_to_cartesian`: Brouwer Mean Elements (short-period) $\rightarrow$ Cartesian
-  - `cartesian_to_brouwer_mean_long`: Cartesian $\rightarrow$ Brouwer Mean Elements (short and long period terms)
-  - `brouwer_mean_long_to_cartesian`: Brouwer Mean Elements (short and long period) $\rightarrow$ Cartesian
-- **Supporting Routines**:
-  - `brouwer_mean_short_to_osculating` / `brouwer_mean_long_to_osculating`
-  - `cartesian_to_keplerian` / `keplerian_to_cartesian` (supports True Anomaly `"TA"` and Mean Anomaly `"MA"`)
-  - `true_to_mean_anomaly` / `mean_to_true_anomaly`
-  - `true_to_eccentric_anomaly` / `true_to_hyperbolic_anomaly`
-- **Modern Fortran**:
-  - Standard Fortran 2008+ with selectable `real32`, `real64`, or `real128` working precision.
-  - Pure conversion subroutines with required `stat` error status and result output arguments.
-  - Compatible with Fortran Package Manager (`fpm`).
+### Four Primary Conversion Routines:
+
+  *  `cartesian_to_brouwer_mean_short`: Cartesian $\rightarrow$ Brouwer Mean Elements (short-period terms only)
+  *  `brouwer_mean_short_to_cartesian`: Brouwer Mean Elements (short-period) $\rightarrow$ Cartesian
+  *  `cartesian_to_brouwer_mean_long`: Cartesian $\rightarrow$ Brouwer Mean Elements (short and long period terms)
+  *  `brouwer_mean_long_to_cartesian`: Brouwer Mean Elements (short and long period) $\rightarrow$ Cartesian
 
 ## Building and Testing
 
-### Using `fpm` directly
+Use `fpm` to build and test. You can use `pixi` to manage the environment with the necessary development tools.
 
 ```bash
+pixi shell  # activate the environment
 fpm build
 fpm test
 ```
