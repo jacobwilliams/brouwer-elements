@@ -1,5 +1,11 @@
 Modern Fortran version of Brouwer-Lyddane mean orbital element conversion routines.
 
+[![Language](https://img.shields.io/badge/-Fortran-734f96?logo=fortran&logoColor=white)](https://github.com/topics/fortran)
+[![GitHub release](https://img.shields.io/github/release/jacobwilliams/brouwer-elements.svg)](https://github.com/jacobwilliams/brouwer-elements/releases/latest)
+[![Build Status](https://github.com/jacobwilliams/brouwer-elements/actions/workflows/CI.yml/badge.svg)](https://github.com/jacobwilliams/brouwer-elements/actions)
+[![codecov](https://codecov.io/gh/jacobwilliams/brouwer-elements/branch/master/graph/badge.svg)](https://codecov.io/gh/jacobwilliams/brouwer-elements)
+[![last-commit](https://img.shields.io/github/last-commit/jacobwilliams/brouwer-elements)](https://github.com/jacobwilliams/brouwer-elements/commits/master)
+
 ## Overview
 
 The `brouwer_module` provides modern Fortran subroutines to convert between Cartesian state vectors $[x, y, z, v_x, v_y, v_z]$ and Brouwer-Lyddane mean orbital elements $[a, e, i, \Omega, \omega, M]$ (semi-major axis, eccentricity, inclination, right ascension of ascending node, argument of periapsis, and mean anomaly).
@@ -86,6 +92,11 @@ Add `brouwer-elements` to your `fpm.toml`:
 [dependencies]
 brouwer_elements = { git = "https://github.com/jacobwilliams/brouwer-elements.git" }
 ```
+
+## Documentation
+
+The latest API documentation can be found [here](http://jacobwilliams.github.io/brouwer-elements/). This was generated from the source code using [FORD](https://github.com/Fortran-FOSS-Programmers/ford).
+
 
 ## References
 
