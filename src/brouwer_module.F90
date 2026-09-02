@@ -125,9 +125,7 @@ contains
         end if
 
         ! Convert true anomaly (deg) to mean anomaly (deg)
-        kep(6) = kep(6) * deg2rad
-        kep(6) = true_to_mean_anomaly(kep(6), kep(2))
-        kep(6) = kep(6) * rad2deg
+        kep(6) = true_to_mean_anomaly(kep(6) * deg2rad, kep(2)) * rad2deg
 
         pseudostate = 0
         if (kep(3) > 175.0_wp) then
@@ -495,9 +493,7 @@ contains
         end if
 
         ! Convert TA to MA
-        kep(6) = kep(6) * deg2rad
-        kep(6) = true_to_mean_anomaly(kep(6), kep(2))
-        kep(6) = kep(6) * rad2deg
+        kep(6) = true_to_mean_anomaly(kep(6) * deg2rad, kep(2)) * rad2deg
 
         pseudostate = 0
         if (kep(3) > 175.0_wp) then
