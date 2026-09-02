@@ -132,14 +132,14 @@ program main_test
     ! Test 5: Pseudostate Orbit (i > 175 deg)
     ! -------------------------------------------------------------
     kep_orig = [7100.0_wp, 0.01_wp, 177.0_wp, 60.0_wp, 45.0_wp, 100.0_wp]
-    call keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat, cart=cart_orig); if (stat /= 0) error stop "Error converting pseudostate Keplerian to Cartesian state."
-    call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat, blms=blms); if (stat /= 0) error stop "Error converting pseudostate Cartesian to Brouwer Short state."
-    call brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat, cart=cart_roundtrip); if (stat /= 0) error stop "Error converting pseudostate Brouwer Short to Cartesian state."
+    call keplerian_to_cartesian(mu_earth, kep_orig, anomaly_type="TA", stat=stat, cart=cart_orig); if (stat /= BROUWER_SUCCESS) error stop "Error converting pseudostate Keplerian to Cartesian state."
+    call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_orig, stat=stat, blms=blms); if (stat /= BROUWER_SUCCESS) error stop "Error converting pseudostate Cartesian to Brouwer Short state."
+    call brouwer_mean_short_to_cartesian(mu_earth, req_earth, j2_earth, blms, stat=stat, cart=cart_roundtrip); if (stat /= BROUWER_SUCCESS) error stop "Error converting pseudostate Brouwer Short to Cartesian state."
     diff = norm2(cart_orig - cart_roundtrip) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Short roundtrip")
 
-    call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat, blml=blml); if (stat /= 0) error stop "Error converting pseudostate Cartesian to Brouwer Long state."
-    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, cart=cart_long); if (stat /= 0) error stop "Error converting pseudostate Brouwer Long to Cartesian state."
+    call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat, blml=blml); if (stat /= BROUWER_SUCCESS) error stop "Error converting pseudostate Cartesian to Brouwer Long state."
+    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, cart=cart_long); if (stat /= BROUWER_SUCCESS) error stop "Error converting pseudostate Brouwer Long to Cartesian state."
     diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
     call check(diff < 1.0e-7_wp, "Pseudostate (i > 175) Long roundtrip")
 

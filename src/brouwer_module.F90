@@ -38,15 +38,15 @@ module brouwer_module
     integer,parameter :: wp = brouwer_module_wp !! real kind to use in this module
 
     ! Error codes:
-    integer,parameter,public :: BROUWER_SUCCESS = 0 !! Successful execution
-    integer,parameter,public :: BROUWER_INVALID_MU = 1 !! Invalid gravitational parameter or equatorial radius
-    integer,parameter,public :: BROUWER_INVALID_INCLINATION = 2 !! Invalid inclination
-    integer,parameter,public :: BROUWER_INVALID_ECCENTRICITY = 3 !! Eccentricity outside [0, 0.99)
-    integer,parameter,public :: BROUWER_PERIAPSIS_TOO_LOW = 4 !! Periapsis radius < 1 km
+    integer,parameter,public :: BROUWER_SUCCESS                    = 0 !! Successful execution
+    integer,parameter,public :: BROUWER_INVALID_MU                 = 1 !! Invalid gravitational parameter or equatorial radius
+    integer,parameter,public :: BROUWER_INVALID_INCLINATION        = 2 !! Invalid inclination
+    integer,parameter,public :: BROUWER_INVALID_ECCENTRICITY       = 3 !! Eccentricity outside [0, 0.99)
+    integer,parameter,public :: BROUWER_PERIAPSIS_TOO_LOW          = 4 !! Periapsis radius < 1 km
     integer,parameter,public :: BROUWER_ITERATION_DID_NOT_CONVERGE = 5 !! Iteration did not converge
-    integer,parameter,public :: BROUWER_DEGENERATE_STATE = 6 !! Degenerate Cartesian state (e.g., zero position and velocity)
-    integer,parameter,public :: BROUWER_PARABOLIC_ORBIT = 7 !! Parabolic orbit (eccentricity close to 1)
-    integer,parameter,public :: BROUWER_SINGULARITY = 8 !! some other error (in mean_to_true_anomaly)
+    integer,parameter,public :: BROUWER_DEGENERATE_STATE           = 6 !! Degenerate Cartesian state (e.g., zero position and velocity)
+    integer,parameter,public :: BROUWER_PARABOLIC_ORBIT            = 7 !! Parabolic orbit (eccentricity close to 1)
+    integer,parameter,public :: BROUWER_SINGULARITY                = 8 !! some other error (in mean_to_true_anomaly)
 
     ! Mathematical constants
     real(wp), parameter :: pi = acos(-1.0_wp)
@@ -56,8 +56,7 @@ module brouwer_module
     real(wp), parameter :: min_brouwer_radper = 1.0_wp !! Minimum periapsis radius for Brouwer-Lyddane Mean Elements (km)
 
     ! Numerical tolerances
-    real(wp), parameter :: kep_tol = 1.0e-10_wp !! Tolerance for Keplerian elements
-    real(wp), parameter :: singular_tol = 0.001_wp !! Tolerance for singularities in Brouwer-Lyddane Mean Elements
+    real(wp), parameter :: parabolic_tol = 1.0e-10_wp !! Tolerance for Keplerian elements
 
     ! Public API
     public :: cartesian_to_brouwer_mean_short
@@ -86,7 +85,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -107,7 +106,7 @@ contains
 
         cart = cartesian
         call cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat, kepl=kep)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
 
         if (kep(3) > 180.0_wp) then
             stat = BROUWER_INVALID_INCLINATION
@@ -135,13 +134,13 @@ contains
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
             pseudostate = 1
         end if
 
         blmean = kep
         call brouwer_mean_short_to_osculating(mu, req, j2, kep, stat=stat, kepl=kep2)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
 
         ! Convert to alternate equinoctial elements
         aeq(1) = kep(1)
@@ -187,9 +186,9 @@ contains
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
             call brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=stat, kepl=kep2)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
 
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
@@ -253,7 +252,7 @@ contains
         real(wp), intent(in) :: req !! Central body equatorial radius (km)
         real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
@@ -318,7 +317,7 @@ contains
         gm2p = gm2 / (eta**4)
 
         call mean_to_true_anomaly(meanAnom, eccp, 1.0e-8_wp, stat=stat, ta=tap)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
         if (tap < 0.0_wp) tap = tap + two_pi
 
         rp = p / (1.0_wp + eccp * cos(tap))
@@ -435,7 +434,7 @@ contains
         real(wp), dimension(6) :: kepl
 
         call brouwer_mean_short_to_osculating(mu, req, j2, blms, stat, kepl)
-        if (stat /= 0) then
+        if (stat /= BROUWER_SUCCESS) then
             cart = 0.0_wp
             return
         end if
@@ -456,7 +455,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
-        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc outside [0, 0.99); 4 periapsis < 1 km; 5 iteration did not converge; 6 critical inclination
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
@@ -477,7 +476,7 @@ contains
 
         cart = cartesian
         call cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat, kepl=kep)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
             stat = BROUWER_INVALID_ECCENTRICITY
@@ -505,13 +504,13 @@ contains
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
             pseudostate = 1
         end if
 
         blmean = kep
         call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, kep, stat=stat, kepl=kep2)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
 
         ! Alternate equinoctial elements
         aeq(1) = kep(1)
@@ -557,9 +556,9 @@ contains
             blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
 
             call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=stat, kepl=kep2)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
 
             tmp = cart - cart2
             sum_sq_diff = sum(tmp**2)
@@ -628,7 +627,7 @@ contains
         real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
         real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
         real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
-        integer, intent(out) :: stat !! Status: 0 success; 1 invalid mu/req; 2 invalid inclination; 3 ecc exceeds 0.99; 4 periapsis < 1 km
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp) :: smadp, eccdp, incdp, raandp, aopdp, meanAnom, radper, t2, &
@@ -720,7 +719,7 @@ contains
         cosraandp = cos(raandp)
 
         call mean_to_true_anomaly(meanAnom, eccdp, 1.0e-12_wp, stat=stat, ta=tadp)
-        if (stat /= 0) return
+        if (stat /= BROUWER_SUCCESS) return
 
         rp = smadp * (1.0_wp - eccdp2) / (1.0_wp + eccdp * cos(tadp))
         adr = smadp / rp
@@ -910,7 +909,7 @@ contains
         real(wp), dimension(6) :: kepl
 
         call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat, kepl)
-        if (stat /= 0) then
+        if (stat /= BROUWER_SUCCESS) then
             cart = 0.0_wp
             return
         end if
@@ -971,12 +970,14 @@ contains
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
         real(wp), dimension(6), intent(in) :: cartesian !! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)
         character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-        integer, intent(out) :: stat !! Status: 0 success; 6 invalid, singular, or parabolic Cartesian state
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: kepl !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
 
         real(wp), dimension(3) :: pos, vel, angMomentum, nodeVec, eccVec
         real(wp) :: h, n, posMag, velMag, e, zeta, sma, inc, raan, argPeriapsis, trueAnom, anom
         character(len=2) :: anom_type
+
+        real(wp), parameter :: singular_tol = 0.001_wp !! minimum allowed rp (km)
 
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
@@ -1024,7 +1025,7 @@ contains
 
         ! Specific energy zeta
         zeta = 0.5_wp * velMag**2 - mu / posMag
-        if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= kep_tol) then
+        if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= parabolic_tol) then
             stat = BROUWER_PARABOLIC_ORBIT
             return
         end if
@@ -1044,7 +1045,10 @@ contains
 
         if (e >= 1.0e-11_wp .and. (inc >= 1.0e-11_wp .and. inc <= (pi - 1.0e-11_wp))) then
             ! Case 1: Non-circular, Inclined Orbit
-            if (n /= 0.0_wp) then
+            if (n == 0.0_wp) then
+                stat = BROUWER_DEGENERATE_STATE
+                return
+            else
                 raan = acos(min(1.0_wp, max(-1.0_wp, nodeVec(1) / n)))
                 if (nodeVec(2) < 0.0_wp) raan = two_pi - raan
 
@@ -1068,12 +1072,13 @@ contains
 
         else if (e < 1.0e-11_wp .and. (inc >= 1.0e-11_wp .and. inc <= (pi - 1.0e-11_wp))) then
             ! Case 3: Circular, Inclined Orbit
-            if (n /= 0.0_wp) then
+            if (n == 0.0_wp) then
+                stat = BROUWER_DEGENERATE_STATE
+                return
+            else
                 raan = acos(min(1.0_wp, max(-1.0_wp, nodeVec(1) / n)))
                 if (nodeVec(2) < 0.0_wp) raan = two_pi - raan
-            end if
-            argPeriapsis = 0.0_wp
-            if (n /= 0.0_wp) then
+                argPeriapsis = 0.0_wp
                 trueAnom = acos(min(1.0_wp, max(-1.0_wp, dot_product(nodeVec, pos) / (n * posMag))))
                 if (pos(3) < 0.0_wp) trueAnom = two_pi - trueAnom
             end if
@@ -1110,7 +1115,7 @@ contains
         real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
         real(wp), dimension(6), intent(in) :: keplerian !! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]
         character(len=*), intent(in), optional :: anomaly_type !! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)
-        integer, intent(out) :: stat !! Status: 0 success; 6 invalid semilatus rectum or mean-to-true anomaly conversion failed
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: cart !! Cartesian state [x, y, z, vx, vy, vz] (km, km/s)
 
         real(wp) :: sma, ecc, inc, raan, per, anom, true_anom, p, onePlusECos, rad, &
@@ -1136,7 +1141,7 @@ contains
 
         if (anom_type == "MA") then
             call mean_to_true_anomaly(anom, ecc, 1.0e-8_wp, stat=stat, ta=true_anom)
-            if (stat /= 0) return
+            if (stat /= BROUWER_SUCCESS) return
             anom = true_anom
         end if
 
@@ -1147,6 +1152,11 @@ contains
         end if
 
         onePlusECos = 1.0_wp + ecc * cos(anom)
+        if (onePlusECos < 1.0e-10_wp) then
+            stat = BROUWER_DEGENERATE_STATE
+            return
+        end if
+
         rad = p / onePlusECos
 
         cosPerAnom = cos(per + anom)
@@ -1184,10 +1194,10 @@ contains
 
         real(wp) :: ea, ha
 
-        if (ecc < (1.0_wp - kep_tol)) then
+        if (ecc < (1.0_wp - parabolic_tol)) then
             ea = true_to_eccentric_anomaly(ta_radians, ecc)
             ma = ea - ecc * sin(ea)
-        else if (ecc > (1.0_wp + kep_tol)) then
+        else if (ecc > (1.0_wp + parabolic_tol)) then
             ha = true_to_hyperbolic_anomaly(ta_radians, ecc)
             ma = ecc * sinh(ha) - ha
         else
@@ -1230,7 +1240,7 @@ contains
         real(wp) :: tanhHa2
 
         ha = 0.0_wp
-        if (ecc >= (1.0_wp + kep_tol)) then
+        if (ecc >= (1.0_wp + parabolic_tol)) then
             tanhHa2 = tan(ta_radians * 0.5_wp) * sqrt((ecc - 1.0_wp) / (ecc + 1.0_wp))
             ha = 2.0_wp * atanh(tanhHa2)
         end if
@@ -1244,11 +1254,7 @@ contains
         real(wp), intent(in) :: ma_radians !! Mean anomaly in radians
         real(wp), intent(in) :: ecc !! Eccentricity
         real(wp), intent(in), optional :: tol !! Optional convergence tolerance (default = 1.0e-8)
-        integer, intent(out) :: stat !! Status:
-                                     !!
-                                     !! * 0 : success
-                                     !! * 10 : infinite loop
-                                     !! * 20 : Newton iteration failed or a singular anomaly conversion
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), intent(out) :: ta !! True anomaly in radians [0, 2*pi)
 
         real(wp), parameter :: ztol = 1.0e-30_wp !! zero tolerance to avoid division by zero

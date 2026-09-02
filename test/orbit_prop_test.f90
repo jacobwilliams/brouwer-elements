@@ -66,7 +66,7 @@ program orbit_prop_test
     kep_0 = [6800.0_wp, 0.02_wp, 33.3_wp, 30.0_wp, 40.0_wp, 0.0_wp] ! lower inc case
  ! critical inc
     call keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat, cart=cart_0)
-    if (stat /= 0) error stop "Error converting initial Keplerian to Cartesian state."
+    if (stat /= BROUWER_SUCCESS) error stop "Error converting initial Keplerian to Cartesian state."
 
     cart_state = cart_0
     t = 0.0_wp
