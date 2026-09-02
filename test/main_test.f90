@@ -370,7 +370,7 @@ program main_test
     call check(stat == 6, "Cart2Kep error on zero pos/vel")
 
     call cartesian_to_keplerian(0.0_wp, cart_orig, stat=stat, kepl=kep_res)
-    call check(stat == 6, "Cart2Kep error on zero mu")
+    call check(stat == BROUWER_INVALID_MU, "Cart2Kep error on zero mu")
 
     ! Singular radius in Keplerian to Cartesian
     kep_res = [0.0_wp, 1.0_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]

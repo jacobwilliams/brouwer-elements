@@ -37,6 +37,17 @@ module brouwer_module
 #endif
     integer,parameter :: wp = brouwer_module_wp !! real kind to use in this module
 
+    ! Error codes:
+    integer,parameter,public :: BROUWER_SUCCESS = 0 !! Successful execution
+    integer,parameter,public :: BROUWER_INVALID_MU = 1 !! Invalid gravitational parameter or equatorial radius
+    integer,parameter,public :: BROUWER_INVALID_INCLINATION = 2 !! Invalid inclination
+    integer,parameter,public :: BROUWER_INVALID_ECCENTRICITY = 3 !! Eccentricity outside [0, 0.99)
+    integer,parameter,public :: BROUWER_PERIAPSIS_TOO_LOW = 4 !! Periapsis radius < 1 km
+    integer,parameter,public :: BROUWER_ITERATION_DID_NOT_CONVERGE = 5 !! Iteration did not converge
+    integer,parameter,public :: BROUWER_DEGENERATE_STATE = 6 !! Degenerate Cartesian state (e.g., zero position and velocity)
+    integer,parameter,public :: BROUWER_PARABOLIC_ORBIT = 7 !! Parabolic orbit (eccentricity close to 1)
+    integer,parameter,public :: BROUWER_SINGULARITY = 8 !! some other error (in mean_to_true_anomaly)
+
     ! Mathematical constants
     real(wp), parameter :: pi = acos(-1.0_wp)
     real(wp), parameter :: two_pi = 2.0_wp * pi
@@ -86,11 +97,11 @@ contains
         real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
         integer :: pseudostate, ii
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         blms = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            stat = 1
+            stat = BROUWER_INVALID_MU
             return
         end if
 
@@ -99,18 +110,18 @@ contains
         if (stat /= 0) return
 
         if (kep(3) > 180.0_wp) then
-            stat = 2
+            stat = BROUWER_INVALID_INCLINATION
             return
         end if
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
-            stat = 3
+            stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
         if (radper < min_brouwer_radper) then
-            stat = 4
+            stat = BROUWER_PERIAPSIS_TOO_LOW
             return
         end if
 
@@ -198,13 +209,13 @@ contains
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
                 ! Not converging
-                stat = 5
+                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                 exit
             end if
 
             ii = ii + 1
             if (ii > maxiter) then
-                stat = 5
+                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                 exit
             end if
         end do
@@ -251,11 +262,11 @@ contains
         real(wp) :: ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
         integer :: pseudostate
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            stat = 1
+            stat = BROUWER_INVALID_MU
             return
         end if
 
@@ -267,13 +278,13 @@ contains
         meanAnom = blms(6) * deg2rad
 
         if (incp < 0.0_wp .or. incp > pi) then
-            stat = 2
+            stat = BROUWER_INVALID_INCLINATION
             return
         end if
 
         radper = blms(1) * (1.0_wp - blms(2))
         if (radper < min_brouwer_radper) then
-            stat = 4
+            stat = BROUWER_PERIAPSIS_TOO_LOW
             return
         end if
 
@@ -284,7 +295,7 @@ contains
         end if
 
         if (eccp > 0.99_wp) then
-            stat = 3
+            stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
 
@@ -456,11 +467,11 @@ contains
         real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
         integer :: pseudostate, ii
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         blml = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            stat = 1
+            stat = BROUWER_INVALID_MU
             return
         end if
 
@@ -469,18 +480,18 @@ contains
         if (stat /= 0) return
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
-            stat = 3
+            stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
 
         radper = kep(1) * (1.0_wp - kep(2))
         if (radper < min_brouwer_radper) then
-            stat = 4
+            stat = BROUWER_PERIAPSIS_TOO_LOW
             return
         end if
 
         if (kep(3) > 180.0_wp) then
-            stat = 2
+            stat = BROUWER_INVALID_INCLINATION
             return
         end if
 
@@ -568,13 +579,13 @@ contains
                 aeqmean = aeqmean2
                 aeqmean2 = aeqmean + (aeq - aeq2)
             else
-                stat = 5
+                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                 exit
             end if
 
             ii = ii + 1
             if (ii > maxiter) then
-                stat = 5
+                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                 exit
             end if
         end do
@@ -635,11 +646,11 @@ contains
                     ma, raan, aop, arg1, arg2
         integer :: pseudostate
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
         if (mu <= 0.0_wp .or. req <= 0.0_wp) then
-            stat = 1
+            stat = BROUWER_INVALID_MU
             return
         end if
 
@@ -658,18 +669,18 @@ contains
         end if
 
         if (eccdp > 0.99_wp) then
-            stat = 3
+            stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
 
         radper = blml(1) * (1.0_wp - blml(2))
         if (radper < min_brouwer_radper) then
-            stat = 4
+            stat = BROUWER_PERIAPSIS_TOO_LOW
             return
         end if
 
         if (blml(3) > 180.0_wp) then
-            stat = 2
+            stat = BROUWER_INVALID_INCLINATION
             return
         end if
 
@@ -967,7 +978,7 @@ contains
         real(wp) :: h, n, posMag, velMag, e, zeta, sma, inc, raan, argPeriapsis, trueAnom, anom
         character(len=2) :: anom_type
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
         if (present(anomaly_type)) then
@@ -977,7 +988,7 @@ contains
         end if
 
         if (abs(mu) < 1.0e-30_wp) then
-            stat = 6
+            stat = BROUWER_INVALID_MU
             return
         end if
 
@@ -988,7 +999,7 @@ contains
         velMag = norm2(vel)
 
         if (posMag == 0.0_wp .or. velMag == 0.0_wp) then
-            stat = 6
+            stat = BROUWER_DEGENERATE_STATE
             return
         end if
 
@@ -997,7 +1008,7 @@ contains
         h = norm2(angMomentum)
 
         if (h == 0.0_wp) then
-            stat = 6
+            stat = BROUWER_DEGENERATE_STATE
             return
         end if
 
@@ -1014,14 +1025,14 @@ contains
         ! Specific energy zeta
         zeta = 0.5_wp * velMag**2 - mu / posMag
         if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= kep_tol) then
-            stat = 6
+            stat = BROUWER_PARABOLIC_ORBIT
             return
         end if
 
         sma = -mu / (2.0_wp * zeta)
 
         if (abs(sma * (1.0_wp - e)) < singular_tol) then
-            stat = 6
+            stat = BROUWER_DEGENERATE_STATE
             return
         end if
 
@@ -1107,7 +1118,7 @@ contains
                     sqrtGravP, cosAnomPlusE, sinAnom, cosPer, sinPer
         character(len=2) :: anom_type
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         cart = 0.0_wp
 
         if (present(anomaly_type)) then
@@ -1131,7 +1142,7 @@ contains
 
         p = sma * (1.0_wp - ecc**2)
         if (abs(p) < 1.0e-30_wp) then
-            stat = 6
+            stat = BROUWER_DEGENERATE_STATE
             return
         end if
 
@@ -1236,17 +1247,18 @@ contains
         integer, intent(out) :: stat !! Status:
                                      !!
                                      !! * 0 : success
-                                     !! * 1 : infinite loop
-                                     !! * 2 : Newton iteration failed or a singular anomaly conversion
+                                     !! * 10 : infinite loop
+                                     !! * 20 : Newton iteration failed or a singular anomaly conversion
         real(wp), intent(out) :: ta !! True anomaly in radians [0, 2*pi)
 
         real(wp), parameter :: ztol = 1.0e-30_wp !! zero tolerance to avoid division by zero
+        integer, parameter :: max_iter = 1000 !! maximum number of iterations for Newton-Raphson
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
         integer :: iter
         logical :: done
 
-        stat = 0
+        stat = BROUWER_SUCCESS
         ta = 0.0_wp
 
         if (present(tol)) then
@@ -1265,14 +1277,14 @@ contains
 
             do while (.not. done)
                 iter = iter + 1
-                if (iter > 1000) then
-                    stat = 1
+                if (iter > max_iter) then
+                    stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                     return
                 end if
 
                 temp = 1.0_wp - ecc * cos(e2)
                 if (abs(temp) < ztol) then
-                    stat = 2
+                    stat = BROUWER_SINGULARITY
                     return
                 end if
 
@@ -1291,12 +1303,12 @@ contains
             if (c >= 1.0e-8_wp) then
                 temp = 1.0_wp - ecc
                 if (abs(temp) < ztol) then
-                    stat = 2
+                    stat = BROUWER_PARABOLIC_ORBIT
                     return
                 else
                     temp2 = (1.0_wp + ecc) / temp
                     if (temp2 < 0.0_wp) then
-                        stat = 2
+                        stat = BROUWER_SINGULARITY
                         return
                     else
                         f = sqrt(temp2)
@@ -1317,14 +1329,14 @@ contains
 
             do while (.not. done)
                 iter = iter + 1
-                if (iter > 1000) then
-                    stat = 1
+                if (iter > max_iter) then
+                    stat = BROUWER_ITERATION_DID_NOT_CONVERGE
                     return
                 end if
 
                 temp = ecc * cosh(f2) - 1.0_wp
                 if (abs(temp) < ztol) then
-                    stat = 2
+                    stat = BROUWER_SINGULARITY
                     return
                 end if
 
@@ -1338,12 +1350,12 @@ contains
             f = f2
             temp = ecc - 1.0_wp
             if (abs(temp) < ztol) then
-                stat = 2
+                stat = BROUWER_PARABOLIC_ORBIT
                 return
             else
                 temp2 = (ecc + 1.0_wp) / temp
                 if (temp2 < 0.0_wp) then
-                    stat = 2
+                    stat = BROUWER_SINGULARITY
                     return
                 else
                     e = sqrt(temp2)
