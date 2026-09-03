@@ -47,6 +47,5 @@ program critical_inclination_t2_test
     call plt%add_plot([63.4349_wp, 63.4349_wp],   [-50.0_wp, 50.0_wp],  label="63.4349 deg", linestyle="--", color=black, linewidth=1)
     call plt%add_plot([116.5651_wp, 116.5651_wp], [-50.0_wp, 50.0_wp],  label="116.5651 deg", linestyle="--", color=black, linewidth=1)
     call plt%savefig("critical_inclination_t2_comparison.png")
-    call plt%showfig()
 
 end program critical_inclination_t2_test
