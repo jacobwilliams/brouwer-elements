@@ -64,7 +64,6 @@ program orbit_prop_test
     kep_0 = [6800.0_wp, 0.02_wp, 51.6_wp, 30.0_wp, 40.0_wp, 0.0_wp] ! ISS-like LEO orbit
     ! kep_0 = [7500.0_wp, 0.02_wp, 63.4349488_wp, 50.0_wp, 40.0_wp, 80.0_wp] ! critical inclination
     ! kep_0 = [6800.0_wp, 0.02_wp, 33.3_wp, 30.0_wp, 40.0_wp, 0.0_wp] ! lower inc case
- ! critical inc
     call keplerian_to_cartesian(mu_earth, kep_0, anomaly_type="TA", stat=stat, cart=cart_0)
     if (stat /= BROUWER_SUCCESS) error stop "Error converting initial Keplerian to Cartesian state."
 
