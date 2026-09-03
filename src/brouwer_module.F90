@@ -73,6 +73,7 @@ module brouwer_module
     public :: mean_to_true_anomaly
     public :: true_to_eccentric_anomaly
     public :: true_to_hyperbolic_anomaly
+    public :: critical_inclination_t2
 
 contains
 
