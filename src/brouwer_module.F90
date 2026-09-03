@@ -932,7 +932,7 @@ contains
         real(wp), intent(in) :: cos_inc !! cosine of the mean inclination
         real(wp) :: t2 !! approximation to \( (1 - 5 cos^2(i))^{-1} \)
 
-        real(wp) :: x, x2, series, product, beta_power, factorial
+        real(wp) :: x, x2, series, product, beta_power, factorial, factor
         integer :: ii
 
         real(wp), parameter :: beta = 100.0_wp / 2.0_wp**11 !! Phipps T2 regularization parameter
@@ -944,11 +944,8 @@ contains
         factorial = 1.0_wp
         do ii = 0, 12
             factorial = factorial * real(ii + 1, wp)
-            if (mod(ii, 2) == 0) then
-                series = series + beta_power * x2**ii / factorial
-            else
-                series = series - beta_power * x2**ii / factorial
-            end if
+            factor = merge(1.0_wp, -1.0_wp, mod(ii, 2) == 0)
+            series = series + factor * beta_power * x2**ii / factorial
             beta_power = beta_power * beta
         end do
 
