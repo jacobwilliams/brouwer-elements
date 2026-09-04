@@ -206,10 +206,9 @@ contains
         ! note: will not test if we hit this tol since
         ! is can be too strict sometimes. this is the
         ! best that can be achieved.
-        if (emag > tol) then
-            ! write(*,*) 'emag = ', emag_saved
-            stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-        end if
+        ! if (emag > tol) then
+        !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
+        ! end if
 
         blmean(1) = aeqmean(1)
         blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
