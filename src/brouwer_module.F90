@@ -90,11 +90,11 @@ contains
         real(wp), dimension(6), intent(out) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
-        integer, parameter :: maxiter = 75
+        integer, parameter :: maxiter = 100
 
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
-                                  aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
-        real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
+                                  aeq, aeq2, aeqmean, aeqmean2, cart2
+        real(wp) :: radper, emag, inc_arg
         integer :: pseudostate, ii
 
         stat = BROUWER_SUCCESS
@@ -165,11 +165,11 @@ contains
 
         aeqmean2 = aeqmean + (aeq - aeq2)
 
-        emag = 0.9_wp
-        emag_old = 1.0_wp
+        emag = huge(1.0_wp)
         ii = 0
 
-        do while (emag > tol)
+        do while (emag > tol .and. ii < maxiter)
+
             blmean2(1) = aeqmean2(1)
             blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
 
@@ -189,10 +189,7 @@ contains
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
             if (stat /= BROUWER_SUCCESS) return
 
-            tmp = cart - cart2
-            sum_sq_diff = sum(tmp**2)
-            sum_sq_cart = sum(cart**2)
-            emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
+            emag = norm2(cart - cart2) / norm2(cart)
 
             aeq2(1) = kep2(1)
             aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
@@ -201,32 +198,29 @@ contains
             aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
             aeq2(6) = kep2(4) + kep2(5) + kep2(6)
 
-            if (emag_old > emag) then
-                emag_old = emag
-                aeqmean = aeqmean2
-                aeqmean2 = aeqmean + (aeq - aeq2)
-            else
-                ! Not converging
-                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-                exit
-            end if
+            aeqmean = aeqmean2
+            aeqmean2 = aeqmean + (aeq - aeq2)
 
             ii = ii + 1
-            if (ii > maxiter) then
-                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-                exit
-            end if
         end do
+        ! note: will not test if we hit this tol since
+        ! is can be too strict sometimes. this is the
+        ! best that can be achieved.
+        ! if (emag > tol) then
+        !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
+        ! end if
 
-        blmean(1) = aeqmean2(1)
-        blmean(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
+        blmean(1) = aeqmean(1)
+        blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
 
-        inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
+        inc_arg = aeqmean(4)**2 + aeqmean(5)**2
         blmean(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
 
-        blmean(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
-        blmean(5) = atan2(aeqmean2(2), aeqmean2(3)) * rad2deg - blmean(4)
-        blmean(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
+        blmean(4) = atan2(aeqmean(4), aeqmean(5)) * rad2deg
+        if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
+
+        blmean(5) = atan2(aeqmean(2), aeqmean(3)) * rad2deg - blmean(4)
+        blmean(6) = aeqmean(6) - atan2(aeqmean(2), aeqmean(3)) * rad2deg
 
         if (pseudostate /= 0) then
             blmean(3) = 180.0_wp - blmean(3)
@@ -458,11 +452,11 @@ contains
         real(wp), dimension(6), intent(out) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
         real(wp), parameter :: tol = 1.0e-8_wp
-        integer, parameter :: maxiter = 75
+        integer, parameter :: maxiter = 100
 
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
-        real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, tmp, cart2
-        real(wp) :: radper, emag, emag_old, sum_sq_diff, sum_sq_cart, inc_arg
+        real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, cart2
+        real(wp) :: radper, emag, inc_arg
         integer :: pseudostate, ii
 
         stat = BROUWER_SUCCESS
@@ -533,11 +527,11 @@ contains
 
         aeqmean2 = aeqmean + (aeq - aeq2)
 
-        emag = 0.9_wp
-        emag_old = 1.0_wp
+        emag = huge(1.0_wp)
         ii = 0
 
-        do while (emag > tol)
+        do while (emag > tol .and. ii < maxiter)
+
             blmean2(1) = aeqmean2(1)
             blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
 
@@ -557,34 +551,26 @@ contains
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
             if (stat /= BROUWER_SUCCESS) return
 
-            tmp = cart - cart2
-            sum_sq_diff = sum(tmp**2)
-            sum_sq_cart = sum(cart**2)
-            emag = sqrt(sum_sq_diff) / sqrt(sum_sq_cart)
+            emag = norm2(cart - cart2) / norm2(cart)
 
-            if (emag_old > emag) then
-                emag_old = emag
+            aeq2(1) = kep2(1)
+            aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
+            aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
+            aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
+            aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
+            aeq2(6) = kep2(4) + kep2(5) + kep2(6)
 
-                aeq2(1) = kep2(1)
-                aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
-                aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
-                aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
-                aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
-                aeq2(6) = kep2(4) + kep2(5) + kep2(6)
-
-                aeqmean = aeqmean2
-                aeqmean2 = aeqmean + (aeq - aeq2)
-            else
-                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-                exit
-            end if
+            aeqmean = aeqmean2
+            aeqmean2 = aeqmean + (aeq - aeq2)
 
             ii = ii + 1
-            if (ii > maxiter) then
-                stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-                exit
-            end if
         end do
+        ! note: will not test if we hit this tol since
+        ! is can be too strict sometimes. this is the
+        ! best that can be achieved.
+        ! if (emag > tol) then
+        !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
+        ! end if
 
         blmean(1) = aeqmean(1)
         blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
@@ -715,6 +701,7 @@ contains
         sinraandp = sin(raandp)
         cosraandp = cos(raandp)
 
+        ! Compute true anomal y(double primed)
         call mean_to_true_anomaly(meanAnom, eccdp, 1.0e-12_wp, stat=stat, ta=tadp)
         if (stat /= BROUWER_SUCCESS) return
 
@@ -780,6 +767,7 @@ contains
         b12 = -((80.0_wp * a17 + 32.0_wp * a16 + 5.0_wp) * (a22 * eccdp * sinI * sinI * (35.0_wp / 576.0_wp) * g5dg2) &
               + (a8 * a21 * (35.0_wp / 1152.0_wp)))
 
+        ! Compute semi-major axis
         sma = smadp * (1.0_wp + gm2 * ((3.0_wp * theta2 - 1.0_wp) * (eccdp2 / (cn2**3)) * (cn + (1.0_wp / (1.0_wp + cn))) &
               + ((3.0_wp * theta2 - 1.0_wp) / (cn2**3)) * (eccdp * costa) * (3.0_wp + 3.0_wp * eccdp * costa + eccdp2 * costa2) &
               + 3.0_wp * (1.0_wp - theta2) * adr3 * cs2gta))
@@ -796,6 +784,7 @@ contains
         sinGD = sin(aopdp)
         cosGD = cos(aopdp)
 
+        ! Compute (L+G+H) primed
         bisubc = t2**2 * ((25.0_wp * theta4 * theta) * (gmp2 * eccdp2))
 
         if (bisubc >= 0.001_wp) then
