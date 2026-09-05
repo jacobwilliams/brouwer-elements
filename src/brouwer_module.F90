@@ -99,7 +99,8 @@ contains
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
                                   aeq, aeq2, aeqmean, aeqmean2, cart2
         real(wp) :: radper, emag
-        integer :: pseudostate, ii
+        integer :: i
+        logical :: pseudostate !! indicates if the orbit inc > 175 degrees
 
         stat = BROUWER_SUCCESS
         blms = 0.0_wp
@@ -134,9 +135,9 @@ contains
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
             if (stat /= BROUWER_SUCCESS) return
-            pseudostate = 1
+            pseudostate = .true.
         else
-            pseudostate = 0
+            pseudostate = .false.
         end if
 
         blmean = kep
@@ -151,9 +152,9 @@ contains
         aeqmean2 = aeqmean + (aeq - aeq2)
 
         emag = huge(1.0_wp)
-        ii = 0
+        i = 0
 
-        do while (emag > brouwer_iter_tol .and. ii < brouwer_maxiter)
+        do while (emag > brouwer_iter_tol .and. i < brouwer_maxiter)
 
             call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=stat, kepl=kep2)
@@ -168,12 +169,12 @@ contains
             aeqmean = aeqmean2
             aeqmean2 = aeqmean + (aeq - aeq2)
 
-            ii = ii + 1
+            i = i + 1
         end do
 
         call alternate_equinoctial_to_blm(aeqmean, blmean)
 
-        if (pseudostate /= 0) then
+        if (pseudostate) then
             blmean(3) = 180.0_wp - blmean(3)
             blmean(4) = -blmean(4)
         end if
@@ -235,7 +236,7 @@ contains
                     eta, theta, p, k2, gm2, gm2p, tap, rp, adr, &
                     sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl, &
                     ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
-        integer :: pseudostate
+        logical :: pseudostate !! indicates if the orbit inc > 175 degrees
 
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
@@ -277,9 +278,9 @@ contains
         if (incp > 175.0_wp * deg2rad) then
             incp = pi - incp
             raanp = -raanp
-            pseudostate = 1
+            pseudostate = .true.
         else
-            pseudostate = 0
+            pseudostate = .false.
         end if
 
         call wrap_0_2pi(raanp)
@@ -389,7 +390,7 @@ contains
         kepl(5) = aop1 * rad2deg
         kepl(6) = ma1 * rad2deg
 
-        if (pseudostate /= 0) then
+        if (pseudostate) then
             kepl(3) = 180.0_wp - kepl(3)
             kepl(4) = 360.0_wp - kepl(4)
         end if
@@ -438,7 +439,8 @@ contains
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
                                   aeq, aeq2, aeqmean, aeqmean2, cart2
         real(wp) :: radper, emag
-        integer :: pseudostate, ii
+        integer :: i
+        logical :: pseudostate !! indicates if the orbit inc > 175 degrees
 
         stat = BROUWER_SUCCESS
         blml = 0.0_wp
@@ -473,9 +475,9 @@ contains
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
             if (stat /= BROUWER_SUCCESS) return
-            pseudostate = 1
+            pseudostate = .true.
         else
-            pseudostate = 0
+            pseudostate = .false.
         end if
 
         blmean = kep
@@ -490,9 +492,9 @@ contains
         aeqmean2 = aeqmean + (aeq - aeq2)
 
         emag = huge(1.0_wp)
-        ii = 0
+        i = 0
 
-        do while (emag > brouwer_iter_tol .and. ii < brouwer_maxiter)
+        do while (emag > brouwer_iter_tol .and. i < brouwer_maxiter)
 
             call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=stat, kepl=kep2)
@@ -507,12 +509,12 @@ contains
             aeqmean = aeqmean2
             aeqmean2 = aeqmean + (aeq - aeq2)
 
-            ii = ii + 1
+            i = i + 1
         end do
 
         call alternate_equinoctial_to_blm(aeqmean, blmean)
 
-        if (pseudostate /= 0) then
+        if (pseudostate) then
             blmean(3) = 180.0_wp - blmean(3)
             blmean(4) = -blmean(4)
         end if
@@ -554,7 +556,7 @@ contains
                     sinGD, cosGD, bisubc, blghp, eccdpdl, dltI, sinDH, dlt1e, &
                     blgh, dlte, eccdpdl2, eccdpde2, ecc, sinDH2, squar, sqrI, inc, &
                     ma, raan, aop, arg1, arg2
-        integer :: pseudostate
+        logical :: pseudostate !! indicates if the orbit inc > 175 degrees
 
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
@@ -574,9 +576,9 @@ contains
         if (incdp > 175.0_wp * deg2rad) then
             incdp = pi - incdp
             raandp = -raandp
-            pseudostate = 1
+            pseudostate = .true.
         else
-            pseudostate = 0
+            pseudostate = .false.
         end if
 
         if (eccdp > (1.0_wp - parabolic_tol)) then
@@ -799,7 +801,7 @@ contains
         kepl(5) = aop * rad2deg
         kepl(6) = ma * rad2deg
 
-        if (pseudostate /= 0) then
+        if (pseudostate) then
             kepl(3) = 180.0_wp - kepl(3)
             kepl(4) = 360.0_wp - kepl(4)
         end if
@@ -851,7 +853,7 @@ contains
         real(wp) :: t2 !! approximation to \( (1 - 5 cos^2(i))^{-1} \)
 
         real(wp) :: x, x2, series, product, beta_power, factorial, factor
-        integer :: ii
+        integer :: i
 
         real(wp), parameter :: beta = 100.0_wp / 2.0_wp**11 !! Phipps T2 regularization parameter
 
@@ -860,16 +862,16 @@ contains
         series = 0.0_wp
         beta_power = 1.0_wp
         factorial = 1.0_wp
-        do ii = 0, 12
-            factorial = factorial * real(ii + 1, wp)
-            factor = merge(1.0_wp, -1.0_wp, mod(ii, 2) == 0)
-            series = series + factor * beta_power * x2**ii / factorial
+        do i = 0, 12
+            factorial = factorial * real(i + 1, wp)
+            factor = merge(1.0_wp, -1.0_wp, mod(i, 2) == 0)
+            series = series + factor * beta_power * x2**i / factorial
             beta_power = beta_power * beta
         end do
 
         product = 1.0_wp
-        do ii = 0, 10
-            product = product * (1.0_wp + exp(-beta * x2 * 2.0_wp**ii))
+        do i = 0, 10
+            product = product * (1.0_wp + exp(-beta * x2 * 2.0_wp**i))
         end do
         t2 = beta * x * series * product
 
