@@ -94,7 +94,7 @@ contains
 
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
                                   aeq, aeq2, aeqmean, aeqmean2, cart2
-        real(wp) :: radper, emag, inc_arg
+        real(wp) :: radper, emag
         integer :: pseudostate, ii
 
         stat = BROUWER_SUCCESS
@@ -106,7 +106,7 @@ contains
         end if
 
         cart = cartesian
-        call cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat, kepl=kep)
+        call cartesian_to_keplerian(mu, cart, anomaly_type="MA", stat=stat, kepl=kep)
         if (stat /= BROUWER_SUCCESS) return
 
         if (kep(3) > 180.0_wp) then
@@ -125,43 +125,24 @@ contains
             return
         end if
 
-        ! Convert true anomaly (deg) to mean anomaly (deg)
-        kep(6) = true_to_mean_anomaly(kep(6) * deg2rad, kep(2)) * rad2deg
-
-        pseudostate = 0
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
             if (stat /= BROUWER_SUCCESS) return
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         blmean = kep
         call brouwer_mean_short_to_osculating(mu, req, j2, kep, stat=stat, kepl=kep2)
         if (stat /= BROUWER_SUCCESS) return
 
-        ! Convert to alternate equinoctial elements
-        aeq(1) = kep(1)
-        aeq(2) = kep(2) * sin((kep(5) + kep(4)) * deg2rad)
-        aeq(3) = kep(2) * cos((kep(5) + kep(4)) * deg2rad)
-        aeq(4) = sin(kep(3) * 0.5_wp * deg2rad) * sin(kep(4) * deg2rad)
-        aeq(5) = sin(kep(3) * 0.5_wp * deg2rad) * cos(kep(4) * deg2rad)
-        aeq(6) = kep(4) + kep(5) + kep(6)
-
-        aeq2(1) = kep2(1)
-        aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
-        aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
-        aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
-        aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
-        aeq2(6) = kep2(4) + kep2(5) + kep2(6)
-
-        aeqmean(1) = blmean(1)
-        aeqmean(2) = blmean(2) * sin((blmean(5) + blmean(4)) * deg2rad)
-        aeqmean(3) = blmean(2) * cos((blmean(5) + blmean(4)) * deg2rad)
-        aeqmean(4) = sin(blmean(3) * 0.5_wp * deg2rad) * sin(blmean(4) * deg2rad)
-        aeqmean(5) = sin(blmean(3) * 0.5_wp * deg2rad) * cos(blmean(4) * deg2rad)
-        aeqmean(6) = blmean(4) + blmean(5) + blmean(6)
+        ! Alternate equinoctial elements
+        call kepler_to_alternate_equinoctial(kep, aeq)
+        call kepler_to_alternate_equinoctial(kep2, aeq2)
+        call kepler_to_alternate_equinoctial(blmean, aeqmean)
 
         aeqmean2 = aeqmean + (aeq - aeq2)
 
@@ -170,20 +151,7 @@ contains
 
         do while (emag > tol .and. ii < maxiter)
 
-            blmean2(1) = aeqmean2(1)
-            blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
-
-            inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
-            blmean2(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
-
-            blmean2(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
-            if (blmean2(4) < 0.0_wp) blmean2(4) = blmean2(4) + 360.0_wp
-
-            blmean2(5) = atan2(aeqmean2(2), aeqmean2(3)) * rad2deg - blmean2(4)
-            if (blmean2(5) < 0.0_wp) blmean2(5) = blmean2(5) + 360.0_wp
-
-            blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
-
+            call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=stat, kepl=kep2)
             if (stat /= BROUWER_SUCCESS) return
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
@@ -191,12 +159,7 @@ contains
 
             emag = norm2(cart - cart2) / norm2(cart)
 
-            aeq2(1) = kep2(1)
-            aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
-            aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
-            aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
-            aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
-            aeq2(6) = kep2(4) + kep2(5) + kep2(6)
+            call kepler_to_alternate_equinoctial(kep2, aeq2)
 
             aeqmean = aeqmean2
             aeqmean2 = aeqmean + (aeq - aeq2)
@@ -204,23 +167,13 @@ contains
             ii = ii + 1
         end do
         ! note: will not test if we hit this tol since
-        ! is can be too strict sometimes. this is the
+        ! it can be too strict sometimes. this is the
         ! best that can be achieved.
         ! if (emag > tol) then
         !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
         ! end if
 
-        blmean(1) = aeqmean(1)
-        blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
-
-        inc_arg = aeqmean(4)**2 + aeqmean(5)**2
-        blmean(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
-
-        blmean(4) = atan2(aeqmean(4), aeqmean(5)) * rad2deg
-        if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
-
-        blmean(5) = atan2(aeqmean(2), aeqmean(3)) * rad2deg - blmean(4)
-        blmean(6) = aeqmean(6) - atan2(aeqmean(2), aeqmean(3)) * rad2deg
+        call alternate_equinoctial_to_blm(aeqmean, blmean)
 
         if (pseudostate /= 0) then
             blmean(3) = 180.0_wp - blmean(3)
@@ -235,6 +188,38 @@ contains
 
     end subroutine cartesian_to_brouwer_mean_short
 
+    pure subroutine kepler_to_alternate_equinoctial(kep, aeq)
+        real(wp), dimension(6), intent(in) :: kep !! Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        real(wp), dimension(6), intent(out) :: aeq !! Alternate equinoctial elements [sma(km), h, k, p, q, lambda(deg)]
+
+        aeq(1) = kep(1)
+        aeq(2) = kep(2) * sin((kep(5) + kep(4)) * deg2rad)
+        aeq(3) = kep(2) * cos((kep(5) + kep(4)) * deg2rad)
+        aeq(4) = sin(kep(3) * 0.5_wp * deg2rad) * sin(kep(4) * deg2rad)
+        aeq(5) = sin(kep(3) * 0.5_wp * deg2rad) * cos(kep(4) * deg2rad)
+        aeq(6) = kep(4) + kep(5) + kep(6)
+
+    end subroutine kepler_to_alternate_equinoctial
+
+    pure subroutine alternate_equinoctial_to_blm(aeq, blm)
+        real(wp), dimension(6), intent(in) :: aeq !! Alternate equinoctial elements [sma(km), h, k, p, q, lambda(deg)]
+        real(wp), dimension(6), intent(out) :: blm !! Brouwer-Lyddane mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+
+        real(wp) :: inc_arg
+
+        inc_arg = aeq(4)**2 + aeq(5)**2
+        blm(1) = aeq(1)
+        blm(2) = sqrt(aeq(2)**2 + aeq(3)**2)
+        blm(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
+        blm(4) = atan2(aeq(4), aeq(5)) * rad2deg
+        call wrap_0_360(blm(4))
+        blm(5) = atan2(aeq(2), aeq(3)) * rad2deg - blm(4)
+        call wrap_0_360(blm(5))
+        blm(6) = aeq(6) - atan2(aeq(2), aeq(3)) * rad2deg
+        call wrap_0_360(blm(6))
+
+    end subroutine alternate_equinoctial_to_blm
+
     !--------------------------------------------------------------------------
     !>
     !  Converts Brouwer-Lyddane Mean Elements (short-period terms only) to
@@ -248,10 +233,10 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
-        real(wp) :: eta, theta, p, k2, gm2, gm2p, tap, rp, adr
-        real(wp) :: sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl
-        real(wp) :: ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
+        real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper, &
+                    eta, theta, p, k2, gm2, gm2p, tap, rp, adr, &
+                    sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl, &
+                    ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
         integer :: pseudostate
 
         stat = BROUWER_SUCCESS
@@ -291,11 +276,12 @@ contains
             return
         end if
 
-        pseudostate = 0
         if (incp > 175.0_wp * deg2rad) then
             incp = pi - incp
             raanp = -raanp
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         call wrap_0_2pi(raanp)
@@ -456,7 +442,7 @@ contains
 
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
         real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, cart2
-        real(wp) :: radper, emag, inc_arg
+        real(wp) :: radper, emag
         integer :: pseudostate, ii
 
         stat = BROUWER_SUCCESS
@@ -468,7 +454,7 @@ contains
         end if
 
         cart = cartesian
-        call cartesian_to_keplerian(mu, cart, anomaly_type="TA", stat=stat, kepl=kep)
+        call cartesian_to_keplerian(mu, cart, anomaly_type="MA", stat=stat, kepl=kep)
         if (stat /= BROUWER_SUCCESS) return
 
         if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
@@ -487,16 +473,14 @@ contains
             return
         end if
 
-        ! Convert TA to MA
-        kep(6) = true_to_mean_anomaly(kep(6) * deg2rad, kep(2)) * rad2deg
-
-        pseudostate = 0
         if (kep(3) > 175.0_wp) then
             kep(3) = 180.0_wp - kep(3)
             kep(4) = -kep(4)
             call keplerian_to_cartesian(mu, kep, anomaly_type="MA", stat=stat, cart=cart)
             if (stat /= BROUWER_SUCCESS) return
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         blmean = kep
@@ -504,26 +488,9 @@ contains
         if (stat /= BROUWER_SUCCESS) return
 
         ! Alternate equinoctial elements
-        aeq(1) = kep(1)
-        aeq(2) = kep(2) * sin((kep(5) + kep(4)) * deg2rad)
-        aeq(3) = kep(2) * cos((kep(5) + kep(4)) * deg2rad)
-        aeq(4) = sin(kep(3) * 0.5_wp * deg2rad) * sin(kep(4) * deg2rad)
-        aeq(5) = sin(kep(3) * 0.5_wp * deg2rad) * cos(kep(4) * deg2rad)
-        aeq(6) = kep(4) + kep(5) + kep(6)
-
-        aeq2(1) = kep2(1)
-        aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
-        aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
-        aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
-        aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
-        aeq2(6) = kep2(4) + kep2(5) + kep2(6)
-
-        aeqmean(1) = blmean(1)
-        aeqmean(2) = blmean(2) * sin((blmean(5) + blmean(4)) * deg2rad)
-        aeqmean(3) = blmean(2) * cos((blmean(5) + blmean(4)) * deg2rad)
-        aeqmean(4) = sin(blmean(3) * 0.5_wp * deg2rad) * sin(blmean(4) * deg2rad)
-        aeqmean(5) = sin(blmean(3) * 0.5_wp * deg2rad) * cos(blmean(4) * deg2rad)
-        aeqmean(6) = blmean(4) + blmean(5) + blmean(6)
+        call kepler_to_alternate_equinoctial(kep, aeq)
+        call kepler_to_alternate_equinoctial(kep2, aeq2)
+        call kepler_to_alternate_equinoctial(blmean, aeqmean)
 
         aeqmean2 = aeqmean + (aeq - aeq2)
 
@@ -532,20 +499,7 @@ contains
 
         do while (emag > tol .and. ii < maxiter)
 
-            blmean2(1) = aeqmean2(1)
-            blmean2(2) = sqrt(aeqmean2(2)**2 + aeqmean2(3)**2)
-
-            inc_arg = aeqmean2(4)**2 + aeqmean2(5)**2
-            blmean2(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
-
-            blmean2(4) = atan2(aeqmean2(4), aeqmean2(5)) * rad2deg
-            if (blmean2(4) < 0.0_wp) blmean2(4) = blmean2(4) + 360.0_wp
-
-            blmean2(5) = atan2(aeqmean2(2), aeqmean2(3)) * rad2deg - blmean2(4)
-            if (blmean2(5) < 0.0_wp) blmean2(5) = blmean2(5) + 360.0_wp
-
-            blmean2(6) = aeqmean2(6) - atan2(aeqmean2(2), aeqmean2(3)) * rad2deg
-
+            call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=stat, kepl=kep2)
             if (stat /= BROUWER_SUCCESS) return
             call keplerian_to_cartesian(mu, kep2, anomaly_type="MA", stat=stat, cart=cart2)
@@ -553,12 +507,7 @@ contains
 
             emag = norm2(cart - cart2) / norm2(cart)
 
-            aeq2(1) = kep2(1)
-            aeq2(2) = kep2(2) * sin((kep2(5) + kep2(4)) * deg2rad)
-            aeq2(3) = kep2(2) * cos((kep2(5) + kep2(4)) * deg2rad)
-            aeq2(4) = sin(kep2(3) * 0.5_wp * deg2rad) * sin(kep2(4) * deg2rad)
-            aeq2(5) = sin(kep2(3) * 0.5_wp * deg2rad) * cos(kep2(4) * deg2rad)
-            aeq2(6) = kep2(4) + kep2(5) + kep2(6)
+            call kepler_to_alternate_equinoctial(kep2, aeq2)
 
             aeqmean = aeqmean2
             aeqmean2 = aeqmean + (aeq - aeq2)
@@ -566,23 +515,13 @@ contains
             ii = ii + 1
         end do
         ! note: will not test if we hit this tol since
-        ! is can be too strict sometimes. this is the
+        ! it can be too strict sometimes. this is the
         ! best that can be achieved.
         ! if (emag > tol) then
         !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
         ! end if
 
-        blmean(1) = aeqmean(1)
-        blmean(2) = sqrt(aeqmean(2)**2 + aeqmean(3)**2)
-
-        inc_arg = aeqmean(4)**2 + aeqmean(5)**2
-        blmean(3) = acos(1.0_wp - 2.0_wp * min(1.0_wp, inc_arg)) * rad2deg
-
-        blmean(4) = atan2(aeqmean(4), aeqmean(5)) * rad2deg
-        if (blmean(4) < 0.0_wp) blmean(4) = blmean(4) + 360.0_wp
-
-        blmean(5) = atan2(aeqmean(2), aeqmean(3)) * rad2deg - blmean(4)
-        blmean(6) = aeqmean(6) - atan2(aeqmean(2), aeqmean(3)) * rad2deg
+        call alternate_equinoctial_to_blm(aeqmean, blmean)
 
         if (pseudostate /= 0) then
             blmean(3) = 180.0_wp - blmean(3)
@@ -636,7 +575,6 @@ contains
             return
         end if
 
-        pseudostate = 0
         smadp = blml(1) / req
         eccdp = blml(2)
         incdp = blml(3) * deg2rad
@@ -648,6 +586,8 @@ contains
             incdp = pi - incdp
             raandp = -raandp
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         if (eccdp > 0.99_wp) then
@@ -1077,9 +1017,10 @@ contains
             if (trueAnom < 0.0_wp) trueAnom = trueAnom + two_pi
         end if
 
-        anom = trueAnom * rad2deg
         if (anom_type == "MA") then
             anom = true_to_mean_anomaly(trueAnom, e) * rad2deg
+        else
+            anom = trueAnom * rad2deg
         end if
 
         kepl(1) = sma
