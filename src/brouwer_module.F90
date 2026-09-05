@@ -233,10 +233,10 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: kepl !! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper
-        real(wp) :: eta, theta, p, k2, gm2, gm2p, tap, rp, adr
-        real(wp) :: sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl
-        real(wp) :: ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
+        real(wp) :: smap, eccp, incp, raanp, aopp, meanAnom, radper, &
+                    eta, theta, p, k2, gm2, gm2p, tap, rp, adr, &
+                    sma1, decc, dinc, draan, aop1, ma1, lgh, eccpdl, &
+                    ecosl, esinl, ecc1, sinhalfisinh, sinhalficosh, inc1, raan1, sqr_inc
         integer :: pseudostate
 
         stat = BROUWER_SUCCESS
@@ -276,11 +276,12 @@ contains
             return
         end if
 
-        pseudostate = 0
         if (incp > 175.0_wp * deg2rad) then
             incp = pi - incp
             raanp = -raanp
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         call wrap_0_2pi(raanp)
@@ -574,7 +575,6 @@ contains
             return
         end if
 
-        pseudostate = 0
         smadp = blml(1) / req
         eccdp = blml(2)
         incdp = blml(3) * deg2rad
@@ -586,6 +586,8 @@ contains
             incdp = pi - incdp
             raandp = -raandp
             pseudostate = 1
+        else
+            pseudostate = 0
         end if
 
         if (eccdp > 0.99_wp) then
