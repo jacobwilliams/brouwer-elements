@@ -1,0 +1,919 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Brouwer-Lyddane mean orbital elements">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>brouwer_mean_long_to_osculating &ndash; brouwer-elements</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">brouwer-elements </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../sourcefile/brouwer_module.f90.html">Source File</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>brouwer_mean_long_to_osculating
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="23.4% of total for procedures.">202 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/brouwer_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/brouwer_module.f90.html'>brouwer_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/brouwer_module.html'>brouwer_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">brouwer_mean_long_to_osculating</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/brouwer_mean_long_to_osculating.html#src">brouwer_mean_long_to_osculating</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public pure subroutine brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blml, stat, kepl)  
+</h2>
+    
+
+    <p>Converts Brouwer-Lyddane Mean Elements (short and long period terms) to
+Osculating Keplerian Elements.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mu~5"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mu</strong></td>
+            <td>
+                <p>Central body gravitational parameter (km^3/s^2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-req~5"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>req</strong></td>
+            <td>
+                <p>Central body equatorial radius (km)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j2~5"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j2</strong></td>
+            <td>
+                <p>Central body J2 zonal harmonic coefficient</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j3~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j3</strong></td>
+            <td>
+                <p>Central body J3 zonal harmonic coefficient</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j4~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j4</strong></td>
+            <td>
+                <p>Central body J4 zonal harmonic coefficient</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j5~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j5</strong></td>
+            <td>
+                <p>Central body J5 zonal harmonic coefficient</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-blml~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>blml</strong></td>
+            <td>
+                <p>Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stat~5"></span>
+              integer,
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>stat</strong></td>
+            <td>
+                <p>Status: 0 success; /=0 failure.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kepl~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>kepl</strong></td>
+            <td>
+                <p>Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~brouwer_mean_long_to_osculating~~CallsGraph Pages: 1 -->
+<svg id="procbrouwer_mean_long_to_osculatingCallsGraph" width="487pt" height="94pt"
+ viewBox="0.00 0.00 487.00 94.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 90)">
+<title>proc~~brouwer_mean_long_to_osculating~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-90 483,-90 483,4 -4,4"/>
+<!-- proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_node1" class="node">
+<title>proc~brouwer_mean_long_to_osculating</title>
+<polygon fill="none" stroke="black" points="196,-44 0,-44 0,-20 196,-20 196,-44"/>
+<text text-anchor="middle" x="98" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50">brouwer_mean_long_to_osculating</text>
+</g>
+<!-- proc~critical_inclination_t2 -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_node2" class="node">
+<title>proc~critical_inclination_t2</title>
+<g id="a_proc~~brouwer_mean_long_to_osculating~~CallsGraph_node2"><a xlink:href="../proc/critical_inclination_t2.html" xlink:title="critical_inclination_t2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="363.5,-86 238.5,-86 238.5,-62 363.5,-62 363.5,-86"/>
+<text text-anchor="middle" x="301" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">critical_inclination_t2</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating&#45;&gt;proc~critical_inclination_t2 -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_edge1" class="edge">
+<title>proc~brouwer_mean_long_to_osculating&#45;&gt;proc~critical_inclination_t2</title>
+<path fill="none" stroke="#000000" d="M156.6,-44.04C180.25,-48.98 207.81,-54.74 232.41,-59.88"/>
+<polygon fill="#000000" stroke="#000000" points="231.89,-63.34 242.39,-61.96 233.32,-56.49 231.89,-63.34"/>
+</g>
+<!-- proc~mean_to_true_anomaly -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_node3" class="node">
+<title>proc~mean_to_true_anomaly</title>
+<g id="a_proc~~brouwer_mean_long_to_osculating~~CallsGraph_node3"><a xlink:href="../proc/mean_to_true_anomaly.html" xlink:title="mean_to_true_anomaly">
+<polygon fill="#d9534f" stroke="#d9534f" points="370,-44 232,-44 232,-20 370,-20 370,-44"/>
+<text text-anchor="middle" x="301" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mean_to_true_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_edge2" class="edge">
+<title>proc~brouwer_mean_long_to_osculating&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M196.26,-32C204.81,-32 213.39,-32 221.75,-32"/>
+<polygon fill="#000000" stroke="#000000" points="221.83,-35.5 231.83,-32 221.83,-28.5 221.83,-35.5"/>
+</g>
+<!-- proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_node4" class="node">
+<title>proc~wrap_0_2pi</title>
+<g id="a_proc~~brouwer_mean_long_to_osculating~~CallsGraph_node4"><a xlink:href="../proc/wrap_0_2pi.html" xlink:title="wrap_0_2pi">
+<polygon fill="#d9534f" stroke="#d9534f" points="479,-24 406,-24 406,0 479,0 479,-24"/>
+<text text-anchor="middle" x="442.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_0_2pi</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_edge3" class="edge">
+<title>proc~brouwer_mean_long_to_osculating&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M162.02,-19.98C184.06,-16.33 209.04,-12.8 232,-11 293.15,-6.2 308.67,-10.57 370,-11 378.3,-11.06 387.13,-11.15 395.66,-11.26"/>
+<polygon fill="#000000" stroke="#000000" points="395.81,-14.77 405.86,-11.4 395.91,-7.77 395.81,-14.77"/>
+</g>
+<!-- proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CallsGraph_edge4" class="edge">
+<title>proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M370.12,-22.23C378.77,-20.99 387.46,-19.75 395.65,-18.57"/>
+<polygon fill="#000000" stroke="#000000" points="396.31,-22.01 405.72,-17.13 395.32,-15.08 396.31,-22.01"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~brouwer_mean_long_to_osculating~~CalledByGraph Pages: 1 -->
+<svg id="procbrouwer_mean_long_to_osculatingCalledByGraph" width="431pt" height="74pt"
+ viewBox="0.00 0.00 431.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~brouwer_mean_long_to_osculating~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 427,-70 427,4 -4,4"/>
+<!-- proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph_node1" class="node">
+<title>proc~brouwer_mean_long_to_osculating</title>
+<polygon fill="none" stroke="black" points="423,-45 227,-45 227,-21 423,-21 423,-45"/>
+<text text-anchor="middle" x="325" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">brouwer_mean_long_to_osculating</text>
+</g>
+<!-- proc~brouwer_mean_long_to_cartesian -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph_node2" class="node">
+<title>proc~brouwer_mean_long_to_cartesian</title>
+<g id="a_proc~~brouwer_mean_long_to_osculating~~CalledByGraph_node2"><a xlink:href="../proc/brouwer_mean_long_to_cartesian.html" xlink:title="brouwer_mean_long_to_cartesian">
+<polygon fill="#d9534f" stroke="#d9534f" points="191,-66 0,-66 0,-42 191,-42 191,-66"/>
+<text text-anchor="middle" x="95.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_long_to_cartesian</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph_edge1" class="edge">
+<title>proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~brouwer_mean_long_to_osculating</title>
+<path fill="none" stroke="#000000" d="M191,-45.28C199.52,-44.49 208.17,-43.69 216.78,-42.9"/>
+<polygon fill="#000000" stroke="#000000" points="217.22,-46.37 226.86,-41.97 216.58,-39.4 217.22,-46.37"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph_node3" class="node">
+<title>proc~cartesian_to_brouwer_mean_long</title>
+<g id="a_proc~~brouwer_mean_long_to_osculating~~CalledByGraph_node3"><a xlink:href="../proc/cartesian_to_brouwer_mean_long.html" xlink:title="cartesian_to_brouwer_mean_long">
+<polygon fill="#d9534f" stroke="#d9534f" points="191,-24 0,-24 0,0 191,0 191,-24"/>
+<text text-anchor="middle" x="95.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_brouwer_mean_long</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~brouwer_mean_long_to_osculating~~CalledByGraph_edge2" class="edge">
+<title>proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~brouwer_mean_long_to_osculating</title>
+<path fill="none" stroke="#000000" d="M191,-20.72C199.52,-21.51 208.17,-22.31 216.78,-23.1"/>
+<polygon fill="#000000" stroke="#000000" points="216.58,-26.6 226.86,-24.03 217.22,-19.63 216.58,-26.6"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure subroutine </span><span class="n">brouwer_mean_long_to_osculating</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">j2</span><span class="p">,</span><span class="w"> </span><span class="n">j3</span><span class="p">,</span><span class="w"> </span><span class="n">j4</span><span class="p">,</span><span class="w"> </span><span class="n">j5</span><span class="p">,</span><span class="w"> </span><span class="n">blml</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">kepl</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mu</span><span class="w"> </span><span class="c">!! Central body gravitational parameter (km^3/s^2)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="c">!! Central body equatorial radius (km)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j2</span><span class="w"> </span><span class="c">!! Central body J2 zonal harmonic coefficient</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j3</span><span class="w"> </span><span class="c">!! Central body J3 zonal harmonic coefficient</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j4</span><span class="w"> </span><span class="c">!! Central body J4 zonal harmonic coefficient</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j5</span><span class="w"> </span><span class="c">!! Central body J5 zonal harmonic coefficient</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">blml</span><span class="w"> </span><span class="c">!! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span><span class="w"> </span><span class="c">!! Status: 0 success; /=0 failure.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">kepl</span><span class="w"> </span><span class="c">!! Osculating Keplerian elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">smadp</span><span class="p">,</span><span class="w"> </span><span class="n">eccdp</span><span class="p">,</span><span class="w"> </span><span class="n">incdp</span><span class="p">,</span><span class="w"> </span><span class="n">raandp</span><span class="p">,</span><span class="w"> </span><span class="n">aopdp</span><span class="p">,</span><span class="w"> </span><span class="n">meanAnom</span><span class="p">,</span><span class="w"> </span><span class="n">radper</span><span class="p">,</span><span class="w"> </span><span class="n">t2</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">bk2</span><span class="p">,</span><span class="w"> </span><span class="n">bk3</span><span class="p">,</span><span class="w"> </span><span class="n">bk4</span><span class="p">,</span><span class="w"> </span><span class="n">bk5</span><span class="p">,</span><span class="w"> </span><span class="n">eccdp2</span><span class="p">,</span><span class="w"> </span><span class="n">cn2</span><span class="p">,</span><span class="w"> </span><span class="n">cn</span><span class="p">,</span><span class="w"> </span><span class="n">gm2</span><span class="p">,</span><span class="w"> </span><span class="n">gmp2</span><span class="p">,</span><span class="w"> </span><span class="n">gm4</span><span class="p">,</span><span class="w"> </span><span class="n">gmp4</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">theta</span><span class="p">,</span><span class="w"> </span><span class="n">theta2</span><span class="p">,</span><span class="w"> </span><span class="n">theta4</span><span class="p">,</span><span class="w"> </span><span class="n">gm3</span><span class="p">,</span><span class="w"> </span><span class="n">gmp3</span><span class="p">,</span><span class="w"> </span><span class="n">gm5</span><span class="p">,</span><span class="w"> </span><span class="n">gmp5</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">g3dg2</span><span class="p">,</span><span class="w"> </span><span class="n">g4dg2</span><span class="p">,</span><span class="w"> </span><span class="n">g5dg2</span><span class="p">,</span><span class="w"> </span><span class="n">sinMADP</span><span class="p">,</span><span class="w"> </span><span class="n">cosMADP</span><span class="p">,</span><span class="w"> </span><span class="n">sinraandp</span><span class="p">,</span><span class="w"> </span><span class="n">cosraandp</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">tadp</span><span class="p">,</span><span class="w"> </span><span class="n">rp</span><span class="p">,</span><span class="w"> </span><span class="n">adr</span><span class="p">,</span><span class="w"> </span><span class="n">sinta</span><span class="p">,</span><span class="w"> </span><span class="n">costa</span><span class="p">,</span><span class="w"> </span><span class="n">cs2gta</span><span class="p">,</span><span class="w"> </span><span class="n">adr2</span><span class="p">,</span><span class="w"> </span><span class="n">adr3</span><span class="p">,</span><span class="w"> </span><span class="n">costa2</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">a1</span><span class="p">,</span><span class="w"> </span><span class="n">a2</span><span class="p">,</span><span class="w"> </span><span class="n">a3</span><span class="p">,</span><span class="w"> </span><span class="n">a4</span><span class="p">,</span><span class="w"> </span><span class="n">a5</span><span class="p">,</span><span class="w"> </span><span class="n">a6</span><span class="p">,</span><span class="w"> </span><span class="n">sinI</span><span class="p">,</span><span class="w"> </span><span class="n">a10</span><span class="p">,</span><span class="w"> </span><span class="n">a7</span><span class="p">,</span><span class="w"> </span><span class="n">a8p</span><span class="p">,</span><span class="w"> </span><span class="n">a8</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">b13</span><span class="p">,</span><span class="w"> </span><span class="n">b14</span><span class="p">,</span><span class="w"> </span><span class="n">b15</span><span class="p">,</span><span class="w"> </span><span class="n">a11</span><span class="p">,</span><span class="w"> </span><span class="n">a12</span><span class="p">,</span><span class="w"> </span><span class="n">a13</span><span class="p">,</span><span class="w"> </span><span class="n">a14</span><span class="p">,</span><span class="w"> </span><span class="n">a17</span><span class="p">,</span><span class="w"> </span><span class="n">a15</span><span class="p">,</span><span class="w"> </span><span class="n">a16</span><span class="p">,</span><span class="w"> </span><span class="n">a18</span><span class="p">,</span><span class="w"> </span><span class="n">a19</span><span class="p">,</span><span class="w"> </span><span class="n">a21</span><span class="p">,</span><span class="w"> </span><span class="n">a22</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">sinI2</span><span class="p">,</span><span class="w"> </span><span class="n">cosI2</span><span class="p">,</span><span class="w"> </span><span class="n">tanI2</span><span class="p">,</span><span class="w"> </span><span class="n">a26</span><span class="p">,</span><span class="w"> </span><span class="n">a27</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">b1</span><span class="p">,</span><span class="w"> </span><span class="n">b2</span><span class="p">,</span><span class="w"> </span><span class="n">b3</span><span class="p">,</span><span class="w"> </span><span class="n">b4</span><span class="p">,</span><span class="w"> </span><span class="n">b5</span><span class="p">,</span><span class="w"> </span><span class="n">b6</span><span class="p">,</span><span class="w"> </span><span class="n">b7</span><span class="p">,</span><span class="w"> </span><span class="n">b8</span><span class="p">,</span><span class="w"> </span><span class="n">b9</span><span class="p">,</span><span class="w"> </span><span class="n">b10</span><span class="p">,</span><span class="w"> </span><span class="n">b11</span><span class="p">,</span><span class="w"> </span><span class="n">b12</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">sma</span><span class="p">,</span><span class="w"> </span><span class="n">sn2gta</span><span class="p">,</span><span class="w"> </span><span class="n">snf2gd</span><span class="p">,</span><span class="w"> </span><span class="n">csf2gd</span><span class="p">,</span><span class="w"> </span><span class="n">sn2gd</span><span class="p">,</span><span class="w"> </span><span class="n">cs2gd</span><span class="p">,</span><span class="w"> </span><span class="n">sin3gd</span><span class="p">,</span><span class="w"> </span><span class="n">cs3gd</span><span class="p">,</span><span class="w"> </span><span class="n">sn3fgd</span><span class="p">,</span><span class="w"> </span><span class="n">cs3fgd</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">sinGD</span><span class="p">,</span><span class="w"> </span><span class="n">cosGD</span><span class="p">,</span><span class="w"> </span><span class="n">bisubc</span><span class="p">,</span><span class="w"> </span><span class="n">blghp</span><span class="p">,</span><span class="w"> </span><span class="n">eccdpdl</span><span class="p">,</span><span class="w"> </span><span class="n">dltI</span><span class="p">,</span><span class="w"> </span><span class="n">sinDH</span><span class="p">,</span><span class="w"> </span><span class="n">dlt1e</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">blgh</span><span class="p">,</span><span class="w"> </span><span class="n">dlte</span><span class="p">,</span><span class="w"> </span><span class="n">eccdpdl2</span><span class="p">,</span><span class="w"> </span><span class="n">eccdpde2</span><span class="p">,</span><span class="w"> </span><span class="n">ecc</span><span class="p">,</span><span class="w"> </span><span class="n">sinDH2</span><span class="p">,</span><span class="w"> </span><span class="n">squar</span><span class="p">,</span><span class="w"> </span><span class="n">sqrI</span><span class="p">,</span><span class="w"> </span><span class="n">inc</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">ma</span><span class="p">,</span><span class="w"> </span><span class="n">raan</span><span class="p">,</span><span class="w"> </span><span class="n">aop</span><span class="p">,</span><span class="w"> </span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">arg2</span>
+<span class="w">        </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pseudostate</span>
+
+<span class="w">        </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_SUCCESS</span>
+<span class="w">        </span><span class="n">kepl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mu</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_INVALID_MU</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">smadp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">req</span>
+<span class="w">        </span><span class="n">eccdp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">incdp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deg2rad</span>
+<span class="w">        </span><span class="n">raandp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deg2rad</span>
+<span class="w">        </span><span class="n">aopdp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deg2rad</span>
+<span class="w">        </span><span class="n">meanAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deg2rad</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">incdp</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">17</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">deg2rad</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">incdp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">incdp</span>
+<span class="w">            </span><span class="n">raandp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">raandp</span>
+<span class="w">            </span><span class="n">pseudostate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">pseudostate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.99_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_INVALID_ECCENTRICITY</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">radper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">blml</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">radper</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">min_brouwer_radper</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_PERIAPSIS_TOO_LOW</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">blml</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18</span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_INVALID_INCLINATION</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">raandp</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">meanAnom</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">bk2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">j2</span>
+<span class="w">        </span><span class="n">bk3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">j3</span>
+<span class="w">        </span><span class="n">bk4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">j4</span>
+<span class="w">        </span><span class="n">bk5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">j5</span>
+
+<span class="w">        </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span>
+<span class="w">        </span><span class="n">cn2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eccdp2</span>
+<span class="w">        </span><span class="n">cn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">cn2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">gm2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bk2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">smadp</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gmp2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gm4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bk4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">smadp</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gmp4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+<span class="w">        </span><span class="n">theta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">incdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">theta2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span>
+<span class="w">        </span><span class="n">theta4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span>
+<span class="w">        </span><span class="n">t2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">critical_inclination_t2</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">gm3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bk3</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">smadp</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gmp3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm3</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gm5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bk5</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">smadp</span><span class="o">**</span><span class="mi">5</span><span class="p">)</span>
+<span class="w">        </span><span class="n">gmp5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm5</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn</span><span class="o">**</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">g3dg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gmp3</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">gmp2</span>
+<span class="w">        </span><span class="n">g4dg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gmp4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">gmp2</span>
+<span class="w">        </span><span class="n">g5dg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gmp5</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">gmp2</span>
+
+<span class="w">        </span><span class="n">sinMADP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">meanAnom</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cosMADP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">meanAnom</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sinraandp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">raandp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cosraandp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">raandp</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Compute true anomal y(double primed)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">mean_to_true_anomaly</span><span class="p">(</span><span class="n">meanAnom</span><span class="p">,</span><span class="w"> </span><span class="n">eccdp</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e-12_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="o">=</span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">ta</span><span class="o">=</span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">stat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">BROUWER_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="k">return</span>
+
+<span class="k">        </span><span class="n">rp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">smadp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eccdp2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">tadp</span><span class="p">))</span>
+<span class="w">        </span><span class="n">adr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">smadp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">rp</span>
+<span class="w">        </span><span class="n">sinta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">costa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cs2gta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">adr2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">adr</span>
+<span class="w">        </span><span class="n">adr3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">adr</span>
+<span class="w">        </span><span class="n">costa2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span>
+
+<span class="w">        </span><span class="n">a1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">4</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">a2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g4dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">a3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g5dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">4.0_wp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">a4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g5dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">9.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="mf">4.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">a5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">g5dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">4.0_wp</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">9.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="mf">4.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">a6</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g3dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.25_wp</span>
+<span class="w">        </span><span class="n">sinI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">incdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">a10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span>
+<span class="w">        </span><span class="n">a7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a10</span>
+<span class="w">        </span><span class="n">a8p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g5dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="mf">6.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span>
+<span class="w">        </span><span class="n">a8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a8p</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span>
+
+<span class="w">        </span><span class="n">b13</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b14</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a7</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a10</span>
+<span class="w">        </span><span class="n">b15</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">38</span><span class="mf">4.0_wp</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">a11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp2</span>
+<span class="w">        </span><span class="n">a12</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span>
+<span class="w">        </span><span class="n">a13</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a12</span>
+<span class="w">        </span><span class="n">a14</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span>
+<span class="w">        </span><span class="n">a17</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">theta4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">        </span><span class="n">a15</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">        </span><span class="n">a16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span>
+<span class="w">        </span><span class="n">a18</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span>
+<span class="w">        </span><span class="n">a19</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a18</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cn</span><span class="p">)</span>
+<span class="w">        </span><span class="n">a21</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span>
+<span class="w">        </span><span class="n">a22</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span>
+<span class="w">        </span><span class="n">sinI2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">incdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cosI2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">incdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">tanI2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">tan</span><span class="p">(</span><span class="n">incdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">a26</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="mf">6.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a16</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">4</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a17</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span>
+<span class="w">        </span><span class="n">a27</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.125_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a17</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a16</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a2</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">((</span><span class="n">a11</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">40</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a15</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">4</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a14</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a13</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="mf">6.0_wp</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a17</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a16</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="o">-</span><span class="mi">8</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a15</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a14</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a13</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a11</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a26</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a22</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g4dg2</span>
+<span class="w">        </span><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a19</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eccdp2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a19</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a18</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a6</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a21</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tanI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">9.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="mf">6.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a18</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a21</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a26</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="mi">8</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a17</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a16</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">theta</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">57</span><span class="mf">6.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g5dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">-</span><span class="w"> </span><span class="p">((</span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tanI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">115</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a8p</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="mf">9.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a7</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span>
+<span class="w">        </span><span class="n">b6</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">38</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span>
+<span class="w">        </span><span class="n">b7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a18</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">8.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">             </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">7.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g4dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="mf">2.0_wp</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">b8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">9.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="mf">4.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t2</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span>
+<span class="w">        </span><span class="n">b9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">38</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span>
+<span class="w">        </span><span class="n">b10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a26</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g4dg2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">a27</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a21</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">6</span><span class="mf">4.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a6</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a26</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="mf">2.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="p">)</span>
+<span class="w">        </span><span class="n">b12</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="p">((</span><span class="mi">8</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a17</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a16</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">a22</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">57</span><span class="mf">6.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g5dg2</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">a8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">a21</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">115</span><span class="mf">2.0_wp</span><span class="p">)))</span>
+
+<span class="w">        </span><span class="c">! Compute semi-major axis</span>
+<span class="w">        </span><span class="n">sma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">smadp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">gm2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">cn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cn</span><span class="p">)))</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa2</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">              </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">adr3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs2gta</span><span class="p">))</span>
+
+<span class="w">        </span><span class="n">sn2gta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">snf2gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">csf2gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tadp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sn2gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cs2gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sin3gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cs3gd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sn3fgd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tadp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cs3fgd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tadp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sinGD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="n">aopdp</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cosGD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="n">aopdp</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Compute (L+G+H) primed</span>
+<span class="w">        </span><span class="n">bisubc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t2</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="mi">2</span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp2</span><span class="p">))</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bisubc</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.001_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">dlt1e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">blghp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">eccdpdl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">dltI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">sinDH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">blghp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raandp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">aopdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">meanAnom</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs3gd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn2gd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosGD</span>
+<span class="w">            </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">blghp</span><span class="p">)</span>
+
+<span class="w">            </span><span class="n">dlt1e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b14</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinGD</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b13</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs2gd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b15</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin3gd</span>
+<span class="w">            </span><span class="n">eccdpdl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn2gd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosGD</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b6</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs3gd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.25_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                      </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinta</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                      </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="o">-</span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">adr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">snf2gd</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                      </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn3fgd</span><span class="p">))</span>
+<span class="w">            </span><span class="n">dltI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs3fgd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">csf2gd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cs2gta</span><span class="p">))</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">a21</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">cn2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">b8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinGD</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b7</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs2gd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b9</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin3gd</span><span class="p">)</span>
+<span class="w">            </span><span class="n">sinDH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">cosI2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">b12</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs3gd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b11</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosGD</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn2gd</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="o">-</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">6.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinta</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">meanAnom</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tadp</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">sn2gta</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">snf2gd</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn3fgd</span><span class="p">))))</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">blgh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blghp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.25_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">sn3fgd</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">+</span><span class="w"> </span><span class="n">snf2gd</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">adr2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">adr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="o">-</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinta</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tadp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">meanAnom</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">5.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.25_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sn3fgd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">sn2gta</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">snf2gd</span><span class="p">)))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">blgh</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">dlte</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dlt1e</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gm2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cs2gta</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp</span><span class="p">))</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">gmp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">theta2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">csf2gd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cs3fgd</span><span class="p">))</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">theta2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0_wp</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gm2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">cn2</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cn</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cn</span><span class="p">))</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">               </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">3.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdp2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">costa2</span><span class="p">)))</span>
+
+<span class="w">        </span><span class="n">eccdpdl2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdpdl</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eccdpdl</span>
+<span class="w">        </span><span class="n">eccdpde2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dlte</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">        </span><span class="n">ecc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">eccdpdl2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eccdpde2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">sinDH2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sinDH</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinDH</span>
+<span class="w">        </span><span class="n">squar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dltI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosI2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinI2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="w">        </span><span class="n">sqrI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">sqrt</span><span class="p">(</span><span class="n">sinDH2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">squar</span><span class="p">)</span>
+<span class="w">        </span><span class="n">inc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">asin</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">sqrI</span><span class="p">)))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ecc</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">aop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.0e-7_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">                </span><span class="n">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blgh</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">arg1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sinDH</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosraandp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinraandp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dltI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinI2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">arg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cosraandp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dltI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinI2</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">sinDH</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinraandp</span>
+<span class="w">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">arg2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blgh</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">aop</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">raan</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        else</span>
+<span class="k">            </span><span class="n">arg1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eccdpdl</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosMADP</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dlte</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinMADP</span>
+<span class="w">            </span><span class="n">arg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">eccdp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dlte</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosMADP</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eccdpdl</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinMADP</span>
+<span class="w">            </span><span class="n">ma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">arg2</span><span class="p">)</span>
+<span class="w">            </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">ma</span><span class="p">)</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">1.0e-7_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">                </span><span class="n">aop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blgh</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">raan</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ma</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="k">                </span><span class="n">arg1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sinDH</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosraandp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinraandp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dltI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinI2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">arg2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cosraandp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dltI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cosI2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sinI2</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">sinDH</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sinraandp</span>
+<span class="w">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">arg2</span><span class="p">)</span>
+<span class="w">                </span><span class="n">aop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blgh</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ma</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">raan</span>
+<span class="w">            </span><span class="k">end if</span>
+<span class="k">        end if</span>
+
+<span class="k">        call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">raan</span><span class="p">)</span>
+<span class="w">        </span><span class="k">call </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">aop</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">req</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ecc</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inc</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raan</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aop</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pseudostate</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">kepl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">18</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kepl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">            </span><span class="n">kepl</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">36</span><span class="mf">0.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kepl</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">    end subroutine </span><span class="n">brouwer_mean_long_to_osculating</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              brouwer-elements
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

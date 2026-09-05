@@ -1,0 +1,754 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Brouwer-Lyddane mean orbital elements">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>cartesian_to_keplerian &ndash; brouwer-elements</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">brouwer-elements </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../sourcefile/brouwer_module.f90.html">Source File</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>cartesian_to_keplerian
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title="12.3% of total for procedures.">106 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/brouwer_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/brouwer_module.f90.html'>brouwer_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/brouwer_module.html'>brouwer_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">cartesian_to_keplerian</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/cartesian_to_keplerian.html#src">cartesian_to_keplerian</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public pure subroutine cartesian_to_keplerian(mu, cartesian, anomaly_type, stat, kepl)  
+</h2>
+    
+
+    <p>Converts Cartesian state to Keplerian elements.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mu~7"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mu</strong></td>
+            <td>
+                <p>Central body gravitational parameter (km^3/s^2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cartesian~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>cartesian</strong></td>
+            <td>
+                <p>Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-anomaly_type"></span>
+              character(len=*),
+            </td>
+<td>intent(in),</td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>anomaly_type</strong></td>
+            <td>
+                <p>Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stat~7"></span>
+              integer,
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>stat</strong></td>
+            <td>
+                <p>Status: 0 success; /=0 failure.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-kepl~5"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>kepl</strong></td>
+            <td>
+                <p>Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~cartesian_to_keplerian~~CallsGraph Pages: 1 -->
+<svg id="proccartesian_to_keplerianCallsGraph" width="623pt" height="90pt"
+ viewBox="0.00 0.00 623.00 89.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~cartesian_to_keplerian~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 85.96)">
+<title>proc~~cartesian_to_keplerian~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-85.96 619,-85.96 619,4 -4,4"/>
+<!-- proc~cartesian_to_keplerian -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node1" class="node">
+<title>proc~cartesian_to_keplerian</title>
+<polygon fill="none" stroke="black" points="133,-60.96 0,-60.96 0,-36.96 133,-36.96 133,-60.96"/>
+<text text-anchor="middle" x="66.5" y="-46.56" font-family="Helvetica,sans-Serif" font-size="10.50">cartesian_to_keplerian</text>
+</g>
+<!-- proc~cross -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node2" class="node">
+<title>proc~cross</title>
+<g id="a_proc~~cartesian_to_keplerian~~CallsGraph_node2"><a xlink:href="../proc/cross.html" xlink:title="cross">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="265,-81.96 211,-81.96 211,-57.96 265,-57.96 265,-81.96"/>
+<text text-anchor="middle" x="238" y="-67.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_keplerian&#45;&gt;proc~cross -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge1" class="edge">
+<title>proc~cartesian_to_keplerian&#45;&gt;proc~cross</title>
+<path fill="none" stroke="#000000" d="M133.03,-57.08C156.09,-59.94 181.15,-63.05 200.89,-65.49"/>
+<polygon fill="#000000" stroke="#000000" points="200.62,-68.98 210.98,-66.74 201.48,-62.04 200.62,-68.98"/>
+</g>
+<!-- proc~true_to_mean_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node3" class="node">
+<title>proc~true_to_mean_anomaly</title>
+<g id="a_proc~~cartesian_to_keplerian~~CallsGraph_node3"><a xlink:href="../proc/true_to_mean_anomaly.html" xlink:title="true_to_mean_anomaly">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="307,-39.96 169,-39.96 169,-15.96 307,-15.96 307,-39.96"/>
+<text text-anchor="middle" x="238" y="-25.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">true_to_mean_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_keplerian&#45;&gt;proc~true_to_mean_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge2" class="edge">
+<title>proc~cartesian_to_keplerian&#45;&gt;proc~true_to_mean_anomaly</title>
+<path fill="none" stroke="#000000" d="M133.03,-40.85C141.47,-39.8 150.17,-38.72 158.79,-37.65"/>
+<polygon fill="#000000" stroke="#000000" points="159.34,-41.11 168.84,-36.41 158.48,-34.17 159.34,-41.11"/>
+</g>
+<!-- proc~true_to_eccentric_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node4" class="node">
+<title>proc~true_to_eccentric_anomaly</title>
+<g id="a_proc~~cartesian_to_keplerian~~CallsGraph_node4"><a xlink:href="../proc/true_to_eccentric_anomaly.html" xlink:title="true_to_eccentric_anomaly">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="503,-81.96 346,-81.96 346,-57.96 503,-57.96 503,-81.96"/>
+<text text-anchor="middle" x="424.5" y="-67.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">true_to_eccentric_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~true_to_mean_anomaly&#45;&gt;proc~true_to_eccentric_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge3" class="edge">
+<title>proc~true_to_mean_anomaly&#45;&gt;proc~true_to_eccentric_anomaly</title>
+<path fill="none" stroke="#000000" d="M291.87,-40C313.39,-44.9 338.43,-50.6 360.86,-55.7"/>
+<polygon fill="#000000" stroke="#000000" points="360.09,-59.12 370.62,-57.93 361.65,-52.29 360.09,-59.12"/>
+</g>
+<!-- proc~true_to_hyperbolic_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node5" class="node">
+<title>proc~true_to_hyperbolic_anomaly</title>
+<g id="a_proc~~cartesian_to_keplerian~~CallsGraph_node5"><a xlink:href="../proc/true_to_hyperbolic_anomaly.html" xlink:title="true_to_hyperbolic_anomaly">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="506,-39.96 343,-39.96 343,-15.96 506,-15.96 506,-39.96"/>
+<text text-anchor="middle" x="424.5" y="-25.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">true_to_hyperbolic_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~true_to_mean_anomaly&#45;&gt;proc~true_to_hyperbolic_anomaly -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge4" class="edge">
+<title>proc~true_to_mean_anomaly&#45;&gt;proc~true_to_hyperbolic_anomaly</title>
+<path fill="none" stroke="#000000" d="M307.18,-27.96C315.51,-27.96 324.13,-27.96 332.74,-27.96"/>
+<polygon fill="#000000" stroke="#000000" points="332.81,-31.46 342.81,-27.96 332.81,-24.46 332.81,-31.46"/>
+</g>
+<!-- proc~wrap_0_2pi -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_node6" class="node">
+<title>proc~wrap_0_2pi</title>
+<g id="a_proc~~cartesian_to_keplerian~~CallsGraph_node6"><a xlink:href="../proc/wrap_0_2pi.html" xlink:title="wrap_0_2pi">
+<polygon fill="#d9534f" stroke="#d9534f" points="615,-40.96 542,-40.96 542,-16.96 615,-16.96 615,-40.96"/>
+<text text-anchor="middle" x="578.5" y="-26.56" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_0_2pi</text>
+</a>
+</g>
+</g>
+<!-- proc~true_to_mean_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge5" class="edge">
+<title>proc~true_to_mean_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M288.16,-15.95C305.39,-12.29 324.95,-8.77 343,-6.96 415.09,0.24 434.36,3.81 506,-6.96 515.82,-8.44 526.15,-11 535.81,-13.86"/>
+<polygon fill="#000000" stroke="#000000" points="535,-17.27 545.58,-16.91 537.09,-10.59 535,-17.27"/>
+</g>
+<!-- proc~true_to_eccentric_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~cartesian_to_keplerian~~CallsGraph_edge6" class="edge">
+<title>proc~true_to_eccentric_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M472.36,-57.89C483.4,-55 495.12,-51.9 506,-48.96 514.5,-46.67 523.55,-44.17 532.26,-41.75"/>
+<polygon fill="#000000" stroke="#000000" points="533.2,-45.12 541.89,-39.06 531.32,-38.38 533.2,-45.12"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~cartesian_to_keplerian~~CalledByGraph Pages: 1 -->
+<svg id="proccartesian_to_keplerianCalledByGraph" width="372pt" height="74pt"
+ viewBox="0.00 0.00 372.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~cartesian_to_keplerian~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 368,-70 368,4 -4,4"/>
+<!-- proc~cartesian_to_keplerian -->
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph_node1" class="node">
+<title>proc~cartesian_to_keplerian</title>
+<polygon fill="none" stroke="black" points="364,-45 231,-45 231,-21 364,-21 364,-45"/>
+<text text-anchor="middle" x="297.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">cartesian_to_keplerian</text>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long -->
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph_node2" class="node">
+<title>proc~cartesian_to_brouwer_mean_long</title>
+<g id="a_proc~~cartesian_to_keplerian~~CalledByGraph_node2"><a xlink:href="../proc/cartesian_to_brouwer_mean_long.html" xlink:title="cartesian_to_brouwer_mean_long">
+<polygon fill="#d9534f" stroke="#d9534f" points="193,-66 2,-66 2,-42 193,-42 193,-66"/>
+<text text-anchor="middle" x="97.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_brouwer_mean_long</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~cartesian_to_keplerian -->
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph_edge1" class="edge">
+<title>proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~cartesian_to_keplerian</title>
+<path fill="none" stroke="#000000" d="M193.15,-43.96C202.4,-42.98 211.69,-41.99 220.72,-41.04"/>
+<polygon fill="#000000" stroke="#000000" points="221.2,-44.51 230.78,-39.97 220.46,-37.55 221.2,-44.51"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short -->
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph_node3" class="node">
+<title>proc~cartesian_to_brouwer_mean_short</title>
+<g id="a_proc~~cartesian_to_keplerian~~CalledByGraph_node3"><a xlink:href="../proc/cartesian_to_brouwer_mean_short.html" xlink:title="cartesian_to_brouwer_mean_short">
+<polygon fill="#d9534f" stroke="#d9534f" points="195,-24 0,-24 0,0 195,0 195,-24"/>
+<text text-anchor="middle" x="97.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_brouwer_mean_short</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~cartesian_to_keplerian -->
+<g id="proc~~cartesian_to_keplerian~~CalledByGraph_edge2" class="edge">
+<title>proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~cartesian_to_keplerian</title>
+<path fill="none" stroke="#000000" d="M195.18,-22.25C203.76,-23.16 212.37,-24.08 220.74,-24.97"/>
+<polygon fill="#000000" stroke="#000000" points="220.51,-28.46 230.82,-26.03 221.25,-21.5 220.51,-28.46"/>
+</g>
+</g>
+</svg>
+</div>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure subroutine </span><span class="n">cartesian_to_keplerian</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="n">anomaly_type</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">kepl</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mu</span><span class="w"> </span><span class="c">!! Central body gravitational parameter (km^3/s^2)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cartesian</span><span class="w"> </span><span class="c">!! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">anomaly_type</span><span class="w"> </span><span class="c">!! Anomaly type: "TA" (True Anomaly, default) or "MA" (Mean Anomaly)</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span><span class="w"> </span><span class="c">!! Status: 0 success; /=0 failure.</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">kepl</span><span class="w"> </span><span class="c">!! Keplerian state [sma(km), ecc, inc(deg), raan(deg), aop(deg), anom(deg)]</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vel</span><span class="p">,</span><span class="w"> </span><span class="n">angMomentum</span><span class="p">,</span><span class="w"> </span><span class="n">nodeVec</span><span class="p">,</span><span class="w"> </span><span class="n">eccVec</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">posMag</span><span class="p">,</span><span class="w"> </span><span class="n">velMag</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">zeta</span><span class="p">,</span><span class="w"> </span><span class="n">sma</span><span class="p">,</span><span class="w"> </span><span class="n">inc</span><span class="p">,</span><span class="w"> </span><span class="n">raan</span><span class="p">,</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="p">,</span><span class="w"> </span><span class="n">trueAnom</span><span class="p">,</span><span class="w"> </span><span class="n">anom</span>
+<span class="w">        </span><span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">anom_type</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">singular_tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.001_wp</span><span class="w"> </span><span class="c">!! minimum allowed rp (km)</span>
+
+<span class="w">        </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_SUCCESS</span>
+<span class="w">        </span><span class="n">kepl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">anomaly_type</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">anom_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anomaly_type</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">anom_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"TA"</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0e-30_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_INVALID_MU</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cartesian</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">vel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cartesian</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">posMag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">norm2</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+<span class="w">        </span><span class="n">velMag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">norm2</span><span class="p">(</span><span class="n">vel</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">posMag</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">velMag</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_DEGENERATE_STATE</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! Angular momentum vector h = pos x vel</span>
+<span class="w">        </span><span class="n">angMomentum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cross</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vel</span><span class="p">)</span>
+<span class="w">        </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">norm2</span><span class="p">(</span><span class="n">angMomentum</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_DEGENERATE_STATE</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="w">        </span><span class="c">! Line of nodes vector n = [0,0,1] x angMomentum</span>
+<span class="w">        </span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">angMomentum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">angMomentum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">norm2</span><span class="p">(</span><span class="n">nodeVec</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Eccentricity vector</span>
+<span class="w">        </span><span class="n">eccVec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">mu</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="n">velMag</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mu</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">posMag</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pos</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vel</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vel</span><span class="p">)</span>
+<span class="w">        </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">norm2</span><span class="p">(</span><span class="n">eccVec</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c">! Specific energy zeta</span>
+<span class="w">        </span><span class="n">zeta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">velMag</span><span class="o">**</span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mu</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">posMag</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">zeta</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">parabolic_tol</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_PARABOLIC_ORBIT</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">sma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">mu</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0_wp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">zeta</span><span class="p">)</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">sma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0_wp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">e</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">singular_tol</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_DEGENERATE_STATE</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        </span><span class="n">inc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">angMomentum</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">h</span><span class="p">)))</span>
+
+<span class="w">        </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">        </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">        </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">inc</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">)))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! Case 1: Non-circular, Inclined Orbit</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_DEGENERATE_STATE</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            else</span>
+<span class="k">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">n</span><span class="p">)))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">raan</span>
+
+<span class="w">                </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">nodeVec</span><span class="p">,</span><span class="w"> </span><span class="n">eccVec</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">e</span><span class="p">))))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">eccVec</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">argPeriapsis</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">            </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">eccVec</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">posMag</span><span class="p">))))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vel</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">trueAnom</span>
+
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">or</span><span class="p">.</span><span class="w"> </span><span class="n">inc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">)))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! Case 2: Non-circular, Equatorial Orbit</span>
+<span class="w">            </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">eccVec</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">e</span><span class="p">)))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">eccVec</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">argPeriapsis</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">))</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">argPeriapsis</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">two_pi</span>
+
+<span class="w">            </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">eccVec</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">posMag</span><span class="p">))))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">vel</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">trueAnom</span>
+
+<span class="w">        </span><span class="k">else if</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">inc</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">)))</span><span class="w"> </span><span class="k">then</span>
+<span class="w">            </span><span class="c">! Case 3: Circular, Inclined Orbit</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">                </span><span class="nb">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BROUWER_DEGENERATE_STATE</span>
+<span class="w">                </span><span class="k">return</span>
+<span class="k">            else</span>
+<span class="k">                </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">n</span><span class="p">)))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nodeVec</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">raan</span>
+<span class="w">                </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">                </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">dot_product</span><span class="p">(</span><span class="n">nodeVec</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">posMag</span><span class="p">))))</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pos</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">trueAnom</span>
+<span class="w">            </span><span class="k">end if</span>
+
+<span class="k">        else</span>
+<span class="w">            </span><span class="c">! Case 4: Circular, Equatorial Orbit</span>
+<span class="w">            </span><span class="n">raan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">acos</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0_wp</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">posMag</span><span class="p">)))</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pos</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">two_pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">trueAnom</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">inc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0e-11_wp</span><span class="p">))</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">trueAnom</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">trueAnom</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">two_pi</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        if</span><span class="w"> </span><span class="p">(</span><span class="n">anom_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"MA"</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">anom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">true_to_mean_anomaly</span><span class="p">(</span><span class="n">trueAnom</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="k">            </span><span class="n">anom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">trueAnom</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="k">end if</span>
+
+<span class="k">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sma</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inc</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raan</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argPeriapsis</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">rad2deg</span>
+<span class="w">        </span><span class="n">kepl</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">anom</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">cartesian_to_keplerian</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              brouwer-elements
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

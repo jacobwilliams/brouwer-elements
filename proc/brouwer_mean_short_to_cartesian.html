@@ -1,0 +1,509 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Brouwer-Lyddane mean orbital elements">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>brouwer_mean_short_to_cartesian &ndash; brouwer-elements</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">brouwer-elements </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../sourcefile/brouwer_module.f90.html">Source File</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>brouwer_mean_short_to_cartesian
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 1.7% of total for procedures.">15 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/brouwer_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/brouwer_module.f90.html'>brouwer_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/brouwer_module.html'>brouwer_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">brouwer_mean_short_to_cartesian</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/brouwer_mean_short_to_cartesian.html#src">brouwer_mean_short_to_cartesian</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>public pure subroutine brouwer_mean_short_to_cartesian(mu, req, j2, blms, stat, cart)  
+</h2>
+    
+
+    <p>Converts Brouwer-Lyddane Mean Elements (short-period terms only) to Cartesian.</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-mu~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>mu</strong></td>
+            <td>
+                <p>Central body gravitational parameter (km^3/s^2)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-req~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>req</strong></td>
+            <td>
+                <p>Central body equatorial radius (km)</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-j2~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>j2</strong></td>
+            <td>
+                <p>Central body J2 zonal harmonic coefficient</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-blms~3"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>blms</strong></td>
+            <td>
+                <p>Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-stat~3"></span>
+              integer,
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>stat</strong></td>
+            <td>
+                <p>Status propagated from <a href="../proc/brouwer_mean_short_to_osculating.html">brouwer_mean_short_to_osculating</a> or <a href="../proc/keplerian_to_cartesian.html">keplerian_to_cartesian</a> conversion</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cart~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>cart</strong></td>
+            <td>
+                <p>Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~brouwer_mean_short_to_cartesian~~CallsGraph Pages: 1 -->
+<svg id="procbrouwer_mean_short_to_cartesianCallsGraph" width="641pt" height="66pt"
+ viewBox="0.00 0.00 641.00 65.70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph" class="graph" transform="scale(0.89 0.89) rotate(0) translate(4 70)">
+<title>proc~~brouwer_mean_short_to_cartesian~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-70 718,-70 718,4 -4,4"/>
+<!-- proc~brouwer_mean_short_to_cartesian -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node1" class="node">
+<title>proc~brouwer_mean_short_to_cartesian</title>
+<polygon fill="none" stroke="black" points="195,-45 0,-45 0,-21 195,-21 195,-45"/>
+<text text-anchor="middle" x="97.5" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">brouwer_mean_short_to_cartesian</text>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node2" class="node">
+<title>proc~brouwer_mean_short_to_osculating</title>
+<g id="a_proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node2"><a xlink:href="../proc/brouwer_mean_short_to_osculating.html" xlink:title="brouwer_mean_short_to_osculating">
+<polygon fill="#d9534f" stroke="#d9534f" points="431,-24 231,-24 231,0 431,0 431,-24"/>
+<text text-anchor="middle" x="331" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_short_to_osculating</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~brouwer_mean_short_to_osculating -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge1" class="edge">
+<title>proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~brouwer_mean_short_to_osculating</title>
+<path fill="none" stroke="#000000" d="M195,-24.25C203.47,-23.48 212.08,-22.7 220.65,-21.92"/>
+<polygon fill="#000000" stroke="#000000" points="221.03,-25.4 230.67,-21.01 220.4,-18.43 221.03,-25.4"/>
+</g>
+<!-- proc~keplerian_to_cartesian -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node3" class="node">
+<title>proc~keplerian_to_cartesian</title>
+<g id="a_proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node3"><a xlink:href="../proc/keplerian_to_cartesian.html" xlink:title="keplerian_to_cartesian">
+<polygon fill="#d9534f" stroke="#d9534f" points="397.5,-66 264.5,-66 264.5,-42 397.5,-42 397.5,-66"/>
+<text text-anchor="middle" x="331" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">keplerian_to_cartesian</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge2" class="edge">
+<title>proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M195,-41.75C214.77,-43.55 235.31,-45.41 254.23,-47.13"/>
+<polygon fill="#000000" stroke="#000000" points="253.98,-50.62 264.26,-48.04 254.62,-43.65 253.98,-50.62"/>
+</g>
+<!-- proc~mean_to_true_anomaly -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node4" class="node">
+<title>proc~mean_to_true_anomaly</title>
+<g id="a_proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node4"><a xlink:href="../proc/mean_to_true_anomaly.html" xlink:title="mean_to_true_anomaly">
+<polygon fill="#d9534f" stroke="#d9534f" points="605,-64 467,-64 467,-40 605,-40 605,-64"/>
+<text text-anchor="middle" x="536" y="-49.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mean_to_true_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge3" class="edge">
+<title>proc~brouwer_mean_short_to_osculating&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M392.91,-24C415.19,-28.39 440.59,-33.4 463.7,-37.95"/>
+<polygon fill="#000000" stroke="#000000" points="463.3,-41.44 473.79,-39.94 464.65,-34.57 463.3,-41.44"/>
+</g>
+<!-- proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node5" class="node">
+<title>proc~wrap_0_2pi</title>
+<g id="a_proc~~brouwer_mean_short_to_cartesian~~CallsGraph_node5"><a xlink:href="../proc/wrap_0_2pi.html" xlink:title="wrap_0_2pi">
+<polygon fill="#d9534f" stroke="#d9534f" points="714,-44 641,-44 641,-20 714,-20 714,-44"/>
+<text text-anchor="middle" x="677.5" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">wrap_0_2pi</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge4" class="edge">
+<title>proc~brouwer_mean_short_to_osculating&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M431.18,-17.76C496.87,-21.57 579.97,-26.4 630.64,-29.34"/>
+<polygon fill="#000000" stroke="#000000" points="630.75,-32.85 640.94,-29.94 631.16,-25.86 630.75,-32.85"/>
+</g>
+<!-- proc~keplerian_to_cartesian&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge5" class="edge">
+<title>proc~keplerian_to_cartesian&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M397.63,-53.35C416.47,-53.17 437.2,-52.96 456.72,-52.77"/>
+<polygon fill="#000000" stroke="#000000" points="456.84,-56.27 466.81,-52.67 456.77,-49.27 456.84,-56.27"/>
+</g>
+<!-- proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~brouwer_mean_short_to_cartesian~~CallsGraph_edge6" class="edge">
+<title>proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M605.12,-42.23C613.77,-40.99 622.46,-39.75 630.65,-38.57"/>
+<polygon fill="#000000" stroke="#000000" points="631.31,-42.01 640.72,-37.13 630.32,-35.08 631.31,-42.01"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocbrouwer_mean_short_to_cartesianCallsGraph = svgPanZoom('#procbrouwer_mean_short_to_cartesianCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure subroutine </span><span class="n">brouwer_mean_short_to_cartesian</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">j2</span><span class="p">,</span><span class="w"> </span><span class="n">blms</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">cart</span><span class="p">)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mu</span><span class="w"> </span><span class="c">!! Central body gravitational parameter (km^3/s^2)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">req</span><span class="w"> </span><span class="c">!! Central body equatorial radius (km)</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j2</span><span class="w"> </span><span class="c">!! Central body J2 zonal harmonic coefficient</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">blms</span><span class="w"> </span><span class="c">!! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span><span class="w"> </span><span class="c">!! Status propagated from [[brouwer_mean_short_to_osculating]] or [[keplerian_to_cartesian]] conversion</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="c">!! Cartesian state vector [x, y, z, vx, vy, vz] (km, km/s)</span>
+
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">kepl</span>
+
+<span class="w">        </span><span class="k">call </span><span class="n">brouwer_mean_short_to_osculating</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">j2</span><span class="p">,</span><span class="w"> </span><span class="n">blms</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">kepl</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">stat</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="n">BROUWER_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0_wp</span>
+<span class="w">            </span><span class="k">return</span>
+<span class="k">        end if</span>
+
+<span class="k">        call </span><span class="n">keplerian_to_cartesian</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">kepl</span><span class="p">,</span><span class="w"> </span><span class="n">anomaly_type</span><span class="o">=</span><span class="s2">"MA"</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="o">=</span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">cart</span><span class="o">=</span><span class="n">cart</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">brouwer_mean_short_to_cartesian</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              brouwer-elements
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

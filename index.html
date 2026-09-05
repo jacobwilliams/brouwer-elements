@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Brouwer-Lyddane mean orbital elements">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="./favicon.png">
+
+    <title> brouwer-elements </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="./css/fontawesome.min.css" rel="stylesheet">
+    <link href="./css/brands.min.css" rel="stylesheet">
+    <link href="./css/regular.min.css" rel="stylesheet">
+    <link href="./css/solid.min.css" rel="stylesheet">
+    <link href="./css/v4-font-face.min.css" rel="stylesheet">
+    <link href="./css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="./css/local.css" rel="stylesheet">
+    <link href="./css/pygments.css" rel="stylesheet">
+    <script src="./js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="./index.html">brouwer-elements </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="./sourcefile/brouwer_module.f90.html">Source File</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="./search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <!-- Main component for a primary marketing message or call to action -->
+    <div class="p-5 mb-4 bg-light border rounded-3" id="jumbotron">
+      <p>Brouwer-Lyddane mean orbital elements</p>
+        <p> Find us on&hellip;</p>
+      <p>
+        <a class="btn btn-lg btn-primary" href="https://github.com/jacobwilliams/brouwer-elements" role="button">GitHub</a>
+        
+        
+        
+        
+      </p>
+    </div>
+
+      <div class="row" id='text'>
+        <div class=col-md-8>
+          <h1>brouwer-elements</h1>
+          <p>Modern Fortran version of Brouwer-Lyddane mean orbital element conversion routines.</p>
+<p><a href="https://github.com/topics/fortran"><img alt="Language" src="https://img.shields.io/badge/-Fortran-734f96?logo=fortran&amp;logoColor=white"></a>
+<a href="https://github.com/jacobwilliams/brouwer-elements/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jacobwilliams/brouwer-elements.svg"></a>
+<a href="https://github.com/jacobwilliams/brouwer-elements/actions"><img alt="Build Status" src="https://github.com/jacobwilliams/brouwer-elements/actions/workflows/CI.yml/badge.svg"></a>
+<a href="https://codecov.io/gh/jacobwilliams/brouwer-elements"><img alt="codecov" src="https://codecov.io/gh/jacobwilliams/brouwer-elements/branch/master/graph/badge.svg"></a>
+<a href="https://github.com/jacobwilliams/brouwer-elements/commits/master"><img alt="last-commit" src="https://img.shields.io/github/last-commit/jacobwilliams/brouwer-elements"></a></p>
+<h2>Overview</h2>
+<p>The <code>brouwer_module</code> provides modern Fortran subroutines to convert between Cartesian state vectors $[x, y, z, v_x, v_y, v_z]$ and Brouwer-Lyddane mean orbital elements $[a, e, i, \Omega, \omega, M]$ (semi-major axis, eccentricity, inclination, right ascension of ascending node, argument of periapsis, and mean anomaly).</p>
+<p>Both short-period perturbation models and full short- plus long-period perturbation models ($J_2, J_3, J_4, J_5$) are supported.</p>
+<h2>Features</h2>
+<h3>Four Primary Conversion Routines:</h3>
+<ul>
+<li><code>cartesian_to_brouwer_mean_short</code>: Cartesian $\rightarrow$ Brouwer Mean Elements (short-period terms only)</li>
+<li><code>brouwer_mean_short_to_cartesian</code>: Brouwer Mean Elements (short-period) $\rightarrow$ Cartesian</li>
+<li><code>cartesian_to_brouwer_mean_long</code>: Cartesian $\rightarrow$ Brouwer Mean Elements (short and long period terms)</li>
+<li><code>brouwer_mean_long_to_cartesian</code>: Brouwer Mean Elements (short and long period) $\rightarrow$ Cartesian</li>
+</ul>
+<h2>Building and Testing</h2>
+<p>Use <code>fpm</code> to build and test. You can use <code>pixi</code> to manage the environment with the necessary development tools.</p>
+<div class="codehilite"><pre><span></span><code>pixi<span class="w"> </span>shell<span class="w">  </span><span class="c1"># activate the environment</span>
+fpm<span class="w"> </span>build
+fpm<span class="w"> </span><span class="nb">test</span>
+</code></pre></div>
+
+<h2>Usage Example</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">program </span><span class="n">example</span>
+<span class="w">  </span><span class="k">use </span><span class="n">brouwer_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">wp</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">brouwer_module_wp</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">cartesian_to_brouwer_mean_short</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">cartesian_to_brouwer_mean_long</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                </span><span class="n">brouwer_mean_long_to_cartesian</span>
+
+<span class="w">    </span><span class="k">implicit none</span>
+
+<span class="w">    </span><span class="c">! Central body parameters (e.g. Earth)</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mu_earth</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">39860</span><span class="mf">0.4415_wp</span><span class="w">           </span><span class="c">! km^3/s^2</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">req_earth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">637</span><span class="mf">8.1363_wp</span><span class="w">             </span><span class="c">! km</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j2_earth</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mf">1.082626925638815e-3_wp</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j3_earth</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">0.2532307818191774e-5_wp</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j4_earth</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">0.1620429990000000e-5_wp</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">j5_earth</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">0.2270711043920343e-6_wp</span>
+
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="n">cartesian_out</span><span class="p">,</span><span class="w"> </span><span class="n">blms</span><span class="p">,</span><span class="w"> </span><span class="n">blml</span>
+<span class="w">    </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">stat</span>
+
+<span class="w">    </span><span class="c">! Cartesian state [x, y, z, vx, vy, vz] in km and km/s</span>
+<span class="w">    </span><span class="n">cartesian</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">42</span><span class="mf">0.040413_wp</span><span class="p">,</span><span class="w"> </span><span class="mi">651</span><span class="mf">2.298337_wp</span><span class="p">,</span><span class="w"> </span><span class="mi">233</span><span class="mf">8.986311_wp</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="o">-</span><span class="mf">7.156474_wp</span><span class="p">,</span><span class="w">  </span><span class="o">-</span><span class="mf">0.443318_wp</span><span class="p">,</span><span class="w">   </span><span class="mf">2.577366_wp</span><span class="p">]</span>
+
+<span class="w">    </span><span class="c">! Convert to Brouwer Mean Short elements [a (km), e, i (deg), raan (deg), aop (deg), ma (deg)]</span>
+<span class="w">    </span><span class="k">call </span><span class="n">cartesian_to_brouwer_mean_short</span><span class="p">(</span><span class="n">mu_earth</span><span class="p">,</span><span class="w"> </span><span class="n">req_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j2_earth</span><span class="p">,</span><span class="w"> </span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="o">=</span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">blms</span><span class="o">=</span><span class="n">blms</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">stat</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s2">"Brouwer Mean Short:"</span><span class="p">,</span><span class="w"> </span><span class="n">blms</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="w">    </span><span class="c">! Convert to Brouwer Mean Long elements</span>
+<span class="w">    </span><span class="k">call </span><span class="n">cartesian_to_brouwer_mean_long</span><span class="p">(</span><span class="n">mu_earth</span><span class="p">,</span><span class="w"> </span><span class="n">req_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j2_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j3_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j4_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j5_earth</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                      </span><span class="n">cartesian</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="o">=</span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">blml</span><span class="o">=</span><span class="n">blml</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">stat</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">        print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s2">"Brouwer Mean Long:"</span><span class="p">,</span><span class="w"> </span><span class="n">blml</span>
+<span class="w">    </span><span class="k">end if</span>
+
+<span class="w">    </span><span class="c">! Convert back to Cartesian</span>
+<span class="w">    </span><span class="k">call </span><span class="n">brouwer_mean_long_to_cartesian</span><span class="p">(</span><span class="n">mu_earth</span><span class="p">,</span><span class="w"> </span><span class="n">req_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j2_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j3_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j4_earth</span><span class="p">,</span><span class="w"> </span><span class="n">j5_earth</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                      </span><span class="n">blml</span><span class="p">,</span><span class="w"> </span><span class="nb">stat</span><span class="o">=</span><span class="nb">stat</span><span class="p">,</span><span class="w"> </span><span class="n">cart</span><span class="o">=</span><span class="n">cartesian_out</span><span class="p">)</span>
+
+<span class="k">end program </span><span class="n">example</span>
+</code></pre></div>
+
+<h2>Adding to Your Project</h2>
+<p>Add <code>brouwer-elements</code> to your <code>fpm.toml</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">[dependencies]</span>
+<span class="n">brouwer_elements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">"https://github.com/jacobwilliams/brouwer-elements.git"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<h2>Documentation</h2>
+<p>The latest API documentation can be found <a href="http://jacobwilliams.github.io/brouwer-elements/">here</a>. This was generated from the source code using <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>.</p>
+<h2>References</h2>
+<ul>
+<li>Brouwer, D., "<a href="https://articles.adsabs.harvard.edu/pdf/1959AJ.....64..378B">Solution of the Problem of Artificial Satellite Theory without Drag</a>," <em>Astronomical Journal</em>, Vol. 64, Nov. 1959, pp. 378-397.</li>
+<li>Lyddane, R. H., "<a href="https://articles.adsabs.harvard.edu/pdf/1963AJ.....68..555L">Small Eccentricities or Inclinations in the Brouwer Theory of the Artificial Satellite</a>," <em>Astronomical Journal</em>, Vol. 68, Oct. 1963, pp. 555-558.</li>
+<li><a href="https://github.com/nasa/GMAT">NASA General Mission Analysis Tool</a> (GMAT), <code>StateConversionUtil.cpp</code>.</li>
+</ul>
+        </div>
+          <div class="col-md-4">
+            <div class="card card-body bg-light">
+              <h2 class="card-title">Developer Info</h2>
+              <h4 class="card-text">Jacob Williams</h4>
+              <p class="card-text"></p>
+                <div class="text-center"><div class="btn-group" role="group">
+                    
+                    <a class="btn btn-lg btn-primary" href="https://github.com/jacobwilliams"><i class="fa fa-github fa-lg"></i></a>
+                    
+                    
+                    
+                    
+                    
+                    
+                </div></div>
+            </div>
+          </div>
+      </div>
+        <div class="row">
+          <hr>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Source Files</h3>
+              <ul><li><a href='sourcefile/brouwer_module.f90.html'>brouwer_module.F90</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/files.html"><em>All source files&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Modules</h3>
+              <ul><li><a href='module/brouwer_module.html'>brouwer_module</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/modules.html"><em>All modules&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-4">
+            <div>
+              <h3>Procedures</h3>
+              <ul><li><a href='proc/alternate_equinoctial_to_blm.html'>alternate_equinoctial_to_blm</a></li><li><a href='proc/brouwer_mean_long_to_cartesian.html'>brouwer_mean_long_to_cartesian</a></li><li><a href='proc/brouwer_mean_long_to_osculating.html'>brouwer_mean_long_to_osculating</a></li><li><a href='proc/brouwer_mean_short_to_cartesian.html'>brouwer_mean_short_to_cartesian</a></li><li><a href='proc/brouwer_mean_short_to_osculating.html'>brouwer_mean_short_to_osculating</a></li><li><a href='proc/cartesian_to_brouwer_mean_long.html'>cartesian_to_brouwer_mean_long</a></li><li><a href='proc/cartesian_to_brouwer_mean_short.html'>cartesian_to_brouwer_mean_short</a></li><li><a href='proc/cartesian_to_keplerian.html'>cartesian_to_keplerian</a></li><li><a href='proc/critical_inclination_t2.html'>critical_inclination_t2</a></li><li><a href='proc/cross.html'>cross</a></li></ul>
+            </div>
+            <div>
+              <ul>
+                <li><a href="./lists/procedures.html"><em>All procedures&hellip;</em></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              brouwer-elements
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
