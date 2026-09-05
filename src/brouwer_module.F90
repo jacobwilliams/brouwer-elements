@@ -53,10 +53,17 @@ module brouwer_module
     real(wp), parameter :: two_pi = 2.0_wp * pi
     real(wp), parameter :: deg2rad = pi / 180.0_wp
     real(wp), parameter :: rad2deg = 180.0_wp / pi
-    real(wp), parameter :: min_brouwer_radper = 1.0_wp !! Minimum periapsis radius for Brouwer-Lyddane Mean Elements (km)
 
     ! Numerical tolerances
-    real(wp), parameter :: parabolic_tol = 1.0e-10_wp !! Tolerance for Keplerian elements
+    real(wp), parameter :: min_brouwer_radper = 1.0e-6_wp  !! Minimum periapsis radius (km)
+    real(wp), parameter :: parabolic_tol      = 1.0e-10_wp !! Tolerance to be considered parabolic (eccentricity close to 1)
+    real(wp), parameter :: zero_ecc_inc_tol   = 1.0e-11_wp !! Tolerance to be considered zero eccentricity and inclination
+    real(wp), parameter :: ztol               = 1.0e-30_wp !! zero tolerance to avoid division by zero
+    real(wp), parameter :: brouwer_iter_tol   = 1.0e-8_wp  !! convergence tolerance for the two brouwer iterations
+                                                           !! note: for some difficult cases, this can't quite be achieved,
+                                                           !! but we don't check since it is as good as can be done with
+                                                           !! the current implementation
+    integer, parameter :: brouwer_maxiter = 100 !! maximum number of iterations for convergence of the brouwer loops
 
     ! Public API
     public :: cartesian_to_brouwer_mean_short
@@ -89,9 +96,6 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: blms !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp), parameter :: tol = 1.0e-8_wp
-        integer, parameter :: maxiter = 100
-
         real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
                                   aeq, aeq2, aeqmean, aeqmean2, cart2
         real(wp) :: radper, emag
@@ -114,7 +118,7 @@ contains
             return
         end if
 
-        if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
+        if (kep(2) >= (1.0_wp - parabolic_tol) .or. kep(2) < 0.0_wp) then
             stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
@@ -149,7 +153,7 @@ contains
         emag = huge(1.0_wp)
         ii = 0
 
-        do while (emag > tol .and. ii < maxiter)
+        do while (emag > brouwer_iter_tol .and. ii < brouwer_maxiter)
 
             call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_short_to_osculating(mu, req, j2, blmean2, stat=stat, kepl=kep2)
@@ -166,12 +170,6 @@ contains
 
             ii = ii + 1
         end do
-        ! note: will not test if we hit this tol since
-        ! it can be too strict sometimes. this is the
-        ! best that can be achieved.
-        ! if (emag > tol) then
-        !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-        ! end if
 
         call alternate_equinoctial_to_blm(aeqmean, blmean)
 
@@ -259,6 +257,11 @@ contains
             return
         end if
 
+        if (eccp > (1.0_wp - parabolic_tol)) then
+            stat = BROUWER_INVALID_ECCENTRICITY
+            return
+        end if
+
         radper = blms(1) * (1.0_wp - blms(2))
         if (radper < min_brouwer_radper) then
             stat = BROUWER_PERIAPSIS_TOO_LOW
@@ -269,11 +272,6 @@ contains
             eccp = -eccp
             meanAnom = meanAnom - pi
             aopp = aopp + pi
-        end if
-
-        if (eccp > 0.99_wp) then
-            stat = BROUWER_INVALID_ECCENTRICITY
-            return
         end if
 
         if (incp > 175.0_wp * deg2rad) then
@@ -318,7 +316,7 @@ contains
                 - 3.0_wp * sin(2.0_wp * aopp + 2.0_wp * tap) - 3.0_wp * eccp * sin(2.0_wp * aopp + tap) &
                 - eccp * sin(2.0_wp * aopp + 3.0_wp * tap))
 
-        if (eccp > 1.0e-11_wp) then ! Avoid singularity at zero eccentricity
+        if (eccp > zero_ecc_inc_tol) then ! Avoid singularity at zero eccentricity
             aop1 = aopp + 3.0_wp * j2 / (2.0_wp * p**2) * ((2.0_wp - 2.5_wp * sin(incp)**2) * (tap - meanAnom + eccp * sin(tap)) &
                + (1.0_wp - 1.5_wp * sin(incp)**2) * ((1.0_wp / eccp) * (1.0_wp - 0.25_wp * eccp**2) * sin(tap) &
                + 0.5_wp * sin(2.0_wp * tap) + (eccp / 12.0_wp) * sin(3.0_wp * tap)) &
@@ -357,7 +355,7 @@ contains
         esinl = (eccp + decc) * sin(meanAnom) + eccpdl * cos(meanAnom)
         ecc1 = sqrt(ecosl**2 + esinl**2)
 
-        if (ecc1 < 1.0e-11_wp) then
+        if (ecc1 < zero_ecc_inc_tol) then
             ma1 = 0.0_wp
         else
             ma1 = atan2(esinl, ecosl)
@@ -372,7 +370,7 @@ contains
         sqr_inc = sqrt(sinhalfisinh**2 + sinhalficosh**2)
         inc1 = 2.0_wp * asin(min(1.0_wp, sqr_inc))
 
-        if (inc1 == 0.0_wp .or. abs(inc1 - pi) < 1.0e-14_wp) then
+        if (inc1 < zero_ecc_inc_tol .or. abs(inc1 - pi) < zero_ecc_inc_tol) then
             raan1 = 0.0_wp
             aop1 = lgh - ma1 - raan1
         else
@@ -437,18 +435,15 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), dimension(6), intent(out) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
 
-        real(wp), parameter :: tol = 1.0e-8_wp
-        integer, parameter :: maxiter = 100
-
-        real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2
-        real(wp), dimension(6) :: aeq, aeq2, aeqmean, aeqmean2, cart2
+        real(wp), dimension(6) :: cart, kep, kep2, blmean, blmean2, &
+                                  aeq, aeq2, aeqmean, aeqmean2, cart2
         real(wp) :: radper, emag
         integer :: pseudostate, ii
 
         stat = BROUWER_SUCCESS
         blml = 0.0_wp
 
-        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
+        if (mu <= ztol .or. req <= ztol) then
             stat = BROUWER_INVALID_MU
             return
         end if
@@ -457,7 +452,7 @@ contains
         call cartesian_to_keplerian(mu, cart, anomaly_type="MA", stat=stat, kepl=kep)
         if (stat /= BROUWER_SUCCESS) return
 
-        if (kep(2) >= 0.99_wp .or. kep(2) < 0.0_wp) then
+        if (kep(2) >= (1.0_wp - parabolic_tol) .or. kep(2) < 0.0_wp) then
             stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
@@ -497,7 +492,7 @@ contains
         emag = huge(1.0_wp)
         ii = 0
 
-        do while (emag > tol .and. ii < maxiter)
+        do while (emag > brouwer_iter_tol .and. ii < brouwer_maxiter)
 
             call alternate_equinoctial_to_blm(aeqmean2, blmean2)
             call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmean2, stat=stat, kepl=kep2)
@@ -514,12 +509,6 @@ contains
 
             ii = ii + 1
         end do
-        ! note: will not test if we hit this tol since
-        ! it can be too strict sometimes. this is the
-        ! best that can be achieved.
-        ! if (emag > tol) then
-        !     stat = BROUWER_ITERATION_DID_NOT_CONVERGE
-        ! end if
 
         call alternate_equinoctial_to_blm(aeqmean, blmean)
 
@@ -570,7 +559,7 @@ contains
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
-        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
+        if (mu <= ztol .or. req <= ztol) then
             stat = BROUWER_INVALID_MU
             return
         end if
@@ -590,7 +579,7 @@ contains
             pseudostate = 0
         end if
 
-        if (eccdp > 0.99_wp) then
+        if (eccdp > (1.0_wp - parabolic_tol)) then
             stat = BROUWER_INVALID_ECCENTRICITY
             return
         end if
@@ -772,9 +761,9 @@ contains
         inc = 2.0_wp * asin(min(1.0_wp, max(-1.0_wp, sqrI)))
         call wrap_0_2pi(inc)
 
-        if (ecc <= 1.0e-11_wp) then
+        if (ecc <= zero_ecc_inc_tol) then
             aop = 0.0_wp
-            if (inc <= 1.0e-7_wp) then
+            if (inc <= zero_ecc_inc_tol) then
                 raan = 0.0_wp
                 ma = blgh
             else
@@ -789,7 +778,7 @@ contains
             ma = atan2(arg1, arg2)
             call wrap_0_2pi(ma)
 
-            if (inc <= 1.0e-7_wp) then
+            if (inc <= zero_ecc_inc_tol) then
                 raan = 0.0_wp
                 aop = blgh - raan - ma
             else
@@ -901,8 +890,6 @@ contains
         real(wp) :: h, n, posMag, velMag, e, zeta, sma, inc, raan, argPeriapsis, trueAnom, anom
         character(len=2) :: anom_type
 
-        real(wp), parameter :: singular_tol = 0.001_wp !! minimum allowed rp (km)
-
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
@@ -912,7 +899,7 @@ contains
             anom_type = "TA"
         end if
 
-        if (abs(mu) < 1.0e-30_wp) then
+        if (abs(mu) < ztol) then
             stat = BROUWER_INVALID_MU
             return
         end if
@@ -923,7 +910,7 @@ contains
         posMag = norm2(pos)
         velMag = norm2(vel)
 
-        if (posMag == 0.0_wp .or. velMag == 0.0_wp) then
+        if (posMag <= ztol .or. velMag <= ztol) then
             stat = BROUWER_DEGENERATE_STATE
             return
         end if
@@ -932,7 +919,7 @@ contains
         angMomentum = cross(pos, vel)
         h = norm2(angMomentum)
 
-        if (h == 0.0_wp) then
+        if (h <= ztol) then
             stat = BROUWER_DEGENERATE_STATE
             return
         end if
@@ -949,15 +936,15 @@ contains
 
         ! Specific energy zeta
         zeta = 0.5_wp * velMag**2 - mu / posMag
-        if (zeta == 0.0_wp .or. abs(1.0_wp - e) <= parabolic_tol) then
+        if (abs(zeta) <= ztol .or. abs(1.0_wp - e) <= parabolic_tol) then
             stat = BROUWER_PARABOLIC_ORBIT
             return
         end if
 
         sma = -mu / (2.0_wp * zeta)
 
-        if (abs(sma * (1.0_wp - e)) < singular_tol) then
-            stat = BROUWER_DEGENERATE_STATE
+        if (abs(sma * (1.0_wp - e)) < min_brouwer_radper) then
+            stat = BROUWER_PERIAPSIS_TOO_LOW
             return
         end if
 
@@ -967,7 +954,7 @@ contains
         argPeriapsis = 0.0_wp
         trueAnom = 0.0_wp
 
-        if (e >= 1.0e-11_wp .and. (inc >= 1.0e-11_wp .and. inc <= (pi - 1.0e-11_wp))) then
+        if (e >= zero_ecc_inc_tol .and. (inc >= zero_ecc_inc_tol .and. inc <= (pi - zero_ecc_inc_tol))) then
             ! Case 1: Non-circular, Inclined Orbit
             if (n == 0.0_wp) then
                 stat = BROUWER_DEGENERATE_STATE
@@ -983,18 +970,18 @@ contains
             trueAnom = acos(min(1.0_wp, max(-1.0_wp, dot_product(eccVec, pos) / (e * posMag))))
             if (dot_product(pos, vel) < 0.0_wp) trueAnom = two_pi - trueAnom
 
-        else if (e >= 1.0e-11_wp .and. (inc < 1.0e-11_wp .or. inc > (pi - 1.0e-11_wp))) then
+        else if (e >= zero_ecc_inc_tol .and. (inc < zero_ecc_inc_tol .or. inc > (pi - zero_ecc_inc_tol))) then
             ! Case 2: Non-circular, Equatorial Orbit
             raan = 0.0_wp
             argPeriapsis = acos(min(1.0_wp, max(-1.0_wp, eccVec(1) / e)))
             if (eccVec(2) < 0.0_wp) argPeriapsis = two_pi - argPeriapsis
-            if (inc > (pi - 1.0e-11_wp)) argPeriapsis = -argPeriapsis
+            if (inc > (pi - zero_ecc_inc_tol)) argPeriapsis = -argPeriapsis
             if (argPeriapsis < 0.0_wp) argPeriapsis = argPeriapsis + two_pi
 
             trueAnom = acos(min(1.0_wp, max(-1.0_wp, dot_product(eccVec, pos) / (e * posMag))))
             if (dot_product(pos, vel) < 0.0_wp) trueAnom = two_pi - trueAnom
 
-        else if (e < 1.0e-11_wp .and. (inc >= 1.0e-11_wp .and. inc <= (pi - 1.0e-11_wp))) then
+        else if (e < zero_ecc_inc_tol .and. (inc >= zero_ecc_inc_tol .and. inc <= (pi - zero_ecc_inc_tol))) then
             ! Case 3: Circular, Inclined Orbit
             if (n == 0.0_wp) then
                 stat = BROUWER_DEGENERATE_STATE
@@ -1013,7 +1000,7 @@ contains
             argPeriapsis = 0.0_wp
             trueAnom = acos(min(1.0_wp, max(-1.0_wp, pos(1) / posMag)))
             if (pos(2) < 0.0_wp) trueAnom = two_pi - trueAnom
-            if (inc > (pi - 1.0e-11_wp)) trueAnom = -trueAnom
+            if (inc > (pi - zero_ecc_inc_tol)) trueAnom = -trueAnom
             if (trueAnom < 0.0_wp) trueAnom = trueAnom + two_pi
         end if
 
@@ -1070,14 +1057,14 @@ contains
             anom = true_anom
         end if
 
+        ! numerator (semi-latus rectum) and denominator (1 + e cos(anom)) for radius
         p = sma * (1.0_wp - ecc**2)
-        if (abs(p) < 1.0e-30_wp) then
+        if (abs(p) < ztol) then
             stat = BROUWER_DEGENERATE_STATE
             return
         end if
-
         onePlusECos = 1.0_wp + ecc * cos(anom)
-        if (onePlusECos < 1.0e-10_wp) then
+        if (onePlusECos < ztol) then
             stat = BROUWER_DEGENERATE_STATE
             return
         end if
@@ -1143,7 +1130,7 @@ contains
         real(wp) :: cosTa, eccCosTa, sinEa, cosEa
 
         ea = 0.0_wp
-        if (ecc <= (1.0_wp - 1.0e-11_wp)) then
+        if (ecc <= (1.0_wp - parabolic_tol)) then
             cosTa = cos(ta_radians)
             eccCosTa = ecc * cosTa
             sinEa = (sqrt(max(0.0_wp, 1.0_wp - ecc**2)) * sin(ta_radians)) / (1.0_wp + eccCosTa)
@@ -1182,7 +1169,6 @@ contains
         integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
         real(wp), intent(out) :: ta !! True anomaly in radians [0, 2*pi)
 
-        real(wp), parameter :: ztol = 1.0e-30_wp !! zero tolerance to avoid division by zero
         integer, parameter :: max_iter = 1000 !! maximum number of iterations for Newton-Raphson
 
         real(wp) :: tol_val, rm, e, e1, e2, temp, temp2, c, f, g, f1, f2
@@ -1220,10 +1206,7 @@ contains
                 end if
 
                 e1 = e2 - (e2 - ecc * sin(e2) - rm) / temp
-
-                if (abs(e2 - e1) < tol_val) then
-                    done = .true.
-                end if
+                done = (abs(e2 - e1) < tol_val)
                 e2 = e1
             end do
 
@@ -1272,9 +1255,7 @@ contains
                 end if
 
                 f1 = f2 - (ecc * sinh(f2) - f2 - rm) / temp
-                if (abs(f2 - f1) < tol_val) then
-                    done = .true.
-                end if
+                done = (abs(f2 - f1) < tol_val)
                 f2 = f1
             end do
 

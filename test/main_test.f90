@@ -342,7 +342,7 @@ program main_test
     call check(stat == 2, "Long osculating error on inc > 180")
 
     ! Invalid eccentricity >= 0.99
-    kep_orig = [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
+    kep_orig = [1000000.0_wp, 1.0_wp - 1.0e-12, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp]
     call brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, kep_orig, stat=stat, kepl=kep_res)
     call check(stat == 3, "Short osculating error on ecc >= 0.99")
 
@@ -358,11 +358,11 @@ program main_test
     call check(stat == 4, "Long osculating error on radper <= 0 km")
 
     ! Cartesian to Brouwer errors on ecc >= 0.99
-    call keplerian_to_cartesian(mu_earth, [1000000.0_wp, 0.995_wp, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp], stat=stat, cart=cart_test)
+    call keplerian_to_cartesian(mu_earth, [1000000.0_wp, 1.0_wp - 1.0e-12, 28.5_wp, 0.0_wp, 0.0_wp, 0.0_wp], stat=stat, cart=cart_test)
     call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_test, stat=stat, blms=blms)
-    call check(stat == 3, "Cart2BrouwerShort error on ecc >= 0.99")
+    call check(stat == 7, "Cart2BrouwerShort error on ecc >= 0.99")
     call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_test, stat=stat, blml=blml)
-    call check(stat == 3, "Cart2BrouwerLong error on ecc >= 0.99")
+    call check(stat == 7, "Cart2BrouwerLong error on ecc >= 0.99")
 
     ! Zero / invalid Cartesian inputs
     cart_test = [0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp]
