@@ -377,6 +377,61 @@ program main_test
     call keplerian_to_cartesian(mu_earth, kep_res, stat=stat, cart=cart_test)
     call check(stat == 6, "Kep2Cart error on singular p")
 
+    ! -------------------------------------------------------------
+    ! Test: Brouwer-Lyddane secular propagation
+    ! -------------------------------------------------------------
+    block
+        real(wp), dimension(6) :: kep_prop, cart_prop0, cart_propt, cart_back
+        real(wp), dimension(6) :: blml_prop0, blml_propt
+        real(wp) :: mean_motion, ldot, gdot, hdot, dt_test, period
+        real(wp) :: n0, p_semilat, theta_c, raan_dot_j2, aop_dot_j2, ma_dot_j2
+
+        kep_prop = [7000.0_wp, 0.01_wp, 51.6_wp, 30.0_wp, 40.0_wp, 10.0_wp]
+        call keplerian_to_cartesian(mu_earth, kep_prop, anomaly_type="TA", stat=stat, cart=cart_prop0)
+        call check(stat == 0, "Propagate: setup keplerian_to_cartesian")
+
+        period = 2.0_wp * pi * sqrt(kep_prop(1)**3 / mu_earth)
+        dt_test = 3.3_wp * period
+
+        ! Forward then backward propagation should return to the original state.
+        call brouwer_lyddane_propagate(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                                        cart_prop0, dt_test, stat, cart_propt)
+        call check(stat == 0, "Propagate forward: status")
+        call brouwer_lyddane_propagate(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                                        cart_propt, -dt_test, stat, cart_back)
+        call check(stat == 0, "Propagate backward: status")
+        diff = norm2(cart_prop0 - cart_back) / norm2(cart_prop0)
+        call check(diff < 1.0e-8_wp, "Propagate forward/backward roundtrip")
+
+        ! Semi-major axis, eccentricity, and inclination have no secular drift.
+        call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                                             cart_prop0, stat=stat, blml=blml_prop0)
+        call check(stat == 0, "Propagate: cartesian_to_brouwer_mean_long epoch")
+        call propagate_brouwer_mean_long(mu_earth, req_earth, j2_earth, j4_earth, blml_prop0, dt_test, stat, blml_propt)
+        call check(stat == 0, "Propagate: propagate_brouwer_mean_long status")
+        call check(abs(blml_propt(1) - blml_prop0(1)) < 1.0e-9_wp, "Propagate: sma unchanged")
+        call check(abs(blml_propt(2) - blml_prop0(2)) < 1.0e-9_wp, "Propagate: ecc unchanged")
+        call check(abs(blml_propt(3) - blml_prop0(3)) < 1.0e-9_wp, "Propagate: inc unchanged")
+
+        ! Cross-check brouwer_secular_rates against the well-known leading-order
+        ! (J2-only) closed-form secular rates (e.g. Vallado), independent of
+        ! this module's own transcription of the reference BROLYD algorithm.
+        call brouwer_secular_rates(mu_earth, req_earth, j2_earth, j4_earth, blml_prop0, stat, mean_motion, ldot, gdot, hdot)
+        call check(stat == 0, "Propagate: brouwer_secular_rates status")
+
+        n0 = sqrt(mu_earth / blml_prop0(1)**3)
+        p_semilat = blml_prop0(1) * (1.0_wp - blml_prop0(2)**2)
+        theta_c = cos(blml_prop0(3) * deg2rad)
+        raan_dot_j2 = -1.5_wp * n0 * j2_earth * (req_earth / p_semilat)**2 * theta_c
+        aop_dot_j2 = 0.75_wp * n0 * j2_earth * (req_earth / p_semilat)**2 * (5.0_wp * theta_c**2 - 1.0_wp)
+        ma_dot_j2 = 0.75_wp * n0 * j2_earth * (req_earth / p_semilat)**2 &
+                    * sqrt(1.0_wp - blml_prop0(2)**2) * (3.0_wp * theta_c**2 - 1.0_wp)
+
+        call check(abs(hdot - raan_dot_j2) / abs(raan_dot_j2) < 1.0e-2_wp, "Propagate: hdot matches leading-order J2 RAAN rate")
+        call check(abs(gdot - aop_dot_j2) / abs(aop_dot_j2) < 1.0e-2_wp, "Propagate: gdot matches leading-order J2 AOP rate")
+        call check(abs(ldot - ma_dot_j2) / abs(ma_dot_j2) < 1.0e-2_wp, "Propagate: ldot matches leading-order J2 MA rate")
+    end block
+
     print *, "=========================================================="
     if (.not. all_passed) error stop 'TEST FAILURE: One or more tests failed.'
     print *, " ALL TESTS PASSED SUCCESSFULLY!"

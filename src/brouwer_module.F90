@@ -70,10 +70,13 @@ module brouwer_module
     public :: brouwer_mean_short_to_cartesian
     public :: cartesian_to_brouwer_mean_long
     public :: brouwer_mean_long_to_cartesian
+    public :: brouwer_lyddane_propagate
 
     ! Supporting routines
     public :: brouwer_mean_short_to_osculating
     public :: brouwer_mean_long_to_osculating
+    public :: brouwer_secular_rates
+    public :: propagate_brouwer_mean_long
     public :: cartesian_to_keplerian
     public :: keplerian_to_cartesian
     public :: true_to_mean_anomaly
@@ -105,7 +108,7 @@ contains
         stat = BROUWER_SUCCESS
         blms = 0.0_wp
 
-        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
+        if (mu <= ztol .or. req <= ztol) then
             stat = BROUWER_INVALID_MU
             return
         end if
@@ -241,7 +244,7 @@ contains
         stat = BROUWER_SUCCESS
         kepl = 0.0_wp
 
-        if (mu <= 0.0_wp .or. req <= 0.0_wp) then
+        if (mu <= ztol .or. req <= ztol) then
             stat = BROUWER_INVALID_MU
             return
         end if
@@ -834,6 +837,161 @@ contains
         call keplerian_to_cartesian(mu, kepl, anomaly_type="MA", stat=stat, cart=cart)
 
     end subroutine brouwer_mean_long_to_cartesian
+
+    !--------------------------------------------------------------------------
+    !>
+    !  Secular drift rates of the Brouwer mean anomaly, argument of perigee,
+    !  and right ascension of the ascending node, due to the \( J_2 \),
+    !  \( J_2^2 \), and \( J_4 \) zonal harmonics.
+    !
+    !  Semi-major axis, eccentricity, and inclination have no secular drift
+    !  in this theory.
+    !
+    !### Reference
+    !  * This is a modernized version of the algorithm from: E.A. Galbreath,
+    !    "[Brouwer-lyddane orbit generator routine](https://ntrs.nasa.gov/citations/19700033083)",
+    !    NASA X-553-70-223, 1970.
+    !    The code is listed in "NOAA Polar Orbiter Data User's Guide", 1998-11-01,
+    !    [Appendix F](https://www.ncei.noaa.gov/pub/data/cdo/documentation/podguides/TIROS-N%20thru%20N-14/pdf/NCDCPODF.pdf).
+
+    pure subroutine brouwer_secular_rates(mu, req, j2, j4, blml, stat, mean_motion, ldot, gdot, hdot)
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), dimension(6), intent(in) :: blml !! Brouwer mean elements [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
+        real(wp), intent(out) :: mean_motion !! Two-body mean motion (rad/s)
+        real(wp), intent(out) :: ldot !! Secular rate of mean anomaly, in addition to [[mean_motion]] (rad/s)
+        real(wp), intent(out) :: gdot !! Secular rate of argument of perigee (rad/s)
+        real(wp), intent(out) :: hdot !! Secular rate of right ascension of the ascending node (rad/s)
+
+        real(wp) :: smadp, eccdp, incdp, eccdp2, cn2, cn, bk2, bk4, gm2, gmp2, gm4, gmp4, theta, theta2, theta4
+
+        stat = BROUWER_SUCCESS
+        mean_motion = 0.0_wp
+        ldot = 0.0_wp
+        gdot = 0.0_wp
+        hdot = 0.0_wp
+
+        if (mu <= ztol .or. req <= ztol) then
+            stat = BROUWER_INVALID_MU
+            return
+        end if
+
+        smadp = blml(1) / req
+        eccdp = blml(2)
+        incdp = blml(3) * deg2rad
+
+        if (eccdp > (1.0_wp - parabolic_tol) .or. eccdp < 0.0_wp) then
+            stat = BROUWER_INVALID_ECCENTRICITY
+            return
+        end if
+
+        bk2 = 0.5_wp * j2
+        bk4 = -(3.0_wp / 8.0_wp) * j4
+
+        eccdp2 = eccdp * eccdp
+        cn2 = 1.0_wp - eccdp2
+        cn = sqrt(max(0.0_wp, cn2))
+        gm2 = bk2 / (smadp**2)
+        gmp2 = gm2 / (cn2**2)
+        gm4 = bk4 / (smadp**4)
+        gmp4 = gm4 / (cn**8)
+        theta = cos(incdp)
+        theta2 = theta * theta
+        theta4 = theta2 * theta2
+
+        mean_motion = sqrt(mu / (blml(1)**3))
+
+        ldot = cn * mean_motion * (gmp2 * (1.5_wp * (3.0_wp * theta2 - 1.0_wp) &
+               + gmp2 * (3.0_wp / 32.0_wp) * (theta2 * (-96.0_wp * cn + 30.0_wp - 90.0_wp * cn2) &
+               + (16.0_wp * cn + 25.0_wp * cn2 - 15.0_wp) + theta4 * (144.0_wp * cn + 25.0_wp * cn2 + 105.0_wp))) &
+               + eccdp2 * gmp4 * (15.0_wp / 16.0_wp) * (3.0_wp + 35.0_wp * theta4 - 30.0_wp * theta2))
+
+        gdot = mean_motion * ((5.0_wp / 16.0_wp) * gmp4 * ((theta2 * (126.0_wp * cn2 - 270.0_wp) &
+               + theta4 * (385.0_wp - 189.0_wp * cn2)) - 9.0_wp * cn2 + 21.0_wp) &
+               + gmp2 * ((3.0_wp / 32.0_wp) * gmp2 * (theta4 * (45.0_wp * cn2 + 360.0_wp * cn + 385.0_wp) &
+               + theta2 * (90.0_wp - 192.0_wp * cn - 126.0_wp * cn2) + (24.0_wp * cn + 25.0_wp * cn2 - 35.0_wp)) &
+               + 1.5_wp * (5.0_wp * theta2 - 1.0_wp)))
+
+        hdot = mean_motion * (gmp4 * 1.25_wp * theta * (3.0_wp - 7.0_wp * theta2) * (5.0_wp - 3.0_wp * cn2) &
+               + gmp2 * (gmp2 * 0.375_wp * (theta * (12.0_wp * cn + 9.0_wp * cn2 - 5.0_wp) &
+               - theta * theta2 * (5.0_wp * cn2 + 36.0_wp * cn + 35.0_wp)) - 3.0_wp * theta))
+
+    end subroutine brouwer_secular_rates
+
+    !--------------------------------------------------------------------------
+    !>
+    !  Propagates Brouwer-Lyddane mean elements (short and long period terms)
+    !  forward or backward in time, by applying the secular rates from
+    !  [[brouwer_secular_rates]].
+
+    pure subroutine propagate_brouwer_mean_long(mu, req, j2, j4, blml0, dt, stat, blmlt)
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), dimension(6), intent(in) :: blml0 !! Brouwer mean elements at epoch [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+        real(wp), intent(in) :: dt !! Elapsed time from epoch (s). May be negative.
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
+        real(wp), dimension(6), intent(out) :: blmlt !! Brouwer mean elements at epoch + dt [sma(km), ecc, inc(deg), raan(deg), aop(deg), ma(deg)]
+
+        real(wp) :: mean_motion, ldot, gdot, hdot
+
+        call brouwer_secular_rates(mu, req, j2, j4, blml0, stat, mean_motion, ldot, gdot, hdot)
+        if (stat /= BROUWER_SUCCESS) then
+            blmlt = 0.0_wp
+            return
+        end if
+
+        blmlt(1:3) = blml0(1:3)
+        blmlt(4) = blml0(4) + hdot * dt * rad2deg
+        blmlt(5) = blml0(5) + gdot * dt * rad2deg
+        blmlt(6) = blml0(6) + (mean_motion + ldot) * dt * rad2deg
+
+        call wrap_0_360(blmlt(4))
+        call wrap_0_360(blmlt(5))
+        call wrap_0_360(blmlt(6))
+
+    end subroutine propagate_brouwer_mean_long
+
+    !--------------------------------------------------------------------------
+    !>
+    !  Propagates a Cartesian state forward or backward in time using the
+    !  Brouwer-Lyddane mean element theory: the input state is converted to
+    !  Brouwer mean elements (short and long period terms), the secular
+    !  drift is applied over the requested time span, and the resulting mean
+    !  elements are converted back to an osculating Cartesian state.
+
+    pure subroutine brouwer_lyddane_propagate(mu, req, j2, j3, j4, j5, cartesian0, dt, stat, cartesian_t)
+        real(wp), intent(in) :: mu !! Central body gravitational parameter (km^3/s^2)
+        real(wp), intent(in) :: req !! Central body equatorial radius (km)
+        real(wp), intent(in) :: j2 !! Central body J2 zonal harmonic coefficient
+        real(wp), intent(in) :: j3 !! Central body J3 zonal harmonic coefficient
+        real(wp), intent(in) :: j4 !! Central body J4 zonal harmonic coefficient
+        real(wp), intent(in) :: j5 !! Central body J5 zonal harmonic coefficient
+        real(wp), dimension(6), intent(in) :: cartesian0 !! Cartesian state at epoch [x, y, z, vx, vy, vz] (km, km/s)
+        real(wp), intent(in) :: dt !! Elapsed time from epoch (s). May be negative.
+        integer, intent(out) :: stat !! Status: 0 success; /=0 failure.
+        real(wp), dimension(6), intent(out) :: cartesian_t !! Cartesian state at epoch + dt [x, y, z, vx, vy, vz] (km, km/s)
+
+        real(wp), dimension(6) :: blml0, blmlt, kepl_t
+
+        cartesian_t = 0.0_wp
+
+        call cartesian_to_brouwer_mean_long(mu, req, j2, j3, j4, j5, cartesian0, stat, blml0)
+        if (stat /= BROUWER_SUCCESS) return
+
+        call propagate_brouwer_mean_long(mu, req, j2, j4, blml0, dt, stat, blmlt)
+        if (stat /= BROUWER_SUCCESS) return
+
+        call brouwer_mean_long_to_osculating(mu, req, j2, j3, j4, j5, blmlt, stat, kepl_t)
+        if (stat /= BROUWER_SUCCESS) return
+
+        call keplerian_to_cartesian(mu, kepl_t, anomaly_type="MA", stat=stat, cart=cartesian_t)
+
+    end subroutine brouwer_lyddane_propagate
 
     !--------------------------------------------------------------------------
     !>

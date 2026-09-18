@@ -7,7 +7,7 @@
 
 program orbit_prop_test
 
-    use iso_fortran_env, only: error_unit
+    use iso_fortran_env, only: error_unit, int64
     use brouwer_module, wp => brouwer_module_wp
     use ddeabm_module, only: ddeabm_class
     use pyplot_module, only: pyplot
@@ -31,13 +31,14 @@ program orbit_prop_test
 
     ! Initial orbital elements: [sma (km), ecc, inc (deg), raan (deg), aop (deg), ta (deg)]
     real(wp), dimension(6) :: kep_0, cart_0, cart_state, kep_osc, bl_short, bl_long
+    real(wp), dimension(6) :: cart_prop, kep_prop
     real(wp), dimension(n_steps + 1) :: t_hrs
-    real(wp), dimension(n_steps + 1) :: sma_osc, sma_short, sma_long
-    real(wp), dimension(n_steps + 1) :: ecc_osc, ecc_short, ecc_long
-    real(wp), dimension(n_steps + 1) :: inc_osc, inc_short, inc_long
-    real(wp), dimension(n_steps + 1) :: aop_osc, aop_short, aop_long
-    real(wp), dimension(n_steps + 1) :: raan_osc, raan_short, raan_long
-    real(wp), dimension(n_steps + 1) :: ma_osc, ma_short, ma_long
+    real(wp), dimension(n_steps + 1) :: sma_osc, sma_short, sma_long, sma_prop
+    real(wp), dimension(n_steps + 1) :: ecc_osc, ecc_short, ecc_long, ecc_prop
+    real(wp), dimension(n_steps + 1) :: inc_osc, inc_short, inc_long, inc_prop
+    real(wp), dimension(n_steps + 1) :: aop_osc, aop_short, aop_long, aop_prop
+    real(wp), dimension(n_steps + 1) :: raan_osc, raan_short, raan_long, raan_prop
+    real(wp), dimension(n_steps + 1) :: ma_osc, ma_short, ma_long, ma_prop
 
     type(ddeabm_class) :: solver
     type(pyplot) :: plt
@@ -50,6 +51,7 @@ program orbit_prop_test
     real(wp),dimension(3),parameter :: c0 = [0.0_wp, 0.4470_wp, 0.7410_wp]
     real(wp),dimension(3),parameter :: c1 = [0.8500_wp, 0.3250_wp, 0.0980_wp]
     real(wp),dimension(3),parameter :: c2 = [0.9290_wp, 0.6940_wp, 0.1250_wp]
+    real(wp),dimension(3),parameter :: c3 = [0.4940_wp, 0.1840_wp, 0.5560_wp]
 
     integer,dimension(2),parameter :: figsize = [10,5]
 
@@ -75,13 +77,15 @@ program orbit_prop_test
     call cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA", kepl=kep_osc, stat=stat)
     call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state, stat=stat, blms=bl_short)
     call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state, stat=stat, blml=bl_long)
+    call brouwer_lyddane_propagate(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_0, 0.0_wp, stat, cart_prop)
+    call cartesian_to_keplerian(mu_earth, cart_prop, anomaly_type="MA", kepl=kep_prop, stat=stat)
 
-    sma_osc(1) = kep_osc(1);  sma_short(1) = bl_short(1);  sma_long(1) = bl_long(1)
-    ecc_osc(1) = kep_osc(2);  ecc_short(1) = bl_short(2);  ecc_long(1) = bl_long(2)
-    inc_osc(1) = kep_osc(3);  inc_short(1) = bl_short(3);  inc_long(1) = bl_long(3)
-    raan_osc(1) = kep_osc(4); raan_short(1) = bl_short(4); raan_long(1) = bl_long(4)
-    aop_osc(1) = kep_osc(5);  aop_short(1) = bl_short(5);  aop_long(1) = bl_long(5)
-    ma_osc(1) = kep_osc(6);  ma_short(1) = bl_short(6);  ma_long(1) = bl_long(6)
+    sma_osc(1) = kep_osc(1);  sma_short(1) = bl_short(1);  sma_long(1) = bl_long(1);  sma_prop(1) = kep_prop(1)
+    ecc_osc(1) = kep_osc(2);  ecc_short(1) = bl_short(2);  ecc_long(1) = bl_long(2);  ecc_prop(1) = kep_prop(2)
+    inc_osc(1) = kep_osc(3);  inc_short(1) = bl_short(3);  inc_long(1) = bl_long(3);  inc_prop(1) = kep_prop(3)
+    raan_osc(1) = kep_osc(4); raan_short(1) = bl_short(4); raan_long(1) = bl_long(4); raan_prop(1) = kep_prop(4)
+    aop_osc(1) = kep_osc(5);  aop_short(1) = bl_short(5);  aop_long(1) = bl_long(5);  aop_prop(1) = kep_prop(5)
+    ma_osc(1) = kep_osc(6);  ma_short(1) = bl_short(6);  ma_long(1) = bl_long(6);  ma_prop(1) = kep_prop(6)
 
     ! 2. Initialize Integrator
     call solver%initialize(6,maxnum=10000000,df=grav_derivs,rtol=[1.0e-12_wp],atol=[1.0e-12_wp])
@@ -99,18 +103,90 @@ program orbit_prop_test
         call cartesian_to_keplerian(mu_earth, cart_state, anomaly_type="MA", kepl=kep_osc, stat=stat)
         call cartesian_to_brouwer_mean_short(mu_earth, req_earth, j2_earth, cart_state, stat=stat, blms=bl_short)
         call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_state, stat=stat, blml=bl_long)
+        call brouwer_lyddane_propagate(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_0, t_out, stat, cart_prop)
+        call cartesian_to_keplerian(mu_earth, cart_prop, anomaly_type="MA", kepl=kep_prop, stat=stat)
 
-        sma_osc(i + 1) = kep_osc(1);  sma_short(i + 1) = bl_short(1);  sma_long(i + 1) = bl_long(1)
-        ecc_osc(i + 1) = kep_osc(2);  ecc_short(i + 1) = bl_short(2);  ecc_long(i + 1) = bl_long(2)
-        inc_osc(i + 1) = kep_osc(3);  inc_short(i + 1) = bl_short(3);  inc_long(i + 1) = bl_long(3)
-        raan_osc(i + 1) = kep_osc(4); raan_short(i + 1) = bl_short(4); raan_long(i + 1) = bl_long(4)
-        aop_osc(i + 1) = kep_osc(5);  aop_short(i + 1) = bl_short(5);  aop_long(i + 1) = bl_long(5)
-        ma_osc(i + 1) = kep_osc(6);  ma_short(i + 1) = bl_short(6);  ma_long(i + 1) = bl_long(6)
+        sma_osc(i + 1) = kep_osc(1);  sma_short(i + 1) = bl_short(1);  sma_long(i + 1) = bl_long(1);  sma_prop(i + 1) = kep_prop(1)
+        ecc_osc(i + 1) = kep_osc(2);  ecc_short(i + 1) = bl_short(2);  ecc_long(i + 1) = bl_long(2);  ecc_prop(i + 1) = kep_prop(2)
+        inc_osc(i + 1) = kep_osc(3);  inc_short(i + 1) = bl_short(3);  inc_long(i + 1) = bl_long(3);  inc_prop(i + 1) = kep_prop(3)
+        raan_osc(i + 1) = kep_osc(4); raan_short(i + 1) = bl_short(4); raan_long(i + 1) = bl_long(4); raan_prop(i + 1) = kep_prop(4)
+        aop_osc(i + 1) = kep_osc(5);  aop_short(i + 1) = bl_short(5);  aop_long(i + 1) = bl_long(5);  aop_prop(i + 1) = kep_prop(5)
+        ma_osc(i + 1) = kep_osc(6);  ma_short(i + 1) = bl_short(6);  ma_long(i + 1) = bl_long(6);  ma_prop(i + 1) = kep_prop(6)
     end do
 
     print *, "Propagation completed successfully."
 
-    ! 3. Generate Comparative Plots using pyplot-fortran
+    ! 3. Speed Comparison: DDEABM Numerical Integration (grav_derivs force
+    !    model) vs Brouwer-Lyddane Analytic Propagation.
+    !
+    !    Each method is used to answer the same set of "state at time t"
+    !    queries from a fixed epoch. The analytic side converts the epoch
+    !    Cartesian state to Brouwer mean elements ONCE (that osculating ->
+    !    mean conversion is an iterative fixed-point solve, done once per
+    !    epoch in any real use case) and then reuses the O(1), non-iterative
+    !    propagate_brouwer_mean_long / brouwer_mean_long_to_osculating /
+    !    keplerian_to_cartesian chain for every query - the actual cost of
+    !    "propagate to a new time" once you're set up at an epoch.
+    block
+        type(ddeabm_class) :: speed_solver
+        real(wp), dimension(6) :: cart_speed_state, blml_speed0, blml_speedt, kepl_speed, cart_speed_prop
+        real(wp) :: t_speed, elapsed_numerical, elapsed_analytic, speedup
+        integer(int64) :: clock_rate, clock_start, clock_end
+        integer :: j, n_queries, speed_idid, speed_stat
+
+        print *, "=========================================================="
+        print *, " Speed Comparison: DDEABM Integration vs Brouwer-Lyddane Propagation"
+        print *, "=========================================================="
+
+        n_queries = n_steps * 1
+
+        call system_clock(count_rate=clock_rate)
+
+        call speed_solver%initialize(6, maxnum=10000000, df=grav_derivs, rtol=[1.0e-12_wp], atol=[1.0e-12_wp])
+
+        elapsed_numerical = 0.0_wp
+        t_out = real(n_queries, wp) * dt
+        call system_clock(clock_start)
+        do j = 1, n_queries
+            cart_speed_state = cart_0
+            t_speed = 0.0_wp
+            call speed_solver%first_call()
+            call speed_solver%integrate(t_speed, cart_speed_state, t_out, idid=speed_idid)
+            if (speed_idid < 1) error stop "Integrator error in speed test"
+        end do
+        call system_clock(clock_end)
+        elapsed_numerical = elapsed_numerical + real(clock_end - clock_start, wp) / real(clock_rate, wp)
+
+        elapsed_analytic = 0.0_wp
+        t_out = real(n_queries, wp) * dt
+        call system_clock(clock_start)
+        do j = 1, n_queries
+            call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                                                cart_0, stat=speed_stat, blml=blml_speed0)
+            call propagate_brouwer_mean_long(mu_earth, req_earth, j2_earth, j4_earth, blml_speed0, t_out, speed_stat, blml_speedt)
+            call brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, &
+                                                  blml_speedt, speed_stat, kepl_speed)
+            call keplerian_to_cartesian(mu_earth, kepl_speed, anomaly_type="MA", stat=speed_stat, cart=cart_speed_prop)
+        end do
+        call system_clock(clock_end)
+        elapsed_analytic = elapsed_analytic + real(clock_end - clock_start, wp) / real(clock_rate, wp)
+
+        speedup = elapsed_numerical / elapsed_analytic
+
+        print '(A,I0)',      " Number of propagation queries       : ", n_queries
+        print '(A,ES12.5,A)', " DDEABM (grav_derivs) total time     : ", elapsed_numerical, " s"
+        print '(A,ES12.5,A)', " Brouwer-Lyddane propagate total time: ", elapsed_analytic, " s"
+        print '(A,F12.1,A)',  " Speedup (analytic vs numerical)     : ", speedup, "x"
+        if (speedup > 1.0_wp) then
+            print *, "Brouwer-Lyddane propagation was faster for this workload."
+        else
+            print *, "DDEABM propagation was faster for this workload."
+        end if
+
+        print *, "=========================================================="
+    end block
+
+    ! 4. Generate Comparative Plots using pyplot-fortran
     print *, "Generating element plots..."
 
     ! Plot 1: Semi-major Axis Comparison
@@ -122,6 +198,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, sma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, sma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, sma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, sma_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_sma_comparison"//trim(file_suffix)//".png")
 
     ! Plot 2: Eccentricity Comparison
@@ -133,6 +210,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, ecc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, ecc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, ecc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, ecc_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_ecc_comparison"//trim(file_suffix)//".png" )
 
     ! Plot 3: Inclination Comparison
@@ -144,6 +222,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, inc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, inc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, inc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, inc_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_inc_comparison"//trim(file_suffix)//".png")
 
     ! Plot 4: Argument of Periapsis Comparison
@@ -155,6 +234,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, aop_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, aop_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, aop_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, aop_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_aop_comparison"//trim(file_suffix)//".png")
 
     ! Plot 5: RAAN Comparison
@@ -166,6 +246,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, raan_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, raan_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, raan_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, raan_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_raan_comparison"//trim(file_suffix)//".png")
 
     ! Plot 6: Mean Anomaly Comparison
@@ -177,6 +258,7 @@ program orbit_prop_test
     call plt%add_plot(t_hrs, ma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
     call plt%add_plot(t_hrs, ma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
     call plt%add_plot(t_hrs, ma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+    call plt%add_plot(t_hrs, ma_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
     call plt%savefig("brouwer_ma_comparison"//trim(file_suffix)//".png")
 
     print *, "All plots generated successfully: brouwer_*.png"
