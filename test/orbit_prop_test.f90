@@ -24,8 +24,8 @@ program orbit_prop_test
 
     ! Orbit simulation parameters: LEO orbit, ~2 days (approx 30 orbits)
     integer, parameter :: n_steps = 1000
-    real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
-    ! real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
+    ! real(wp), parameter :: t_final = 0.1_wp * 86400.0_wp        ! seconds
+    real(wp), parameter :: t_final = 1.0_wp * 86400.0_wp        ! seconds
     ! real(wp), parameter :: t_final = 80.0_wp * 86400.0_wp        ! seconds
     real(wp), parameter :: dt = t_final / real(n_steps, wp)
 
@@ -52,6 +52,7 @@ program orbit_prop_test
     real(wp),dimension(3),parameter :: c1 = [0.8500_wp, 0.3250_wp, 0.0980_wp]
     real(wp),dimension(3),parameter :: c2 = [0.9290_wp, 0.6940_wp, 0.1250_wp]
     real(wp),dimension(3),parameter :: c3 = [0.4940_wp, 0.1840_wp, 0.5560_wp]
+    real(wp),dimension(3),parameter :: blue = [0.0_wp, 0.0_wp, 1.0_wp]
 
     integer,dimension(2),parameter :: figsize = [10,5]
 
@@ -189,77 +190,12 @@ program orbit_prop_test
     ! 4. Generate Comparative Plots using pyplot-fortran
     print *, "Generating element plots..."
 
-    ! Plot 1: Semi-major Axis Comparison
-    call plt%initialize(title="Semi-Major Axis: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="Semi-major axis $a$ (km)", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, sma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, sma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, sma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, sma_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_sma_comparison"//trim(file_suffix)//".png")
-
-    ! Plot 2: Eccentricity Comparison
-    call plt%initialize(title="Eccentricity: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="Eccentricity $e$", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, ecc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, ecc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, ecc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, ecc_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_ecc_comparison"//trim(file_suffix)//".png" )
-
-    ! Plot 3: Inclination Comparison
-    call plt%initialize(title="Inclination: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="Inclination $i$ (deg)", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, inc_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, inc_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, inc_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, inc_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_inc_comparison"//trim(file_suffix)//".png")
-
-    ! Plot 4: Argument of Periapsis Comparison
-    call plt%initialize(title="Argument of Periapsis: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="Argument of Periapsis $\\omega$ (deg)", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, aop_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, aop_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, aop_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, aop_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_aop_comparison"//trim(file_suffix)//".png")
-
-    ! Plot 5: RAAN Comparison
-    call plt%initialize(title="RAAN: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="RAAN $\\Omega$ (deg)", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, raan_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, raan_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, raan_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, raan_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_raan_comparison"//trim(file_suffix)//".png")
-
-    ! Plot 6: Mean Anomaly Comparison
-    call plt%initialize(title="Mean Anomaly: Osculating vs Brouwer Mean", &
-                        figsize=figsize, &
-                        xlabel="Time (hours)", &
-                        ylabel="Mean Anomaly $M$ (deg)", &
-                        legend = .true.)
-    call plt%add_plot(t_hrs, ma_osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
-    call plt%add_plot(t_hrs, ma_short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
-    call plt%add_plot(t_hrs, ma_long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
-    call plt%add_plot(t_hrs, ma_prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
-    call plt%savefig("brouwer_ma_comparison"//trim(file_suffix)//".png")
+    call make_plot("Semi-Major Axis",     'sma',  "$a$",       "km",  t_hrs, sma_osc,  sma_short,  sma_long,  sma_prop)
+    call make_plot("Eccentricity",        'ecc',  "$e$",       "",    t_hrs, ecc_osc,  ecc_short,  ecc_long,  ecc_prop)
+    call make_plot("Inclination",         'inc',  "$i$",       "deg", t_hrs, inc_osc,  inc_short,  inc_long,  inc_prop)
+    call make_plot("RAAN",                'raan', "$\\Omega$", "deg", t_hrs, raan_osc, raan_short, raan_long, raan_prop)
+    call make_plot("Argument of Perigee", 'aop',  "$\\omega$", "deg", t_hrs, aop_osc,  aop_short,  aop_long,  aop_prop)
+    call make_plot("Mean Anomaly",        'ma',   "$M$",       "deg", t_hrs, ma_osc,   ma_short,   ma_long,   ma_prop)
 
     print *, "All plots generated successfully: brouwer_*.png"
     print *, "=========================================================="
@@ -295,6 +231,42 @@ program orbit_prop_test
     print *, "=========================================================="
 
 contains
+
+    subroutine make_plot(title, element, symbol, units, t_hrs, osc, short, long, prop)
+        !! Make a comparison plot of osculating, short-period, long-period, and propagated orbital elements.
+
+        character(len=*), intent(in) :: title
+        character(len=*), intent(in) :: element
+        character(len=*), intent(in) :: symbol
+        character(len=*), intent(in) :: units
+        real(wp), dimension(:), intent(in) :: t_hrs
+        real(wp), dimension(:), intent(in) :: osc
+        real(wp), dimension(:), intent(in) :: short
+        real(wp), dimension(:), intent(in) :: long
+        real(wp), dimension(:), intent(in) :: prop
+
+        ! comparison of all the computations:
+        call plt%initialize(title=title//": Osculating vs Brouwer Mean", &
+                            figsize=figsize, &
+                            xlabel="Time (hours)", &
+                            ylabel=title//' '//symbol//' ('//units//')', &
+                            legend = .true.)
+        call plt%add_plot(t_hrs, osc,   label="Osculating", linestyle="-", color=c0, linewidth=1)
+        call plt%add_plot(t_hrs, short, label="Brouwer Short-Period Mean", linestyle="--", color=c1)
+        call plt%add_plot(t_hrs, long,  label="Brouwer Long-Period Mean", linestyle=":", color=c2)
+        call plt%add_plot(t_hrs, prop,  label="Brouwer-Lyddane Propagation", linestyle="-.", color=c3)
+        call plt%savefig('brouwer_'//element//'_comparison.png')
+
+        ! difference the brouwer propagated state & the actual integrated state:
+        call plt%initialize(title=title//": Long-Period Mean: Brouwer Propagated vs Integrated Diff", &
+                            figsize=figsize, &
+                            xlabel="Time (hours)", &
+                            ylabel=title//' '//symbol//' ('//units//')', &
+                            legend = .true.)
+        call plt%add_plot(t_hrs, osc-prop,  label="Prop-Long Diff", linestyle="-", color=blue)
+        call plt%savefig("brouwer_"//element//'_prop_diff'//trim(file_suffix)//".png")
+
+    end subroutine make_plot
 
     subroutine grav_derivs(me, t, y, dydt)
         !! Right-hand-side equations of motion with zonal harmonics J2, J3, J4, J5
