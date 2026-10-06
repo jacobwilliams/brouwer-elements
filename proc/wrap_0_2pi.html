@@ -1,0 +1,595 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Brouwer-Lyddane mean orbital elements">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>wrap_0_2pi &ndash; brouwer-elements</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">brouwer-elements </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../sourcefile/brouwer_module.f90.html">Source File</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>wrap_0_2pi
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 0.5% of total for procedures.">5 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/brouwer_module.F90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/brouwer_module.f90.html'>brouwer_module.F90</a></li>
+                <li class="breadcrumb-item"><a href='../module/brouwer_module.html'>brouwer_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">wrap_0_2pi</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/wrap_0_2pi.html#src">wrap_0_2pi</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private pure subroutine wrap_0_2pi(angle)  
+</h2>
+    
+
+    <p>Wraps an angle in radians to the range [0, 2*pi).</p>
+
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-angle"></span>
+              real(kind=wp),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>angle</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Called by</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~wrap_0_2pi~~CalledByGraph Pages: 1 -->
+<svg id="procwrap_0_2piCalledByGraph" width="641pt" height="128pt"
+ viewBox="0.00 0.00 641.00 127.62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~wrap_0_2pi~~CalledByGraph" class="graph" transform="scale(0.57 0.57) rotate(0) translate(4 217.98)">
+<title>proc~~wrap_0_2pi~~CalledByGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-217.98 1111,-217.98 1111,4 -4,4"/>
+<!-- proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node1" class="node">
+<title>proc~wrap_0_2pi</title>
+<polygon fill="none" stroke="black" points="1107,-109.87 1034,-109.87 1034,-85.87 1107,-85.87 1107,-109.87"/>
+<text text-anchor="middle" x="1070.5" y="-95.47" font-family="Helvetica,sans-Serif" font-size="10.50">wrap_0_2pi</text>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node2" class="node">
+<title>proc~brouwer_mean_long_to_osculating</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node2"><a xlink:href="../proc/brouwer_mean_long_to_osculating.html" xlink:title="brouwer_mean_long_to_osculating">
+<polygon fill="#d9534f" stroke="#d9534f" points="629,-185.87 433,-185.87 433,-161.87 629,-161.87 629,-185.87"/>
+<text text-anchor="middle" x="531" y="-171.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_long_to_osculating</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge1" class="edge">
+<title>proc~brouwer_mean_long_to_osculating&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M629.19,-173.65C724.66,-171.27 873.66,-161.69 998,-127.87 1010.69,-124.42 1024.1,-119.24 1035.83,-114.14"/>
+<polygon fill="#000000" stroke="#000000" points="1037.55,-117.21 1045.25,-109.93 1034.69,-110.82 1037.55,-117.21"/>
+</g>
+<!-- proc~mean_to_true_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node4" class="node">
+<title>proc~mean_to_true_anomaly</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node4"><a xlink:href="../proc/mean_to_true_anomaly.html" xlink:title="mean_to_true_anomaly">
+<polygon fill="#d9534f" stroke="#d9534f" points="805,-144.87 667,-144.87 667,-120.87 805,-120.87 805,-144.87"/>
+<text text-anchor="middle" x="736" y="-130.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mean_to_true_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_osculating&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge11" class="edge">
+<title>proc~brouwer_mean_long_to_osculating&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M591.54,-161.85C614.67,-157.17 641.34,-151.79 665.35,-146.94"/>
+<polygon fill="#000000" stroke="#000000" points="666.36,-150.31 675.47,-144.9 664.97,-143.44 666.36,-150.31"/>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node3" class="node">
+<title>proc~brouwer_mean_short_to_osculating</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node3"><a xlink:href="../proc/brouwer_mean_short_to_osculating.html" xlink:title="brouwer_mean_short_to_osculating">
+<polygon fill="#d9534f" stroke="#d9534f" points="631,-36.87 431,-36.87 431,-12.87 631,-12.87 631,-36.87"/>
+<text text-anchor="middle" x="531" y="-22.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_short_to_osculating</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge2" class="edge">
+<title>proc~brouwer_mean_short_to_osculating&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M600.32,-12.83C693.65,0.59 864.62,14.25 998,-36.87 1019.91,-45.27 1039.76,-63.47 1052.96,-77.82"/>
+<polygon fill="#000000" stroke="#000000" points="1050.68,-80.54 1059.92,-85.72 1055.93,-75.91 1050.68,-80.54"/>
+</g>
+<!-- proc~brouwer_mean_short_to_osculating&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge12" class="edge">
+<title>proc~brouwer_mean_short_to_osculating&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M580.23,-36.92C597.2,-42.54 615.81,-50.36 631,-60.87 651.22,-74.86 647.26,-88.21 667,-102.87 674.07,-108.13 682.21,-112.71 690.35,-116.61"/>
+<polygon fill="#000000" stroke="#000000" points="688.91,-119.81 699.47,-120.72 691.79,-113.42 688.91,-119.81"/>
+</g>
+<!-- proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge3" class="edge">
+<title>proc~mean_to_true_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M805.09,-125.7C870.37,-118.83 967.12,-108.65 1023.7,-102.69"/>
+<polygon fill="#000000" stroke="#000000" points="1024.2,-106.16 1033.78,-101.63 1023.47,-99.2 1024.2,-106.16"/>
+</g>
+<!-- proc~true_to_eccentric_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node5" class="node">
+<title>proc~true_to_eccentric_anomaly</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node5"><a xlink:href="../proc/true_to_eccentric_anomaly.html" xlink:title="true_to_eccentric_anomaly">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="998,-69.87 841,-69.87 841,-45.87 998,-45.87 998,-69.87"/>
+<text text-anchor="middle" x="919.5" y="-55.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">true_to_eccentric_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~true_to_eccentric_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge4" class="edge">
+<title>proc~true_to_eccentric_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M965.2,-69.87C983.81,-74.87 1005.37,-80.66 1024.05,-85.67"/>
+<polygon fill="#000000" stroke="#000000" points="1023.25,-89.08 1033.81,-88.29 1025.06,-82.32 1023.25,-89.08"/>
+</g>
+<!-- proc~true_to_mean_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node6" class="node">
+<title>proc~true_to_mean_anomaly</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node6"><a xlink:href="../proc/true_to_mean_anomaly.html" xlink:title="true_to_mean_anomaly">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="805,-93.87 667,-93.87 667,-69.87 805,-69.87 805,-93.87"/>
+<text text-anchor="middle" x="736" y="-79.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">true_to_mean_anomaly</text>
+</a>
+</g>
+</g>
+<!-- proc~true_to_mean_anomaly&#45;&gt;proc~wrap_0_2pi -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge5" class="edge">
+<title>proc~true_to_mean_anomaly&#45;&gt;proc~wrap_0_2pi</title>
+<path fill="none" stroke="#000000" d="M805.09,-85.15C870.37,-88.29 967.12,-92.94 1023.7,-95.67"/>
+<polygon fill="#000000" stroke="#000000" points="1023.62,-99.17 1033.78,-96.15 1023.96,-92.18 1023.62,-99.17"/>
+</g>
+<!-- proc~true_to_mean_anomaly&#45;&gt;proc~true_to_eccentric_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge14" class="edge">
+<title>proc~true_to_mean_anomaly&#45;&gt;proc~true_to_eccentric_anomaly</title>
+<path fill="none" stroke="#000000" d="M805.1,-72.87C813.49,-71.76 822.15,-70.61 830.77,-69.47"/>
+<polygon fill="#000000" stroke="#000000" points="831.41,-72.92 840.87,-68.14 830.49,-65.98 831.41,-72.92"/>
+</g>
+<!-- proc~brouwer_lyddane_propagate -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node7" class="node">
+<title>proc~brouwer_lyddane_propagate</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node7"><a xlink:href="../proc/brouwer_lyddane_propagate.html" xlink:title="brouwer_lyddane_propagate">
+<polygon fill="#d9534f" stroke="#d9534f" points="164,-153.87 0,-153.87 0,-129.87 164,-129.87 164,-153.87"/>
+<text text-anchor="middle" x="82" y="-139.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_lyddane_propagate</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_lyddane_propagate&#45;&gt;proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge6" class="edge">
+<title>proc~brouwer_lyddane_propagate&#45;&gt;proc~brouwer_mean_long_to_osculating</title>
+<path fill="none" stroke="#000000" d="M99.78,-153.98C121.61,-168.9 161.51,-193.44 200,-202.87 296.64,-226.55 413.36,-204.98 478.9,-188.51"/>
+<polygon fill="#000000" stroke="#000000" points="480.15,-191.8 488.96,-185.92 478.41,-185.02 480.15,-191.8"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node10" class="node">
+<title>proc~cartesian_to_brouwer_mean_long</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node10"><a xlink:href="../proc/cartesian_to_brouwer_mean_long.html" xlink:title="cartesian_to_brouwer_mean_long">
+<polygon fill="#d9534f" stroke="#d9534f" points="393,-113.87 202,-113.87 202,-89.87 393,-89.87 393,-113.87"/>
+<text text-anchor="middle" x="297.5" y="-99.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_brouwer_mean_long</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_lyddane_propagate&#45;&gt;proc~cartesian_to_brouwer_mean_long -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge16" class="edge">
+<title>proc~brouwer_lyddane_propagate&#45;&gt;proc~cartesian_to_brouwer_mean_long</title>
+<path fill="none" stroke="#000000" d="M147.06,-129.87C170.7,-125.44 197.69,-120.38 222.16,-115.8"/>
+<polygon fill="#000000" stroke="#000000" points="222.94,-119.21 232.12,-113.93 221.65,-112.33 222.94,-119.21"/>
+</g>
+<!-- proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node13" class="node">
+<title>proc~keplerian_to_cartesian</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node13"><a xlink:href="../proc/keplerian_to_cartesian.html" xlink:title="keplerian_to_cartesian">
+<polygon fill="#d9534f" stroke="#d9534f" points="597.5,-139.87 464.5,-139.87 464.5,-115.87 597.5,-115.87 597.5,-139.87"/>
+<text text-anchor="middle" x="531" y="-125.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">keplerian_to_cartesian</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_lyddane_propagate&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge19" class="edge">
+<title>proc~brouwer_lyddane_propagate&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M164.21,-139.33C246.76,-136.74 373.65,-132.77 454.2,-130.25"/>
+<polygon fill="#000000" stroke="#000000" points="454.38,-133.74 464.27,-129.93 454.17,-126.74 454.38,-133.74"/>
+</g>
+<!-- proc~brouwer_mean_long_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node8" class="node">
+<title>proc~brouwer_mean_long_to_cartesian</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node8"><a xlink:href="../proc/brouwer_mean_long_to_cartesian.html" xlink:title="brouwer_mean_long_to_cartesian">
+<polygon fill="#d9534f" stroke="#d9534f" points="393,-193.87 202,-193.87 202,-169.87 393,-169.87 393,-193.87"/>
+<text text-anchor="middle" x="297.5" y="-179.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_long_to_cartesian</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge7" class="edge">
+<title>proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~brouwer_mean_long_to_osculating</title>
+<path fill="none" stroke="#000000" d="M393.33,-178.59C402.97,-178.26 412.8,-177.92 422.56,-177.58"/>
+<polygon fill="#000000" stroke="#000000" points="422.82,-181.08 432.69,-177.23 422.58,-174.08 422.82,-181.08"/>
+</g>
+<!-- proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge20" class="edge">
+<title>proc~brouwer_mean_long_to_cartesian&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M350.16,-169.82C385.12,-161.67 431.47,-150.85 468.36,-142.25"/>
+<polygon fill="#000000" stroke="#000000" points="469.55,-145.57 478.49,-139.89 467.96,-138.75 469.55,-145.57"/>
+</g>
+<!-- proc~brouwer_mean_short_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node9" class="node">
+<title>proc~brouwer_mean_short_to_cartesian</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node9"><a xlink:href="../proc/brouwer_mean_short_to_cartesian.html" xlink:title="brouwer_mean_short_to_cartesian">
+<polygon fill="#d9534f" stroke="#d9534f" points="395,-71.87 200,-71.87 200,-47.87 395,-47.87 395,-71.87"/>
+<text text-anchor="middle" x="297.5" y="-57.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">brouwer_mean_short_to_cartesian</text>
+</a>
+</g>
+</g>
+<!-- proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~brouwer_mean_short_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge9" class="edge">
+<title>proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~brouwer_mean_short_to_osculating</title>
+<path fill="none" stroke="#000000" d="M378.17,-47.83C398.29,-44.78 420.02,-41.5 440.59,-38.39"/>
+<polygon fill="#000000" stroke="#000000" points="441.21,-41.83 450.58,-36.88 440.17,-34.91 441.21,-41.83"/>
+</g>
+<!-- proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge21" class="edge">
+<title>proc~brouwer_mean_short_to_cartesian&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M367.36,-71.89C376.8,-74.39 386.25,-77.36 395,-80.87 412.4,-87.85 413.71,-95.6 431,-102.87 440.25,-106.76 450.26,-110.15 460.23,-113.08"/>
+<polygon fill="#000000" stroke="#000000" points="459.58,-116.53 470.15,-115.85 461.46,-109.79 459.58,-116.53"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~brouwer_mean_long_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge8" class="edge">
+<title>proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~brouwer_mean_long_to_osculating</title>
+<path fill="none" stroke="#000000" d="M329.82,-113.91C356.49,-123.95 395.96,-138.26 431,-148.87 443.12,-152.54 456.17,-156.11 468.71,-159.35"/>
+<polygon fill="#000000" stroke="#000000" points="468.07,-162.79 478.62,-161.87 469.79,-156.01 468.07,-162.79"/>
+</g>
+<!-- proc~cartesian_to_keplerian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node12" class="node">
+<title>proc~cartesian_to_keplerian</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node12"><a xlink:href="../proc/cartesian_to_keplerian.html" xlink:title="cartesian_to_keplerian">
+<polygon fill="#d9534f" stroke="#d9534f" points="597.5,-93.87 464.5,-93.87 464.5,-69.87 597.5,-69.87 597.5,-93.87"/>
+<text text-anchor="middle" x="531" y="-79.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_keplerian</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~cartesian_to_keplerian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge17" class="edge">
+<title>proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~cartesian_to_keplerian</title>
+<path fill="none" stroke="#000000" d="M393.33,-93.68C413.64,-91.92 434.84,-90.09 454.31,-88.41"/>
+<polygon fill="#000000" stroke="#000000" points="454.66,-91.89 464.32,-87.55 454.06,-84.92 454.66,-91.89"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge22" class="edge">
+<title>proc~cartesian_to_brouwer_mean_long&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M393.33,-112.52C413.64,-114.8 434.84,-117.18 454.31,-119.37"/>
+<polygon fill="#000000" stroke="#000000" points="453.99,-122.86 464.32,-120.49 454.77,-115.9 453.99,-122.86"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_node11" class="node">
+<title>proc~cartesian_to_brouwer_mean_short</title>
+<g id="a_proc~~wrap_0_2pi~~CalledByGraph_node11"><a xlink:href="../proc/cartesian_to_brouwer_mean_short.html" xlink:title="cartesian_to_brouwer_mean_short">
+<polygon fill="#d9534f" stroke="#d9534f" points="395,-29.87 200,-29.87 200,-5.87 395,-5.87 395,-29.87"/>
+<text text-anchor="middle" x="297.5" y="-15.47" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cartesian_to_brouwer_mean_short</text>
+</a>
+</g>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~brouwer_mean_short_to_osculating -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge10" class="edge">
+<title>proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~brouwer_mean_short_to_osculating</title>
+<path fill="none" stroke="#000000" d="M395,-20.79C403.47,-21.05 412.08,-21.31 420.65,-21.56"/>
+<polygon fill="#000000" stroke="#000000" points="420.57,-25.06 430.67,-21.87 420.78,-18.07 420.57,-25.06"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~cartesian_to_keplerian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge18" class="edge">
+<title>proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~cartesian_to_keplerian</title>
+<path fill="none" stroke="#000000" d="M357.91,-29.88C370.22,-32.63 383.07,-35.68 395,-38.87 425.55,-47.04 459.47,-57.85 485.66,-66.59"/>
+<polygon fill="#000000" stroke="#000000" points="484.71,-69.96 495.3,-69.83 486.94,-63.32 484.71,-69.96"/>
+</g>
+<!-- proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~keplerian_to_cartesian -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge23" class="edge">
+<title>proc~cartesian_to_brouwer_mean_short&#45;&gt;proc~keplerian_to_cartesian</title>
+<path fill="none" stroke="#000000" d="M379.77,-30.04C385.17,-32.49 390.31,-35.41 395,-38.87 421.25,-58.27 405.08,-83.05 431,-102.87 438.06,-108.27 446.15,-112.51 454.6,-115.85"/>
+<polygon fill="#000000" stroke="#000000" points="453.66,-119.22 464.25,-119.23 455.98,-112.62 453.66,-119.22"/>
+</g>
+<!-- proc~cartesian_to_keplerian&#45;&gt;proc~true_to_mean_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge15" class="edge">
+<title>proc~cartesian_to_keplerian&#45;&gt;proc~true_to_mean_anomaly</title>
+<path fill="none" stroke="#000000" d="M597.63,-81.87C616.47,-81.87 637.2,-81.87 656.72,-81.87"/>
+<polygon fill="#000000" stroke="#000000" points="656.81,-85.37 666.81,-81.87 656.81,-78.37 656.81,-85.37"/>
+</g>
+<!-- proc~keplerian_to_cartesian&#45;&gt;proc~mean_to_true_anomaly -->
+<g id="proc~~wrap_0_2pi~~CalledByGraph_edge13" class="edge">
+<title>proc~keplerian_to_cartesian&#45;&gt;proc~mean_to_true_anomaly</title>
+<path fill="none" stroke="#000000" d="M597.63,-129.49C616.47,-129.95 637.2,-130.46 656.72,-130.94"/>
+<polygon fill="#000000" stroke="#000000" points="656.72,-134.44 666.81,-131.19 656.9,-127.45 656.72,-134.44"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocwrap_0_2piCalledByGraph = svgPanZoom('#procwrap_0_2piCalledByGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CalledByGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CalledByGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">    </span><span class="k">pure subroutine </span><span class="n">wrap_0_2pi</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+<span class="w">        </span><span class="c">!! Wraps an angle in radians to the range [0, 2*pi).</span>
+<span class="w">        </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">angle</span>
+<span class="w">        </span><span class="n">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">modulo</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span><span class="w"> </span><span class="n">two_pi</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">angle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.0_wp</span><span class="p">)</span><span class="w"> </span><span class="n">angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">angle</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">two_pi</span>
+<span class="w">    </span><span class="k">end subroutine </span><span class="n">wrap_0_2pi</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              brouwer-elements
+ was developed by Jacob Williams<br>              &copy; 2026 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
