@@ -59,7 +59,7 @@ module brouwer_module
     real(wp), parameter :: parabolic_tol      = 1.0e-10_wp !! Tolerance to be considered parabolic (eccentricity close to 1)
     real(wp), parameter :: zero_ecc_inc_tol   = 1.0e-11_wp !! Tolerance to be considered zero eccentricity and inclination
     real(wp), parameter :: ztol               = 1.0e-30_wp !! zero tolerance to avoid division by zero
-    real(wp), parameter :: brouwer_iter_tol   = 1.0e-8_wp  !! convergence tolerance for the two brouwer iterations
+    real(wp), parameter :: brouwer_iter_tol   = 1.0e-13_wp !! convergence tolerance for the two brouwer iterations
                                                            !! note: for some difficult cases, this can't quite be achieved,
                                                            !! but we don't check since it is as good as can be done with
                                                            !! the current implementation
@@ -297,7 +297,7 @@ contains
         gm2 = k2 / (smap**2)
         gm2p = gm2 / (eta**4)
 
-        call mean_to_true_anomaly(meanAnom, eccp, 1.0e-8_wp, stat=stat, ta=tap)
+        call mean_to_true_anomaly(meanAnom, eccp, 1.0e-12_wp, stat=stat, ta=tap)
         if (stat /= BROUWER_SUCCESS) return
         if (tap < 0.0_wp) tap = tap + two_pi
 
@@ -556,7 +556,7 @@ contains
                     sinI2, cosI2, tanI2, a26, a27, &
                     b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, &
                     sma, sn2gta, snf2gd, csf2gd, sn2gd, cs2gd, sin3gd, cs3gd, sn3fgd, cs3fgd, &
-                    sinGD, cosGD, bisubc, blghp, eccdpdl, dltI, sinDH, dlt1e, &
+                    sinGD, cosGD, blghp, eccdpdl, dltI, sinDH, dlt1e, &
                     blgh, dlte, eccdpdl2, eccdpde2, ecc, sinDH2, squar, sqrI, inc, &
                     ma, raan, aop, arg1, arg2
         logical :: pseudostate !! indicates if the orbit inc > 175 degrees
@@ -719,29 +719,19 @@ contains
         cosGD = cos(aopdp)
 
         ! Compute (L+G+H) primed
-        bisubc = t2**2 * ((25.0_wp * theta4 * theta) * (gmp2 * eccdp2))
+        blghp = raandp + aopdp + meanAnom + b3 * cs3gd + b1 * sn2gd + b2 * cosGD
+        call wrap_0_2pi(blghp)
 
-        if (bisubc >= 0.001_wp) then
-            dlt1e = 0.0_wp
-            blghp = 0.0_wp
-            eccdpdl = 0.0_wp
-            dltI = 0.0_wp
-            sinDH = 0.0_wp
-        else
-            blghp = raandp + aopdp + meanAnom + b3 * cs3gd + b1 * sn2gd + b2 * cosGD
-            call wrap_0_2pi(blghp)
-
-            dlt1e = b14 * sinGD + b13 * cs2gd - b15 * sin3gd
-            eccdpdl = b4 * sn2gd - b5 * cosGD + b6 * cs3gd - 0.25_wp * cn2 * cn * gmp2 &
-                      * (2.0_wp * (3.0_wp * theta2 - 1.0_wp) * (adr2 * cn2 + adr + 1.0_wp) * sinta &
-                      + 3.0_wp * (1.0_wp - theta2) * ((-adr2 * cn2 - adr + 1.0_wp) * snf2gd &
-                      + (adr2 * cn2 + adr + (1.0_wp / 3.0_wp)) * sn3fgd))
-            dltI = 0.5_wp * theta * gmp2 * sinI * (eccdp * cs3fgd + 3.0_wp * (eccdp * csf2gd + cs2gta)) &
-                   - (a21 / cn2) * (b8 * sinGD + b7 * cs2gd - b9 * sin3gd)
-            sinDH = (1.0_wp / cosI2) * (0.5_wp * (b12 * cs3gd + b11 * cosGD + b10 * sn2gd &
-                    - 0.5_wp * gmp2 * theta * sinI * (6.0_wp * (eccdp * sinta - meanAnom + tadp) &
-                    - (3.0_wp * (sn2gta + eccdp * snf2gd) + eccdp * sn3fgd))))
-        end if
+        dlt1e = b14 * sinGD + b13 * cs2gd - b15 * sin3gd
+        eccdpdl = b4 * sn2gd - b5 * cosGD + b6 * cs3gd - 0.25_wp * cn2 * cn * gmp2 &
+                  * (2.0_wp * (3.0_wp * theta2 - 1.0_wp) * (adr2 * cn2 + adr + 1.0_wp) * sinta &
+                  + 3.0_wp * (1.0_wp - theta2) * ((-adr2 * cn2 - adr + 1.0_wp) * snf2gd &
+                  + (adr2 * cn2 + adr + (1.0_wp / 3.0_wp)) * sn3fgd))
+        dltI = 0.5_wp * theta * gmp2 * sinI * (eccdp * cs3fgd + 3.0_wp * (eccdp * csf2gd + cs2gta)) &
+               - (a21 / cn2) * (b8 * sinGD + b7 * cs2gd - b9 * sin3gd)
+        sinDH = (1.0_wp / cosI2) * (0.5_wp * (b12 * cs3gd + b11 * cosGD + b10 * sn2gd &
+                - 0.5_wp * gmp2 * theta * sinI * (6.0_wp * (eccdp * sinta - meanAnom + tadp) &
+                - (3.0_wp * (sn2gta + eccdp * snf2gd) + eccdp * sn3fgd))))
 
         blgh = blghp + ((1.0_wp / (cn + 1.0_wp)) * 0.25_wp * eccdp * gmp2 * cn2 &
                * (3.0_wp * (1.0_wp - theta2) * (sn3fgd * ((1.0_wp / 3.0_wp) + adr2 * cn2 + adr) &
@@ -1212,7 +1202,7 @@ contains
         anom = keplerian(6) * deg2rad
 
         if (anom_type == "MA") then
-            call mean_to_true_anomaly(anom, ecc, 1.0e-8_wp, stat=stat, ta=true_anom)
+            call mean_to_true_anomaly(anom, ecc, 1.0e-12_wp, stat=stat, ta=true_anom)
             if (stat /= BROUWER_SUCCESS) return
             anom = true_anom
         end if

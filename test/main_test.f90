@@ -122,11 +122,41 @@ program main_test
     ! -------------------------------------------------------------
     ! Test 4b: Long-Period Critical-Inclination Fallback
     ! -------------------------------------------------------------
-    ! This high-eccentricity, near-critical orbit enters the `bisubc >= 0.001`
-    ! fallback branch in brouwer_mean_long_to_osculating.
+    ! A high-eccentricity, near-critical orbit case.
+    ! The osculating elements must stay within the size of the J2 periodic
+    ! terms of the mean elements, and close to the short-period-only result
+    ! (they differ only by the long-period terms, which are small here).
     blml = [7000.0_wp, 0.5_wp, 60.0_wp, 50.0_wp, 40.0_wp, 80.0_wp]
     call brouwer_mean_long_to_osculating(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml, stat=stat, kepl=kep_res)
-    call check(stat == 0 .and. all(ieee_is_finite(kep_res)), "Long critical-inclination fallback")
+    call check(stat == 0 .and. all(ieee_is_finite(kep_res)), "Long near-critical: status")
+    call check(abs(kep_res(1) - blml(1)) < 100.0_wp,  "Long near-critical: sma near mean value")
+    call check(abs(kep_res(2) - blml(2)) < 0.01_wp,   "Long near-critical: ecc near mean value")
+    call check(abs(kep_res(3) - blml(3)) < 1.0_wp,    "Long near-critical: inc near mean value")
+    call check(angle_diff_deg(kep_res(4), blml(4)) < 2.0_wp, "Long near-critical: raan near mean value")
+    call check(angle_diff_deg(kep_res(5), blml(5)) < 2.0_wp, "Long near-critical: aop near mean value")
+    call check(angle_diff_deg(kep_res(6), blml(6)) < 2.0_wp, "Long near-critical: ma near mean value")
+
+    call brouwer_mean_short_to_osculating(mu_earth, req_earth, j2_earth, blml, stat=stat, kepl=kep_orig)
+    call check(stat == 0, "Long near-critical: short-only reference status")
+    call check(abs(kep_res(1) - kep_orig(1)) < 10.0_wp, "Long near-critical: sma matches short-only")
+    call check(abs(kep_res(2) - kep_orig(2)) < 1.0e-2_wp, "Long near-critical: ecc matches short-only")
+    call check(abs(kep_res(3) - kep_orig(3)) < 0.5_wp,  "Long near-critical: inc matches short-only")
+    call check(angle_diff_deg(kep_res(4), kep_orig(4)) < 1.0_wp, "Long near-critical: raan matches short-only")
+    call check(angle_diff_deg(kep_res(5), kep_orig(5)) < 1.0_wp, "Long near-critical: aop matches short-only")
+    call check(angle_diff_deg(kep_res(6), kep_orig(6)) < 1.0_wp, "Long near-critical: ma matches short-only")
+
+    ! Cartesian roundtrip through the long-period theory for the same orbit:
+    call keplerian_to_cartesian(mu_earth, kep_res, anomaly_type="MA", stat=stat, cart=cart_orig)
+    call check(stat == 0, "Long near-critical: keplerian_to_cartesian")
+    call cartesian_to_brouwer_mean_long(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, cart_orig, stat=stat, blml=blml_roundtrip)
+    call check(stat == 0, "Long near-critical: cartesian_to_brouwer_mean_long")
+    call brouwer_mean_long_to_cartesian(mu_earth, req_earth, j2_earth, j3_earth, j4_earth, j5_earth, blml_roundtrip, stat=stat, cart=cart_long)
+    call check(stat == 0, "Long near-critical: brouwer_mean_long_to_cartesian")
+    diff = norm2(cart_orig - cart_long) / norm2(cart_orig)
+    call check(diff < 1.0e-7_wp, "Long near-critical: Cartesian roundtrip")
+    call check(abs(blml_roundtrip(1) - blml(1)) < 1.0e-6_wp .and. &
+               angle_diff_deg(blml_roundtrip(5), blml(5)) < 1.0e-6_wp, &
+               "Long near-critical: recovers input mean elements")
 
     ! -------------------------------------------------------------
     ! Test 5: Pseudostate Orbit (i > 175 deg)
@@ -447,9 +477,15 @@ contains
             print *, "PASS: ", test_name
         else
             print *, "FAIL: ", test_name
-            all_passed = .false.
             error stop
         end if
     end subroutine check
+
+    pure function angle_diff_deg(a, b) result(d)
+        !! Absolute difference between two angles in degrees, in [0, 180].
+        real(wp), intent(in) :: a, b
+        real(wp) :: d
+        d = abs(modulo(a - b + 180.0_wp, 360.0_wp) - 180.0_wp)
+    end function angle_diff_deg
 
 end program main_test
